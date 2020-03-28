@@ -170,6 +170,9 @@ function executeUnfoldAction(action) {
 		} else {
 			collapseFolder(folders);
 		}
+	} else if (action.type == "valueChange") {
+		var data = JSON.parse(action.data);
+		setValue(findID(data.ids), data.newValue);
 	} else {
 		alert("Unknown action!");
 		console.log(action);
@@ -270,6 +273,23 @@ var revealUnfoldButtons = function(showUnfold) {
 			Ext.getCmp("unfoldingPrimitivesNotes").setValue(data.ids);
 		}
 
+		function saveChangeValue() {
+			if (Ext.getCmp("unfoldingValuePrimitives")) {
+				var newValue = Ext.getCmp("unfoldingNewValue").getValue();
+				var ids = Ext.getCmp("unfoldingValuePrimitives").getValue();
+				selectedNode.set("data", JSON.stringify({
+					newValue: newValue,
+					ids: ids
+				}));
+			}
+		}
+
+		function loadChangeValue() {
+			var data = JSON.parse(selectedNode.get("data"));
+			Ext.getCmp("unfoldingValuePrimitives").setValue(data.ids);
+			Ext.getCmp("unfoldingNewValue").setValue(data.newValue);
+		}
+
 		function saveFolder() {
 			if (Ext.getCmp("modeCombo")) {
 				var mode = Ext.getCmp("modeCombo").getValue();
@@ -288,6 +308,7 @@ var revealUnfoldButtons = function(showUnfold) {
 				}));
 			}
 		}
+		
 
 		function loadFolder() {
 			var data = JSON.parse(selectedNode.get("data"));
@@ -392,6 +413,9 @@ var revealUnfoldButtons = function(showUnfold) {
 				} else if (type == "folder") {
 					configs.getLayout().setActiveItem(6);
 					loadFolder();
+				} else if (type == "valueChange") {
+					configs.getLayout().setActiveItem(8);
+					loadChangeValue();
 				}
 			}
 			
@@ -501,6 +525,17 @@ var revealUnfoldButtons = function(showUnfold) {
 							}
 						},
 						'-', {
+							text: getText('Change Value (Experimental)'),
+							handler: function() {
+								addNewNode({
+									text: getText("Value Change"),
+									data: "{\"newValue\": \"100\", \"ids\": []}",
+									type: "valueChange",
+									leaf: true
+								});
+							}
+						},
+						'-', {
 							text: getText('Run Simulation'),
 							handler: function() {
 								addNewNode({
@@ -592,6 +627,34 @@ var revealUnfoldButtons = function(showUnfold) {
 			}],
 			data: storeData
 		});
+
+
+		storeData = [];
+		prims = findType(["Stock", "Flow", "Variable"]);
+		for (var i = 0; i < prims.length; i++) {
+			var n = getName(prims[i]);
+			storeData.push({
+				pid: getID(prims[i]),
+				pname: isDefined(n) ? n : "--"
+			});
+		}
+
+		//console.log(storeData)
+		storeData.sort(function(a, b) {
+			return a.pname.localeCompare(b.pname);
+		});
+
+		var valuedConfigStore = new Ext.data.JsonStore({
+			fields: [{
+				name: 'pid',
+				type: 'string'
+			}, {
+				name: 'pname',
+				type: 'string'
+			}],
+			data: storeData
+		});
+
 
 
 		var configs = Ext.create('Ext.container.Container', {
@@ -903,11 +966,55 @@ var revealUnfoldButtons = function(showUnfold) {
 							]
 						}
 						
-					
+					]
+				},
+
+				{
+					xtype: "container",
+					padding: 8,
+					bodyStyle: 'background:none',
+					border: false,
+					layout: {
+						type: 'vbox',
+						align: 'stretch'
+					},
+					items: [{
+							xtype: "displayfield",
+							value: getText("New Value") + ":"
+						}, {
+							xtype: "textfield",
+							id: "unfoldingNewValue",
+							hideLabel: true,
+							listeners: {
+								change: saveChangeValue
+							}
+						}, 
+						{
+							xtype: "displayfield",
+							value: getText("Primitives whose values will be changed") + ":",
+							style: {
+								'margin-top': '20px'
+							}
+						},
+						
+						Ext.create('Ext.form.field.Tag', {
+							hideLabel: true,
+							name: 'unfoldingValuePrimitives',
+							filterPickList: true,
+							id: 'unfoldingValuePrimitives',
+							displayField: 'pname',
+							valueField: 'pid',
+							queryMode: 'local',
+							store: valuedConfigStore,
+							emptyText: getText("Primitives"),
+							listeners: {
+								change: saveChangeValue
+							}
+						})
+						
 
 					]
 				}
-
 			]
 		});
 

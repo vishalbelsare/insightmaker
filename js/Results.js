@@ -1944,7 +1944,7 @@ function createResultsWindow(displayInformation, config) {
 		},
 		{
 			type: 'gear',
-			tooltip: 'Edit Tite',
+			tooltip: 'Edit Title',
 			handler: function(){
 				Ext.Msg.prompt('Edit Results Title', 'Enter the title for these simulation results:', function(btn, text){
 					if (btn == 'ok'){
