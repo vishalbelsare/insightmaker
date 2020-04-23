@@ -525,7 +525,7 @@ var revealUnfoldButtons = function(showUnfold) {
 							}
 						},
 						'-', {
-							text: getText('Change Value (Experimental)'),
+							text: getText('Change Value'),
 							handler: function() {
 								addNewNode({
 									text: getText("Value Change"),

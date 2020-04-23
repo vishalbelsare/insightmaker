@@ -1442,7 +1442,10 @@ function createResultsWindow(displayInformation, config) {
 			if (sliderPrimitives(["Variable", "Flow"]).length > 0) {
 				scripter.dockedPanel = Ext.create("Ext.Panel", {
 					xtype: "panel",
-					layout: "fit",
+					layout: {
+						type: "vbox",
+						align: "stretch"
+					},
 					items: [createSliders(["Variable", "Flow"], function(cell, value) {
 						if (!scripter.isFinished) {
 							var val = new Material(value);
