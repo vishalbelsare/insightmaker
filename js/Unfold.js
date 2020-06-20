@@ -147,7 +147,17 @@ function executeUnfoldAction(action) {
 		if (items.length == []) {
 			items = findAll();
 		}
-		setOpacity(items, data.opacity);
+		var ghosts = [];
+		var nonGhosts = [];
+		items.forEach(function(cell) {
+			if (cell.value.nodeName == "Ghost") {
+				ghosts.push(cell)
+			} else {
+				nonGhosts.push(cell);
+			}
+		})
+		setOpacity(nonGhosts, data.opacity);
+		setOpacity(ghosts, data.opacity * .3);
 		graph.getModel().endUpdate();
 	} else if (action.type == "action") {
 		//lastStepTypes.push("diagram")

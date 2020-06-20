@@ -985,6 +985,7 @@ function main() {
 
 	graph.getTooltipForCell = function(cell) {
 		if (linkedResults && cell != null) {
+			cell = orig(cell);
 			var displayInformation = linkedResults.displayInformation;
 			//console.log(displayInformation);
 
