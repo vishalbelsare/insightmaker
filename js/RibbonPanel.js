@@ -1451,14 +1451,6 @@ var RibbonPanel = function(graph, mainPanel, configPanel) {
 							handler: blockUnfold(showUnfoldingWin),
 							scope: this
 						},
-						{
-							hidden: (!is_editor) || is_ebook,
-							text: getText('Publish Article') + "...",
-							glyph: 0xf0f6,
-							tooltip: getText('Create a crisp, static webpage of describing your model'),
-							handler: blockUnfold(articleWindow),
-							scope: this
-						},
 						 '-', {
 							itemId: 'embed_but',
 							text: getText('Embed in Webpage') + "...",
