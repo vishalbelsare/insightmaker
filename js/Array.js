@@ -1,7 +1,7 @@
 "use strict";
 /*
 
-Copyright 2010-2018 Scott Fortmann-Roe. All rights reserved.
+Copyright 2010-2020 Scott Fortmann-Roe. All rights reserved.
 
 This file may distributed and/or modified under the
 terms of the Insight Maker Public License (https://InsightMaker.com/impl).
@@ -10,14 +10,14 @@ terms of the Insight Maker Public License (https://InsightMaker.com/impl).
 
 
 function showArrayWin() {
-	
-	function saveDimension(){
+
+	function saveDimension() {
 		var selected = dimensions.getSelectionModel().getLastSelected();
 		var keys = [];
-		for(var i=0; i < itemsStore.count(); i++){
+		for (var i = 0; i < itemsStore.count(); i++) {
 			keys.push(itemsStore.getAt(i).get("text"));
 		}
-		selected.set("data", JSON.stringify({keys: keys, primitives: boxselect.getValue()}))
+		selected.set("data", JSON.stringify({ keys: keys, primitives: boxselect.getValue() }))
 	}
 
 	var dimensionsStore = new Ext.data.Store({
@@ -30,8 +30,8 @@ function showArrayWin() {
 			type: 'string'
 		}]
 	});
-	
-	if(getSetting().getAttribute("arrays")){
+
+	if (getSetting().getAttribute("arrays")) {
 		dimensionsStore.loadData(JSON.parse(getSetting().getAttribute("arrays")));
 	}
 
@@ -43,17 +43,18 @@ function showArrayWin() {
 		flex: 1,
 		id: "dimensionsGrid",
 		store: dimensionsStore,
+		bufferedRenderer: false,
 		viewConfig: {
 			plugins: {
 				ptype: 'gridviewdragdrop'
 			},
-            headersDisabled: true,
-            markDirty: false
+			headersDisabled: true,
+			markDirty: false
 		},
 		plugins: [dimensionsEditor],
 		columns: [{
 			sortable: false,
-            menuDisabled: true,
+			menuDisabled: true,
 			text: getText("Dimensions"),
 			dataIndex: 'text',
 			flex: 1,
@@ -61,13 +62,13 @@ function showArrayWin() {
 				allowBlank: false
 			}
 		}, {
-            menuDisabled: true,
+			menuDisabled: true,
 			xtype: "actioncolumn",
 			width: 40,
 			items: [{
 				iconCls: "units-remove-icon",
 				tooltip: getText("Delete"),
-				handler: function(grid, rowIndex, columnIndex) {
+				handler: function (grid, rowIndex, columnIndex) {
 					dimensionsStore.remove(dimensionsStore.getAt(rowIndex));
 					config.getLayout().setActiveItem(0);
 				}
@@ -75,21 +76,21 @@ function showArrayWin() {
 		}],
 		listeners: {
 			select: {
-				fn: function(t, record, index, eOpts) {
+				fn: function (t, record, index, eOpts) {
 					var data = JSON.parse(record.get("data"));
 					var keys = data.keys;
 					var primitives = data.primitives;
-					itemsStore.loadData(keys.map(function(x){
-						return {text: x};
+					itemsStore.loadData(keys.map(function (x) {
+						return { text: x };
 					}));
 					boxselect.setValue(primitives);
-					
-					
+
+
 					config.getLayout().setActiveItem(1);
 				}
 			},
 			edit: {
-				fn: function(editor, e) {
+				fn: function (editor, e) {
 					e.record.commit();
 				}
 			}
@@ -98,7 +99,7 @@ function showArrayWin() {
 			glyph: 0xf055,
 			text: getText('Add Dimension'),
 			scope: this,
-			handler: function() {
+			handler: function () {
 				dimensionsEditor.completeEdit();
 				dimensionsStore.add({
 					text: getText("New Dimension"),
@@ -113,8 +114,8 @@ function showArrayWin() {
 		}]
 
 	});
-	
-	
+
+
 	var itemsStore = new Ext.data.Store({
 		fields: [{
 			name: 'text',
@@ -130,15 +131,16 @@ function showArrayWin() {
 		flex: 1,
 		id: "itemsGrid",
 		store: itemsStore,
+		bufferedRenderer: false,
 		viewConfig: {
 			plugins: {
 				ptype: 'gridviewdragdrop'
 			},
 			headersDisabled: true,
-            markDirty: false,
+			markDirty: false,
 			listeners:
 			{
-				drop: function(){
+				drop: function () {
 					saveDimension();
 				}
 			}
@@ -152,15 +154,15 @@ function showArrayWin() {
 			editor: {
 				allowBlank: false
 			},
-            menuDisabled: true
+			menuDisabled: true
 		}, {
 			xtype: "actioncolumn",
 			width: 40,
-            menuDisabled: true,
+			menuDisabled: true,
 			items: [{
 				iconCls: "units-remove-icon",
 				tooltip: getText("Delete"),
-				handler: function(grid, rowIndex, columnIndex) {
+				handler: function (grid, rowIndex, columnIndex) {
 					itemsStore.remove(itemsStore.getAt(rowIndex));
 					saveDimension();
 				}
@@ -168,18 +170,18 @@ function showArrayWin() {
 		}],
 		listeners: {
 			edit: {
-				fn: function(editor, e) {
+				fn: function (editor, e) {
 					e.record.commit();
 					saveDimension();
 				}
 			}
-			
+
 		},
 		bbar: ["->", {
 			glyph: 0xf055,
 			text: getText('Add Key'),
 			scope: this,
-			handler: function() {
+			handler: function () {
 				itemsEditor.completeEdit();
 				itemsStore.add({
 					text: getText("New Key")
@@ -194,8 +196,8 @@ function showArrayWin() {
 		}]
 
 	});
-	
-	
+
+
 
 
 
@@ -210,7 +212,7 @@ function showArrayWin() {
 	}
 
 	//console.log(storeData)
-	storeData.sort(function(a, b) {
+	storeData.sort(function (a, b) {
 		return a.pname.localeCompare(b.pname);
 	});
 
@@ -226,36 +228,36 @@ function showArrayWin() {
 	});
 
 	var boxselect = Ext.create('Ext.form.field.Tag', {
-						hideLabel: true,
-						filterPickList: true,
-						name: 'dimensionPrimitives',
-						id: 'dimensionsPrimitives',
-						displayField: 'pname',
-						valueField: 'pid',
-						queryMode: 'local',
-						store: primitiveConfigStore,
-						emptyText: getText("Data"),
-						listeners: {
-							change: function() {
-								saveDimension();
-							}
-						}
-					});
+		hideLabel: true,
+		filterPickList: true,
+		name: 'dimensionPrimitives',
+		id: 'dimensionsPrimitives',
+		displayField: 'pname',
+		valueField: 'pid',
+		queryMode: 'local',
+		store: primitiveConfigStore,
+		emptyText: getText("Data"),
+		listeners: {
+			change: function () {
+				saveDimension();
+			}
+		}
+	});
 
-	var config = Ext.create('Ext.container.Container',{
+	var config = Ext.create('Ext.container.Container', {
 		flex: 1,
 		layout: 'card',
-	    items: [
-	        {
+		items: [
+			{
 				xtype: "form",
 				padding: 8,
-				bodyStyle : 'background:none',
+				bodyStyle: 'background:none',
 				border: false
 			},
-	        {
+			{
 				xtype: "form",
 				padding: 8,
-				bodyStyle : 'background:none',
+				bodyStyle: 'background:none',
 				border: false,
 				autoScroll: true,
 				layout: {
@@ -265,8 +267,8 @@ function showArrayWin() {
 				items: [
 					items,
 					{
-						xtype:"displayfield",
-						value: getText("Apply dimension to")+":"
+						xtype: "displayfield",
+						value: getText("Apply dimension to") + ":"
 					},
 					boxselect
 				]
@@ -302,27 +304,27 @@ function showArrayWin() {
 			scale: "large",
 			glyph: 0xf05c,
 			text: getText('Cancel'),
-			handler: function() {
+			handler: function () {
 				win.close();
 			}
 		}, {
 			scale: "large",
 			glyph: 0xf00c,
 			text: getText('Apply'),
-			handler: function() {
-			    graph.getModel().beginUpdate();
+			handler: function () {
+				graph.getModel().beginUpdate();
 
 				var data = [];
-				for(var i=0; i<dimensionsStore.count(); i++){
+				for (var i = 0; i < dimensionsStore.count(); i++) {
 					var item = dimensionsStore.getAt(i);
 					data.push({
 						text: item.get("text"),
 						data: item.get("data")
 					})
 				}
-			    var edit = new mxCellAttributeChange(getSetting(), "arrays", JSON.stringify(data));
+				var edit = new mxCellAttributeChange(getSetting(), "arrays", JSON.stringify(data));
 				graph.getModel().execute(edit);
-	
+
 				graph.getModel().endUpdate();
 
 

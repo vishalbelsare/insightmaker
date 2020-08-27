@@ -21,60 +21,26 @@ var isSendingtoServer = false;
 var waitingToSendToServer = false;
 var waitingToSendTimeout = -1;
 function sendGraphtoServer(graph) {
-	if(isSendingtoServer){
+	if (isSendingtoServer) {
 		waitingToSendToServer = true;
-	}else{
-		if(!unfoldingManager.unfolding){
+	} else {
+		if (!unfoldingManager.unfolding) {
 			clearTimeout(waitingToSendTimeout);
 			waitingToSendToServer = false;
 			isSendingtoServer = true;
 
-			Ext.Ajax.request({
-				url: builder_path + '/save.php',
-				method: 'POST',
-				params: {
+			sendToParent({
+				type: 'save',
+				state: {
 					data: getGraphXml(graph),
-					nid: drupal_node_ID,
 					title: graph_title,
 					description: graph_description,
 					tags: graph_tags,
 					has_article: has_article,
 					published: published,
 					groups: JSON.stringify(node_groups)
-				},
-
-				success: function(result, request) {
-					if (parseInt(result.responseText) != result.responseText) {
-						console.log("Insight Save Issue:\n\n" + result.responseText);
-					} else {
-						drupal_node_ID = result.responseText;
-						setSaveEnabled(waitingToSendToServer);
-						updateWindowTitle();
-						setTopLinks();
-
-					}
-				},
-				failure: function(result, request) {
-					console.log("Insight Not Saved:\n\n" + result.responseText);
-					/*Ext.MessageBox.hide();
-		            Ext.MessageBox.show({
-		                title: 'Error',
-		                msg: 'The Insight could not be saved. Please try again later.',
-		                buttons: Ext.MessageBox.OK,
-		                animEl: 'mb9',
-		                icon: Ext.MessageBox.ERROR
-		            });*/
-				},
-				callback: function(){
-					isSendingtoServer = false;
-
-					if(waitingToSendToServer){
-						waitingToSendTimeout = setTimeout(function(){
-							sendGraphtoServer(graph);
-						}, 5*1000); // Wait 5 seconds
-					}
 				}
-			});
+			})
 		}
 	}
 
@@ -132,7 +98,7 @@ function primitives(type) {
 	if (primitiveCache[" " + type]) {
 		return primitiveCache[" " + type];
 	}
-	var myCells = childrenCells(((graph instanceof SimpleNode)?graph.children[0]:graph.getModel().getRoot()).children[0]);
+	var myCells = childrenCells(((graph instanceof SimpleNode) ? graph.children[0] : graph.getModel().getRoot()).children[0]);
 	if (type == null) {
 		primitiveCache[" " + type] = myCells;
 	} else {
@@ -148,7 +114,7 @@ function primitives(type) {
 }
 
 function childrenCells(root) {
-	var myCells = root?root.children:null;
+	var myCells = root ? root.children : null;
 	if (myCells != null) {
 		var additions = [];
 		for (var i = 0; i < myCells.length; i++) {
@@ -188,7 +154,7 @@ function neighborhood(target) {
 		if (target != null) {
 			var flows = [];
 			var links = [];
-			if (["Flow","Link","Transition"].indexOf(target.value.nodeName) > -1) {
+			if (["Flow", "Link", "Transition"].indexOf(target.value.nodeName) > -1) {
 				if (orig(target.source) !== null) {
 					hood.push({
 						item: orig(target.source),
@@ -260,23 +226,23 @@ function neighborhood(target) {
 			}
 		}
 	}
-	hood = hood.filter(function(x){
+	hood = hood.filter(function (x) {
 		return x;
 	});
 	var res = [];
 
 	//Remove duplicated elements
 	for (var i = 0; i < hood.length; i++) {
-		if(hood[i].linkHidden && strictLinks){
+		if (hood[i].linkHidden && strictLinks) {
 			continue;
 		}
 		var found = false;
 		for (var j = 0; j < res.length; j++) {
 			if (res[j].type == hood[i].type && res[j].item.id == hood[i].item.id) {
 				found = true;
-        if (res[j].linkHidden && !hood[i].linkHidden){
-          res[j].linkHidden = false;
-        }
+				if (res[j].linkHidden && !hood[i].linkHidden) {
+					res[j].linkHidden = false;
+				}
 				break;
 			}
 		}
@@ -295,7 +261,7 @@ function neighborhood(target) {
 			var id = orig(agent).getAttribute("Agent");
 			if (id) {
 				var items = getChildren(findID(id));
-				items.forEach(function(x) {
+				items.forEach(function (x) {
 					if (isValued(x) && x.value.nodeName != "Ghost") {
 						res.push({
 							item: x,
@@ -308,7 +274,7 @@ function neighborhood(target) {
 			}
 		}
 
-		return res.sort(function(a, b) {
+		return res.sort(function (a, b) {
 			if (a.name == b.name) {
 				return 0;
 			} else if (a.name > b.name) {
@@ -346,32 +312,6 @@ function setSaveEnabled(e) {
 			b.setText('Saved');
 		}
 	}
-}
-
-function updateWindowTitle() {
-	if (!is_embed) {
-		if (graph_title == "") {
-			document.title = "Untitled Insight | Insight Maker";
-		} else {
-			document.title = graph_title + " | Insight Maker";
-			if(window.history && window.history.replaceState){
-
-				window.history.replaceState('Object', document.title, '/insight/' + drupal_node_ID + "/" + getURLTitle());
-			}
-		}
-	}
-}
-
-function getURLTitle(){
-	var t = graph_title.replace(/&#\d+;/g, "");
-	t = t.replace(/'/g, '');
-	t = t.replace(/[^A-Za-z0-9]/g, "-");
-	t = t.replace(/\-+/g, "-");
-	t = t.replace(/(^\-)|(\-$)/g, "");
-	if(t.toLowerCase().indexOf("embed") == 0){
-		t = "_" + t;
-	}
-	return t;
 }
 
 function hasDisplay() {
@@ -550,7 +490,7 @@ function linkBroken(edge) {
         }*/
 	}
 	if ((edge.getTerminal(false) !== null) && edge.getTerminal(false).value.nodeName == "Converter") {
-		if (typeof(edge.getTerminal(true)) != "undefined") {
+		if (typeof (edge.getTerminal(true)) != "undefined") {
 			if (isValued(edge.getTerminal(true))) {
 				edge.getTerminal(false).setAttribute("Source", orig(edge.getTerminal(true)).id);
 			}
@@ -647,53 +587,126 @@ function updateProperties() {
 				emptyText: "Environment, Health Care, Finance",
 				value: graph_tags,
 				margin: 9
-			}), new Ext.form.field.HtmlEditor({
-				enableColors: false,
-				enableSourceEdit: false,
-				enableFont: false,
-				enableLists: true,
-				enableFontSize: false,
+			}), {
+				xtype: 'fieldcontainer',
 				fieldLabel: 'Description',
-				name: 'sinsightDescription',
-				id: 'sinsightDescription',
 				allowBlank: true,
-				emptyText: "Enter a brief description of the Insight.",
-				value: graph_description,
+				items: [
+					Ext.create('Ext.toolbar.Toolbar', {
+						style: { padding: '6px 0px' },
+						enableOverflow: true,
+						items: [
+							{
+								glyph: 0xf032,
+								tooltip: 'Bold',
+								handler: () => {
+									document.execCommand('bold');
+								}
+							},
+							{
+								glyph: 0xf033,
+								tooltip: 'Italic',
+								handler: () => {
+									document.execCommand('italic');
+								}
+							},
+							{
+								glyph: 0xf0cd,
+								tooltip: 'Underline',
+								handler: () => {
+									document.execCommand('underline');
+								}
+							},
+							'-',
+							{
+								glyph: 0xf036,
+								tooltip: 'Left align',
+								handler: () => {
+									document.execCommand('justifyLeft');
+								}
+							},
+							{
+								glyph: 0xf037,
+								tooltip: 'Center',
+								handler: () => {
+									document.execCommand('justifyCenter');
+								}
+							},
+							{
+								glyph: 0xf038,
+								tooltip: 'Right align',
+								handler: () => {
+									document.execCommand('justifyRight');
+								}
+							},
+							'-',
+							{
+								glyph: 0xf0c1,
+								tooltip: 'Insert link',
+								handler: () => {
+									var url = prompt('Enter a URL')
+									if (url) {
+										document.execCommand('createLink', true, url);
+										$('#sinsightDescription a').attr('target', '_blank');
+									}
+								}
+							},
+							'-',
+							{
+								glyph: 0xf0cb,
+								tooltip: 'Numbered list',
+								handler: () => {
+									document.execCommand('insertOrderedList');
+								}
+							},
+							{
+								glyph: 0xf0ca,
+								tooltip: 'Bullet list',
+								handler: () => {
+									document.execCommand('insertUnorderedList');
+								}
+							}
+						]
+					}),
+					{
+						html: '<div id="sinsightDescription" style="height: 130px; border: solid 1px #cecece; padding: 4px 6px 3px 6px; overflow: auto;" contenteditable>' + clean(graph_description) + '</div>'
+					}
+				],
 				margin: 9,
 				minHeight: 100,
 				flex: 1
-			}),
+			},
 			{
-			        xtype: 'fieldcontainer',
-			        fieldLabel: 'Insight Access',
-			        layout: 'hbox',
-			        defaults: {
-			            flex: 1,
-			            hideLabel: true
-			        },
-					margin: 9,
-			        items: [
-			{
-				xtype: "segmentedbutton",
-				items: [
-				{
-					glyph: 0xf0ac,
-					text: 'Public Insight',
-					pressed: published,
-					id: 'insightPublic',
-					tooltip: "This Insight is public. Anyone can view it, but only you can edit it."
+				xtype: 'fieldcontainer',
+				fieldLabel: 'Insight Access',
+				layout: 'hbox',
+				defaults: {
+					flex: 1,
+					hideLabel: true
 				},
-				{
-					glyph: 0xf084,
-					//iconCls: 'green-icon',
-					text: 'Private Insight',
-					pressed: ! published,
-					tooltip: "This Insight is private. Only people you have given access to can view it."
-				}
+				margin: 9,
+				items: [
+					{
+						xtype: "segmentedbutton",
+						items: [
+							{
+								glyph: 0xf0ac,
+								text: 'Public Insight',
+								pressed: published,
+								id: 'insightPublic',
+								tooltip: "This Insight is public. Anyone can view it, but only you can edit it."
+							},
+							{
+								glyph: 0xf084,
+								text: 'Private Insight',
+								pressed: !published,
+								tooltip: "This Insight is private. Only people you have given access to can view it."
+							}
+						]
+					}
 				]
-			}
-		]}, Ext.create('Ext.form.field.Tag', {
-			hidden: user_groups.length == 0,
+			}, Ext.create('Ext.form.field.Tag', {
+				hidden: user_groups.length == 0,
 				fieldLabel: 'Share with Groups',
 				name: 'sinsightGroups',
 				id: 'sinsightGroups',
@@ -703,24 +716,24 @@ function updateProperties() {
 				store: group_titles,
 				margin: 9
 			})
-		],
+			],
 
 			buttons: [{
 				text: 'Cancel',
 				scale: "large",
 				glyph: 0xf05c,
-				handler: function() {
+				handler: function () {
 					propertiesWin.hide();
 				}
 			}, {
 				glyph: 0xf00c,
 				scale: "large",
 				text: 'Save',
-				handler: function() {
+				handler: function () {
 					if (Ext.getCmp("sinsightTitle").validate()) {
 						propertiesWin.hide();
 						graph_title = Ext.String.trim(Ext.getCmp('sinsightTitle').getValue());
-						graph_description = Ext.String.trim(Ext.getCmp('sinsightDescription').getValue());
+						graph_description = clean(Ext.String.trim($('#sinsightDescription').html()));
 						graph_description = graph_description.replace(/^(\u200b|&nbsp;)/g, "");
 						graph_description = graph_description.replace(/(\u200b|&nbsp;)$/g, "");
 						if (graph_description == "<br>" || graph_description == "<br/>" || graph_description == "\u200b" || graph_description == "&nbsp;") {
@@ -744,7 +757,7 @@ function updateProperties() {
 		if (graph_title != "") {
 			Ext.getCmp('sinsightTitle').setValue(graph_title);
 			Ext.getCmp('sinsightTags').setValue(graph_tags);
-			Ext.getCmp('sinsightDescription').setValue(graph_description);
+			$('#sinsightDescription').html(clean(graph_description));
 		}
 	}
 	propertiesWin.show();
@@ -756,7 +769,7 @@ function isTrue(item) {
 }
 
 function customUnits() {
-	if (typeof(getSetting().getAttribute("Units")) != "undefined") {
+	if (typeof (getSetting().getAttribute("Units")) != "undefined") {
 		var rows = getSetting().getAttribute("Units").split("\n");
 		for (var i = 0; i < rows.length; i++) {
 			rows[i] = rows[i].split("<>");
@@ -864,11 +877,11 @@ function loadBackgroundColor() {
 }
 
 function isUndefined(item) {
-	return typeof(item) == "undefined";
+	return typeof item == "undefined";
 }
 
 function isDefined(item) {
-	return (!isUndefined(item));
+	return !isUndefined(item);
 }
 
 
@@ -898,7 +911,7 @@ function propogateName(cell, oldName) {
 
 		var connected = graph.getConnections(cell);
 		for (var i = 0; i < connected.length; i++) {
-			if((!connected[i].target) || (!connected[i].source)){
+			if ((!connected[i].target) || (!connected[i].source)) {
 				continue;
 			}
 			var neighbor;
@@ -1207,138 +1220,138 @@ function flatten(arr) {
 	return recFlatten(arr);
 }
 
-var downloadButton = function(name){
+var downloadButton = function (name) {
 	return {
-					xtype: 'button',
-					text: 'Download',
-					glyph: 0xf0ed,
-					handler: function(){
-						var grid = this.up("gridpanel");
-						var store = grid.getStore();
-						var columns = grid.columns;//store.fields ? store.fields.items : store.model.prototype.fields.items;
+		xtype: 'button',
+		text: 'Download',
+		glyph: 0xf0ed,
+		handler: function () {
+			var grid = this.up("gridpanel");
+			var store = grid.getStore();
+			var columns = grid.columns;//store.fields ? store.fields.items : store.model.prototype.fields.items;
 
-						var res = "";
+			var res = "";
 
-						res += columns.filter(function(x){
-							return !x.hidden;
-						}).map(function(x){
-								return '"' + (x.text || x.name).replace(/"/g, '""') + '"';
-							}).join(",");
+			res += columns.filter(function (x) {
+				return !x.hidden;
+			}).map(function (x) {
+				return '"' + (x.text || x.name).replace(/"/g, '""') + '"';
+			}).join(",");
 
-				        store.each(function(record, index) {
-					        var cells = [];
-					        columns.forEach(function(col) {
-					            var name = col.name || col.dataIndex;
-					            if(name) {
-					                //if (Ext.isFunction(col.renderer)) {
-					                 // var value = col.renderer(record.get(name), null, record);
-					                //} else {
-					                  var value = ""+record.get(name);
-					                //}
-					                cells.push('"'+value.replace(/"/g, '""')+'"');
-					            }
-					        });
-
-
-				          res += "\r\n" + cells.join(",");
-				        });
-
-						downloadFile(name, res, 'text/csv');
+			store.each(function (record, index) {
+				var cells = [];
+				columns.forEach(function (col) {
+					var name = col.name || col.dataIndex;
+					if (name) {
+						//if (Ext.isFunction(col.renderer)) {
+						// var value = col.renderer(record.get(name), null, record);
+						//} else {
+						var value = "" + record.get(name);
+						//}
+						cells.push('"' + value.replace(/"/g, '""') + '"');
 					}
-				};
+				});
+
+
+				res += "\r\n" + cells.join(",");
+			});
+
+			downloadFile(name, res, 'text/csv');
+		}
+	};
+}
+
+
+function deepClone(target, obj, depth, fn) {
+	var options, name, src, copy, copyIsArray, clone;
+
+	// Only deal with non-null/undefined values
+	if ((options = arguments[1]) != null) {
+		// Extend the base object
+		for (name in options) {
+			src = target[name];
+			copy = options[name];
+
+			// Prevent never-ending loop
+			if (target === copy) {
+				continue;
 			}
-
-
-			function deepClone(target, obj, depth, fn){
-				var options, name, src, copy, copyIsArray, clone;
-
-						// Only deal with non-null/undefined values
-						if ( (options = arguments[ 1 ]) != null ) {
-							// Extend the base object
-							for ( name in options ) {
-								src = target[ name ];
-								copy = options[ name ];
-
-								// Prevent never-ending loop
-								if ( target === copy ) {
-									continue;
-								}
-								if(fn){
-									var x = fn(copy);
-									if(x){
-										target[name] = x;
-										continue;
-									}
-								}
-								// Recurse if we're merging plain objects or arrays
-								if ( depth > 0 && copy && ( (copyIsArray = Array.isArray(copy)) || typeof(copy)=="object" ) ) {
-									if ( copyIsArray ) {
-										copyIsArray = false;
-										clone = src && Array.isArray(src) ? src : [];
-
-									} else {
-										clone = src && typeof(srv)=="object" ? src : {};
-									}
-
-									// Never move original objects, clone them
-									target[ name ] = deepClone( clone, copy, depth-1, fn );
-
-								// Don't bring in undefined values
-								} else if ( copy !== undefined ) {
-									target[ name ] = copy;
-								}
-							}
-						}
-
-					// Return the modified object
-					return target;
-
+			if (fn) {
+				var x = fn(copy);
+				if (x) {
+					target[name] = x;
+					continue;
+				}
 			}
+			// Recurse if we're merging plain objects or arrays
+			if (depth > 0 && copy && ((copyIsArray = Array.isArray(copy)) || typeof (copy) == "object")) {
+				if (copyIsArray) {
+					copyIsArray = false;
+					clone = src && Array.isArray(src) ? src : [];
 
-			function exportSvg() {
-				var scale = graph.view.scale;
-				var bounds = graph.getGraphBounds();
-
-				// Prepares SVG document that holds the output
-				var svgDoc = mxUtils.createXmlDocument();
-				var root = (svgDoc.createElementNS != null) ?
-					svgDoc.createElementNS(mxConstants.NS_SVG, 'svg') : svgDoc.createElement('svg');
-
-				if (root.style != null) {
-					root.style.backgroundColor = '#FFFFFF';
 				} else {
-					root.setAttribute('style', 'background-color:#FFFFFF');
+					clone = src && typeof (srv) == "object" ? src : {};
 				}
 
-				if (svgDoc.createElementNS == null) {
-					root.setAttribute('xmlns', mxConstants.NS_SVG);
-				}
+				// Never move original objects, clone them
+				target[name] = deepClone(clone, copy, depth - 1, fn);
 
-				root.setAttribute('width', Math.ceil(bounds.width * scale + 2) + 'px');
-				root.setAttribute('height', Math.ceil(bounds.height * scale + 2) + 'px');
-				root.setAttribute('xmlns:xlink', mxConstants.NS_XLINK);
-				root.setAttribute('version', '1.1');
+				// Don't bring in undefined values
+			} else if (copy !== undefined) {
+				target[name] = copy;
+			}
+		}
+	}
 
-				// Adds group for anti-aliasing via transform
-				var group = (svgDoc.createElementNS != null) ?
-					svgDoc.createElementNS(mxConstants.NS_SVG, 'g') : svgDoc.createElement('g');
-				group.setAttribute('transform', 'translate(0.5,0.5)');
-				root.appendChild(group);
-				svgDoc.appendChild(root);
+	// Return the modified object
+	return target;
 
-				// Renders graph. Offset will be multiplied with state's scale when painting state.
-				var svgCanvas = new mxSvgCanvas2D(group);
-				svgCanvas.translate(Math.floor(1 / scale - bounds.x), Math.floor(1 / scale - bounds.y));
-				svgCanvas.scale(scale);
+}
 
-				var imgExport = new mxImageExport();
-				imgExport.drawState(graph.getView().getState(graph.model.root), svgCanvas);
+function exportSvg() {
+	var scale = graph.view.scale;
+	var bounds = graph.getGraphBounds();
+
+	// Prepares SVG document that holds the output
+	var svgDoc = mxUtils.createXmlDocument();
+	var root = (svgDoc.createElementNS != null) ?
+		svgDoc.createElementNS(mxConstants.NS_SVG, 'svg') : svgDoc.createElement('svg');
+
+	if (root.style != null) {
+		root.style.backgroundColor = '#FFFFFF';
+	} else {
+		root.setAttribute('style', 'background-color:#FFFFFF');
+	}
+
+	if (svgDoc.createElementNS == null) {
+		root.setAttribute('xmlns', mxConstants.NS_SVG);
+	}
+
+	root.setAttribute('width', Math.ceil(bounds.width * scale + 2) + 'px');
+	root.setAttribute('height', Math.ceil(bounds.height * scale + 2) + 'px');
+	root.setAttribute('xmlns:xlink', mxConstants.NS_XLINK);
+	root.setAttribute('version', '1.1');
+
+	// Adds group for anti-aliasing via transform
+	var group = (svgDoc.createElementNS != null) ?
+		svgDoc.createElementNS(mxConstants.NS_SVG, 'g') : svgDoc.createElement('g');
+	group.setAttribute('transform', 'translate(0.5,0.5)');
+	root.appendChild(group);
+	svgDoc.appendChild(root);
+
+	// Renders graph. Offset will be multiplied with state's scale when painting state.
+	var svgCanvas = new mxSvgCanvas2D(group);
+	svgCanvas.translate(Math.floor(1 / scale - bounds.x), Math.floor(1 / scale - bounds.y));
+	svgCanvas.scale(scale);
+
+	var imgExport = new mxImageExport();
+	imgExport.drawState(graph.getView().getState(graph.model.root), svgCanvas);
 
 
-				var xml = (mxUtils.getXml(root));
+	var xml = (mxUtils.getXml(root));
 
-				downloadFile(
-					"Insight Maker Diagram.svg",
-					xml,
-					"text/svg");
-			};
+	downloadFile(
+		"Insight Maker Diagram.svg",
+		xml,
+		"text/svg");
+};

@@ -1,7 +1,7 @@
 "use strict";
 /*
 
-Copyright 2010-2018 Scott Fortmann-Roe. All rights reserved.
+Copyright 2010-2020 Scott Fortmann-Roe. All rights reserved.
 
 This file may distributed and/or modified under the
 terms of the Insight Maker Public License (https://InsightMaker.com/impl).
@@ -15,7 +15,7 @@ var JavaScriptEditor = Ext.extend(Ext.form.field.TextArea, {
 	triggers: {
 		edit: {
 			hideOnReadOnly: false,
-			handler: function() {
+			handler: function () {
 				this.editorWindow = new JavaScriptWindow({
 					parent: this,
 					code: this.getValue()
@@ -26,12 +26,12 @@ var JavaScriptEditor = Ext.extend(Ext.form.field.TextArea, {
 	},
 
 	listeners: {
-		'keydown': function(field) {
+		'keydown': function (field) {
 			field.setEditable(true);
 		},
-		'beforerender': function() {
+		'beforerender': function () {
 			if (this.regex != undefined) {
-				this.validator = function(value) {
+				this.validator = function (value) {
 					return this.regex.test(value);
 				};
 			}
@@ -58,7 +58,7 @@ function JavaScriptWindow(config) {
 		tools: [{
 			type: 'help',
 			tooltip: getText('Get Help'),
-			callback: function(panel, tool, event) {
+			callback: function (panel, tool, event) {
 				showURL("/sites/default/files/API/files/API-js.html");
 			}
 		}],
@@ -78,7 +78,7 @@ function JavaScriptWindow(config) {
 			scale: "large",
 			glyph: 0xf05c,
 			text: getText('Cancel'),
-			handler: function() {
+			handler: function () {
 				win.close();
 				if (config.parent != "") {
 					config.parent.resumeEvents();
@@ -88,7 +88,7 @@ function JavaScriptWindow(config) {
 			scale: "large",
 			glyph: 0xf00c,
 			text: getText('Apply'),
-			handler: function() {
+			handler: function () {
 				if (config.parent != "") {
 
 					editingRecord.set("value", codeEditor.getValue());
@@ -109,11 +109,11 @@ function JavaScriptWindow(config) {
 
 	});
 
-	me.show = function() {
+	me.show = function () {
 		win.show();
 		codeEditor.focus(true, true);
 		codeEditor.editor.focus();
-		setTimeout(function() {
+		setTimeout(function () {
 			codeEditor.editor.focus();
 		}, 100)
 	}

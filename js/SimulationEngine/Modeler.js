@@ -1,7 +1,7 @@
 "use strict";
 /*
 
-Copyright 2010-2018 Scott Fortmann-Roe. All rights reserved.
+Copyright 2010-2020 Scott Fortmann-Roe. All rights reserved.
 
 This file may distributed and/or modified under the
 terms of the Insight Maker Public License (https://InsightMaker.com/impl).
@@ -23,6 +23,7 @@ function runSimulation(config) {
 	try {
 		return innerRunSimulation(config); //have an inner function call to escape try-catch performance pathologies
 	} catch (err) {
+		console.error(err);
 		return checkErr(err, config);
 	}
 }
@@ -83,7 +84,7 @@ function innerRunSimulation(config) {
 
 	simulate = new Simulator();
 
-	if(config.resultsWindow){
+	if (config.resultsWindow) {
 		//console.log("ABC")
 		simulate.resultsWindow = config.resultsWindow;
 	}
@@ -421,7 +422,7 @@ function innerRunSimulation(config) {
 		times: [],
 		objects: []
 	};
-	model.submodels["base"].agents[0].children.forEach(function(x) {
+	model.submodels["base"].agents[0].children.forEach(function (x) {
 		if (!((x instanceof Action) || (x instanceof Transition))) {
 			simulate.displayInformation.objects.push(x);
 			simulate.displayInformation.ids.push(x.id);
@@ -445,9 +446,9 @@ function innerRunSimulation(config) {
 
 
 	if (config.silent) {
-		if(config.onPause){
+		if (config.onPause) {
 			simulate.run(config);
-		}else{
+		} else {
 			return formatSimResults(simulate.run(config));
 		}
 
@@ -461,18 +462,20 @@ function innerRunSimulation(config) {
 
 
 		var oldSuccess = config.onSuccess;
-		config.onSuccess = function(res) {
+		config.onSuccess = function (res) {
 			updateDisplayed(null);
 
 			simulate.resultsWindow.results = formatSimResults(simulate.results);
 
 			//simulate.tasks.print()
 
-			oldSuccess ? oldSuccess(res) : null;
+			if (oldSuccess) {
+				oldSuccess(res)
+			};
 		}
 
-		config.onCompletedFirstPass = function() {
-			if(config.resultsWindow){
+		config.onCompletedFirstPass = function () {
+			if (config.resultsWindow) {
 				//console.log("foo")
 
 				config.resultsWindow.displayInformation.store.suspendEvents();
@@ -505,7 +508,7 @@ function innerRunSimulation(config) {
 				//window.x = config.resultsWindow.displayInformation.store;
 
 				clearInterval(scripter.animInter);
-				scripter.animInter = setInterval(function() {
+				scripter.animInter = setInterval(function () {
 					scripter.advanceTimer()
 				}, 200);
 
@@ -536,7 +539,7 @@ function innerRunSimulation(config) {
 					}
 				}
 
-			}else{
+			} else {
 				simulate.displayInformation.colors = [];
 				simulate.displayInformation.headers = [];
 				simulate.displayInformation.agents = [];
@@ -573,7 +576,7 @@ function innerRunSimulation(config) {
 							if (simulate.results[id].dataMode == "float") {
 								simulate.displayInformation.renderers.push(commaStr);
 							} else if (simulate.results[id].dataMode == "agents") {
-								simulate.displayInformation.renderers.push(function(x) {
+								simulate.displayInformation.renderers.push(function (x) {
 									return x;
 								});
 							} else {
@@ -658,7 +661,7 @@ function innerRunSimulation(config) {
 
 
 		var oldStep = config.onStep;
-		config.onStep = function(solver) {
+		config.onStep = function (solver) {
 
 			// See if we should sleep to let the main UI update
 
@@ -675,7 +678,7 @@ function innerRunSimulation(config) {
 					updated = true;
 
 
-					simulate.timer = setTimeout(function() {
+					simulate.timer = setTimeout(function () {
 						simulate.resume();
 					}, 20);
 
@@ -689,11 +692,13 @@ function innerRunSimulation(config) {
 
 			// Call any user defined step function
 
-			oldStep ? oldStep(solver) : null;
+			if (oldStep) {
+				oldStep(solver);
+			}
 		}
 
 		var oldError = config.onError;
-		config.onError = function(res) {
+		config.onError = function (res) {
 
 			try {
 				for (var solver in simulate.model.solvers) {
@@ -708,7 +713,9 @@ function innerRunSimulation(config) {
 				simulate.resultsWindow.scripter.finished();
 			}
 
-			oldError ? oldError(res) : null;
+			if (oldError) {
+				oldError(res);
+			};
 		}
 
 		simulate.run(config);
@@ -718,22 +725,22 @@ function innerRunSimulation(config) {
 }
 
 function formatSimResults(res) {
-	var makeMap = function(returnNonVecs){
-		return function(x){
-			if(x instanceof Vector){
-				if(x.names){
+	var makeMap = function (returnNonVecs) {
+		return function (x) {
+			if (x instanceof Vector) {
+				if (x.names) {
 					var r = {};
-					for(var i = 0; i < x.names.length; i++){
+					for (var i = 0; i < x.names.length; i++) {
 						r[x.names[i]] = vecMap(x.items[i]);
 					}
 					return r;
-				}else{
+				} else {
 					return x.items.slice().map(vecMap);
 				}
-			}else{
-				if(returnNonVecs){
+			} else {
+				if (returnNonVecs) {
 					return x;
-				}else{
+				} else {
 					return undefined;
 				}
 			}
@@ -753,10 +760,10 @@ function formatSimResults(res) {
 	for (var i = 0; i < items.length; i++) {
 		res.names[items[i].name] = items[i].id;
 	}
-	res.value = function(item) {
+	res.value = function (item) {
 		return this[item.id].results;
 	};
-	res.lastValue = function(item) {
+	res.lastValue = function (item) {
 		return this[item.id].results[this[item.id].results.length - 1];
 	};
 	if (res.Time) {
@@ -792,7 +799,7 @@ function simpleEquation(eq, scope, primitiveBank, tree) {
 
 function simpleNum(mat, units) {
 	if (mat instanceof Vector) {
-		return new Vector(mat.items.map(function(x) {
+		return new Vector(mat.items.map(function (x) {
 			return simpleNum(x, units);
 		}));
 	}
@@ -815,7 +822,7 @@ function simpleNum(mat, units) {
 
 function simpleUnitsTest(mat, units, primitive, showEditor) {
 	if (mat instanceof Vector) {
-		return new Vector(mat.items.map(function(x) {
+		return new Vector(mat.items.map(function (x) {
 			return simpleUnitsTest(x, units, primitive, showEditor);
 		}));
 	}
@@ -899,9 +906,9 @@ function DNA(cell, id) {
 function getDNA(cell, solvers) {
 	var dna = new DNA(cell);
 	dna.solver = folderSolvers(cell, solvers);
-	if(cell){
+	if (cell) {
 		var p = getParent(cell);
-		if(p){
+		if (p) {
 			dna.frozen = isTrue(getFrozen(p));
 		}
 	}
@@ -954,7 +961,7 @@ function getDNA(cell, solvers) {
 		dna.repeat = isTrue(cell.getAttribute("Repeat"));
 		dna.recalculate = isTrue(cell.getAttribute("Recalculate")) || dna.trigger == "Condition";
 		try {
-			dna.triggerValue = createTree(""+cell.getAttribute("Value"));
+			dna.triggerValue = createTree("" + cell.getAttribute("Value"));
 		} catch (err) {
 			var msg = getText("The trigger for %s has an equation error that must be corrected before the model can be run.", "<i>[" + clean(dna.name) + "]</i>");
 			if (err.substr && err.substr(0, 4) == "MSG:") {
@@ -1244,7 +1251,7 @@ function linkPrimitive(primitive, dna) {
 					}
 				}
 
-				if(! sourceSet){
+				if (!sourceSet) {
 					error("Converter source could not be found. Please redefine it.", dna.cell, false);
 				}
 
@@ -1327,11 +1334,11 @@ function buildPlacements(submodel, items) {
 
 
 	if (submodel.placement == "Random") {
-		submodel.agents.forEach(function(s) {
+		submodel.agents.forEach(function (s) {
 			s.location = new Vector([mult(submodel.geoWidth, new Material(Rand())), mult(submodel.geoHeight, new Material(Rand()))], ['x', 'y']);
 		});
 	} else if (submodel.placement == "Custom Function") {
-		submodel.agents.forEach(function(s) {
+		submodel.agents.forEach(function (s) {
 			var n = getPrimitiveNeighborhood(submodel, submodel.dna);
 			n.self = s;
 			s.location = simpleUnitsTest(simpleEquation(submodel.placementFunction, {
@@ -1360,7 +1367,7 @@ function buildPlacements(submodel, items) {
 		}
 
 		var j = 0;
-		submodel.agents.forEach(function(s) {
+		submodel.agents.forEach(function (s) {
 			var xPos = ((j % wCount) + 0.5) / wCount;
 			var yPos = (Math.floor(j / wCount) + 0.5) / hCount;
 			s.location = simpleUnitsTest(simpleEquation("{x: x*width(self), y: y*height(self)}", {
@@ -1374,7 +1381,7 @@ function buildPlacements(submodel, items) {
 	} else if (submodel.placement == "Ellipse") {
 		tree = trimTree(createTree("{width(self), height(self)}/2+{sin(index(self)/size*2*3.14159), cos(index(self)/size*2*3.14159)}*{width(self), height(self)}/2"), {});
 		var size = new Material(submodel.agents.length);
-		submodel.agents.forEach(function(s) {
+		submodel.agents.forEach(function (s) {
 			s.location = simpleUnitsTest(simpleEquation("{width(self), height(self)}/2+{sin(index(self)/size*2*3.14159), cos(index(self)/size*2*3.14159)}*{width(self), heigh(self)}/2", {
 				"self": s,
 				"size": size,
@@ -1386,12 +1393,12 @@ function buildPlacements(submodel, items) {
 
 		var graph = new Graph();
 
-		var nodes = submodel.agents.map(function(s) {
+		var nodes = submodel.agents.map(function (s) {
 			return graph.newNode({
 				data: s
 			});
 		});
-		var getNode = function(item) {
+		var getNode = function (item) {
 			for (var i = 0; i < nodes.length; i++) {
 
 				if (nodes[i].data.data === item) {
@@ -1400,8 +1407,8 @@ function buildPlacements(submodel, items) {
 			}
 			return null;
 		}
-		submodel.agents.forEach(function(a) {
-			a.connected.forEach(function(target) {
+		submodel.agents.forEach(function (a) {
+			a.connected.forEach(function (target) {
 				graph.newEdge(getNode(a), getNode(target));
 			});
 		});
@@ -1429,14 +1436,14 @@ function buildPlacements(submodel, items) {
 		bb.width = bb.topright.x - bb.bottomleft.x;
 		bb.height = bb.topright.y - bb.bottomleft.y;
 		//console.log(bb);
-		var scalePoint = function(p) {
+		var scalePoint = function (p) {
 			return {
 				x: (p.x - bb.bottomleft.x) / bb.width,
 				y: (p.y - bb.bottomleft.y) / bb.height
 			};
 		}
 
-		layout.eachNode(function(node, point) {
+		layout.eachNode(function (node, point) {
 			var p = scalePoint(point.p);
 			//console.log(scalePoint(p));
 			node.data.data.location = simpleUnitsTest(simpleEquation("{x: x*width(self), y: y*height(self)}", {
@@ -1491,7 +1498,7 @@ function getPrimitiveNeighborhood(primitive, dna) {
 					hood[model.submodels[item.id].DNAs[i].name.toLowerCase()] = new Placeholder(model.submodels[item.id].DNAs[i], primitive);
 				}
 			}
-		} else if(neighbors[k].type != "agent"){
+		} else if (neighbors[k].type != "agent") {
 
 
 
@@ -1666,7 +1673,7 @@ function updateDisplayed(solver) {
 			var period = (simulate.resultsWindow.scripter.combo.getValue() == -1) ? 200 : 100 / Math.min(0.5, simulate.resultsWindow.scripter.combo.getValue());
 
 			var s = simulate.resultsWindow.scripter;
-			simulate.resultsWindow.scripter.animInter = setInterval(function() {
+			simulate.resultsWindow.scripter.animInter = setInterval(function () {
 				s.advanceTimer()
 			}, period);
 		}

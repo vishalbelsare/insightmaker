@@ -46,7 +46,7 @@ Examples:
 
 The following examples illustrate the usage of the API for certain scenarios.
 
-Using Dialogues:
+Using Dialogs:
 
 Ask the user to specify a URL and opens a new web page at the location.
 
@@ -125,7 +125,7 @@ Then from the parent page you can use the following JavaScript syntax to call AP
 
 /*
 
-Group: Dialogues and User Input
+Group: Dialogs and User Input
 
 */
 
@@ -133,7 +133,7 @@ Group: Dialogues and User Input
 /*
 Method: showMessage
 
-Shows a message in a dialogue window.
+Shows a message in a dialog window.
 
 Parameters:
 
@@ -153,7 +153,7 @@ function showMessage(message) {
 /*
 Method: showPrompt
 
-Shows a prompt in a dialogue window and provides a text input for the user to enter a value.
+Shows a prompt in a dialog window and provides a text input for the user to enter a value.
 
 Parameters:
 
@@ -176,7 +176,7 @@ function showPrompt(message, defaultValue) {
 /*
 Method: showChoice
 
-Shows a prompt in a dialogue window and provides the user the option to click "OK" or "Cancel". Returns the value the user clicked as a boolean.
+Shows a prompt in a dialog window and provides the user the option to click "OK" or "Cancel". Returns the value the user clicked as a boolean.
 
 Parameters:
 
@@ -209,8 +209,8 @@ url - The URL to show.
 
 function showURL(url) {
 	var win = window.open(url, '', 'scrollbars=yes,menubar=yes,height=500,width=700,resizable=yes,toolbar=yes,location=yes,status=yes');
-	if (open == win || typeof(win)=='undefined'){
-		Ext.Msg.alert('', "<big><big><center><a href='"+url+"' target='_blank'><i class='fa fa-external-link-square'></i> Open Link</a></center></big></big>")
+	if (open == win || typeof (win) == 'undefined') {
+		Ext.Msg.alert('', "<big><big><center><a href='" + url + "' target='_blank'><i class='fa fa-external-link-square'></i> Open Link</a></center></big></big>")
 	}
 }
 
@@ -228,11 +228,11 @@ type - The type of file
 */
 
 function downloadFile(fileName, data, type) {
-    var a = document.createElement("a");
-    document.body.appendChild(a);
-	
-	var blob = new Blob([data], {type: type || "octet/stream"}),
-	    url = window.URL.createObjectURL(blob);
+	var a = document.createElement("a");
+	document.body.appendChild(a);
+
+	var blob = new Blob([data], { type: type || "octet/stream" }),
+		url = window.URL.createObjectURL(blob);
 	a.href = url;
 	a.download = fileName;
 	a.click();
@@ -566,7 +566,7 @@ function showData(title, tabs, size) {
 		}]
 	});
 
-	win.on('minimize', function(w) {
+	win.on('minimize', function (w) {
 		if (w.expandedState) {
 			w.expandedState = false;
 			w.collapse();
@@ -585,7 +585,7 @@ function showData(title, tabs, size) {
 /*
 Method: frontWindow
 
-Gets the frontmost window (if one exists).
+Gets the front-most window (if one exists).
 
 Returns:
 
@@ -621,12 +621,12 @@ Note that this function needs to be called as a direct result of user actions (s
 
 Parameters:
 
-config - A configuraiton object with the following optional properties:
+config - A configuration object with the following optional properties:
 multiple - If false, only a single file may be selected; if true, one or more files may be selected at a time.
 accept - A string containing a MIME file type to filter file selection. If defined, only files matching the specified type may be selected. For example, "image/*" may be used to only accept image files.
 read - If defined the selected files will be opened and their contents loaded. Read may either be "binary" in which case the contents is loaded as a binary string, "text" in which case the contents is loaded as a regular text string, or "xlsx" in which case an Excel file is loaded as an object.
 onCompleted - A function to handle results. The openFile function is asynchronous. Once it completes, the callback function is called with the resulting data as a parameter.
-onError - A function to handle the occurence of an error.
+onError - A function to handle the occurrence of an error.
 onSelected - A function fired once files have been selected but before data has been read.
 
 Returns:
@@ -635,7 +635,7 @@ The openFile function is asynchronous and returns nothing directly. On the succe
 
 If config.multiple is false, these results are a single file object. If config.multiple is true, then these results are an array of file objects. Each file object has the following properties:
 
-file - The orginal file object.
+file - The original file object.
 name - The name of the selected file.
 type - The type of the selected file.
 size - The size of the selected file.
@@ -682,7 +682,7 @@ function openFile(config) {
 	var res = null;
 
 	var loadCount = 0;
-	var handleLoad = function() {
+	var handleLoad = function () {
 		$(opener).remove();
 
 		if (!res.length) {
@@ -696,7 +696,7 @@ function openFile(config) {
 
 	}
 
-	var processFile = function(file) {
+	var processFile = function (file) {
 		var data = {};
 		data.file = file;
 		data.size = file.size;
@@ -704,10 +704,10 @@ function openFile(config) {
 		data.type = file.type;
 
 		var reader = new FileReader();
-		reader.onloadend = function(evt) {
+		reader.onloadend = function (evt) {
 			if (config.read == "xlsx") {
-				require(['jszip'], function() {
-					require(['xlsx'], function() {
+				require(['jszip'], function () {
+					require(['xlsx'], function () {
 						data.contents = XLSX.read(reader.result, {
 							type: "binary"
 						});
@@ -719,7 +719,7 @@ function openFile(config) {
 				handleLoad();
 			}
 		};
-		reader.onerror = function() {
+		reader.onerror = function () {
 			if (config.onError) {
 				config.onError(reader.error)
 			} else {
@@ -729,7 +729,7 @@ function openFile(config) {
 			}
 		};
 
-		reader.onabort = function() {
+		reader.onabort = function () {
 			if (config.onError) {
 				config.onError(reader.error)
 			} else {
@@ -755,7 +755,7 @@ function openFile(config) {
 		return data;
 	}
 
-	var callback = function() {
+	var callback = function () {
 
 		var files = opener.files;
 
@@ -772,7 +772,7 @@ function openFile(config) {
 			if (!config.multiple) {
 				res = processFile(files[0]);
 			} else {
-				res = Array.prototype.slice.call(files).map(function(x) {
+				res = Array.prototype.slice.call(files).map(function (x) {
 					return processFile(x);
 				});
 			}
@@ -854,7 +854,7 @@ Examples:
 
 function runModel(config) {
 	if (simulationRunning()) {
-		if( (!simulate.config.silent) && (! config.resultsWindow) ){
+		if ((!simulate.config.silent) && (!config.resultsWindow)) {
 			mxUtils.alert(getText("You have an existing simulation running that has not yet completed. Either close the results window or press the window's 'Stop' button. You may then run a new simulation."));
 			simulate.resultsWindow.show();
 			return;
@@ -862,7 +862,7 @@ function runModel(config) {
 	}
 
 	if (isUndefined(config)) {
-		config = {silent: graph instanceof SimpleNode};
+		config = { silent: graph instanceof SimpleNode };
 	} else if (typeof config == 'boolean') {
 		config = {
 			silent: config
@@ -888,17 +888,17 @@ Saves the model.
 
 Parameters:
 
-dialogue - Pass true to show the properties dialogues (e.g. name, description, tags). The dialogue is always shown if this is the first save.
+dialog - Pass true to show the properties dialog (e.g. name, description, tags). The dialog is always shown if this is the first save.
 
 */
 
 
 
-function saveModel(dialogue) {
-	if (dialogue || graph_title == "") {
+function saveModel(dialog) {
+	if (dialog || graph_title == "") {
 		updateProperties();
 	} else {
-		if(!unfoldingManager.unfolding){
+		if (!unfoldingManager.unfolding) {
 			sendGraphtoServer(graph);
 		}
 	}
@@ -913,12 +913,12 @@ Removes all primitives from the model.
 
 
 function clearModel() {
-	if(graph instanceof SimpleNode){
-		graph.children[0].children[0].children = graph.children[0].children[0].children.filter(function(x){
+	if (graph instanceof SimpleNode) {
+		graph.children[0].children[0].children = graph.children[0].children[0].children.filter(function (x) {
 			return x.value.nodeName == "Setting";
 		});
 		clearPrimitiveCache();
-	}else{
+	} else {
 		graph.getModel().beginUpdate();
 		graph.allowButtonSelect = true;
 		graph.selectAll();
@@ -957,7 +957,7 @@ function layoutModel(algorithm) {
 	}
 }
 
-var executeLayout = function(layout, animate, ignoreChildCount) {
+var executeLayout = function (layout, animate, ignoreChildCount) {
 	var cell = graph.getSelectionCell();
 
 	if (cell == null || (!ignoreChildCount && graph.getModel().getChildCount(cell) == 0)) {
@@ -975,7 +975,7 @@ var executeLayout = function(layout, animate, ignoreChildCount) {
 		if (animate && navigator.userAgent.indexOf('Camino') < 0) {
 			// New API for animating graph layout results asynchronously
 			var morph = new mxMorphing(graph);
-			morph.addListener(mxEvent.DONE, function() {
+			morph.addListener(mxEvent.DONE, function () {
 				graph.getModel().endUpdate();
 			});
 
@@ -1335,7 +1335,7 @@ See also:
 
 
 function findName(name) {
-	var res = map(name, function(name) {
+	var res = map(name, function (name) {
 		var res = [];
 		var myCells = findAll();
 		for (var i = 0; i < myCells.length; i++) {
@@ -1347,7 +1347,7 @@ function findName(name) {
 	});
 
 	res = flatten(res);
-	res = res.filter(function(val) {
+	res = res.filter(function (val) {
 		return val !== null;
 	});
 
@@ -1417,7 +1417,7 @@ See also:
 
 
 function findType(type) {
-	var res = map(type, function(type) {
+	var res = map(type, function (type) {
 		var t = type;
 		return primitives(t);
 
@@ -1450,7 +1450,7 @@ See also:
 
 function findID(id) {
 	var myCells = primitives();
-	var res = map(id, function(id) {
+	var res = map(id, function (id) {
 		for (var i = 0; i < myCells.length; i++) {
 			if (myCells[i].id == id) {
 				return myCells[i];
@@ -1504,7 +1504,7 @@ function findValue(search) {
 	var myCells = findAll();
 
 
-	var res = map(search, function(regEx) {
+	var res = map(search, function (regEx) {
 		var res = [];
 		for (var i = 0; i < myCells.length; i++) {
 			if (regEx instanceof RegExp) {
@@ -1547,7 +1547,7 @@ function findNote(search) {
 	var myCells = findAll();
 
 
-	var res = map(search, function(regEx) {
+	var res = map(search, function (regEx) {
 		var res = [];
 		for (var i = 0; i < myCells.length; i++) {
 			if (regEx instanceof RegExp) {
@@ -1599,18 +1599,18 @@ function createPrimitive(name, type, position, size) {
 
 
 	var t = type.toLowerCase();
-	
-	if(graph instanceof SimpleNode){
+
+	if (graph instanceof SimpleNode) {
 		var parent = graph.children[0].children[0];
 		var vertex = simpleCloneNode(primitiveBank[t], parent);
 		parent.children.push(vertex);
 		clearPrimitiveCache();
-	}else{
+	} else {
 		var parent = graph.getDefaultParent();
-		
+
 		var vertex = graph.insertVertex(parent, null, primitiveBank[t].cloneNode(true), position[0], position[1], size[0], size[1], t);
 	}
-	
+
 
 
 	setName(vertex, name);
@@ -1625,7 +1625,7 @@ function createPrimitive(name, type, position, size) {
 			var d = displays[i];
 			if (isTrue(d.getAttribute("AutoAddPrimitives")) && d.getAttribute("Type") != "Scatterplot" && (d.getAttribute("Type") != "Map" || vertex.value.nodeName == "Agents")) {
 				var s = d.getAttribute("Primitives");
-				if (typeof(s) == "undefined") {
+				if (typeof (s) == "undefined") {
 					d.setAttribute("Primitives", vertex.id);
 				} else {
 					var items = s.split(",");
@@ -1635,8 +1635,8 @@ function createPrimitive(name, type, position, size) {
 			}
 		}
 	}
-	
-	
+
+
 
 	return vertex;
 }
@@ -1671,23 +1671,23 @@ function createConnector(name, type, alpha, omega) {
 
 
 	var t = (type).toLowerCase();
-	
-	if(graph instanceof SimpleNode){
+
+	if (graph instanceof SimpleNode) {
 		var parent = graph.children[0].children[0];
 
-		if(alpha){
+		if (alpha) {
 			parent = alpha.parent;
 		}
-		if(omega){
+		if (omega) {
 			parent = omega.parent;
 		}
 		var edge = simpleCloneNode(primitiveBank[t], parent);
 		parent.children.push(edge);
 		setEnds(edge, [alpha, omega]);
 		clearPrimitiveCache();
-	}else{
+	} else {
 		var parent = graph.getDefaultParent();
-		
+
 		if (omega == null && alpha == null) {
 			usedTemp = true;
 			x = createPrimitive("temp stock xyz", "Stock", [300, 300], [10, 10]);
@@ -1711,11 +1711,11 @@ function createConnector(name, type, alpha, omega) {
 
 			omega = x;
 		}
-	
+
 		var edge = graph.insertEdge(parent, null, primitiveBank[t].cloneNode(true), alpha, omega, t);
 	}
-	
-	
+
+
 
 
 	setName(edge, name);
@@ -1748,30 +1748,30 @@ function removePrimitive(primitive) {
 	if (!(primitive instanceof Array)) {
 		primitive = [primitive];
 	}
-	
-	
-	if(graph instanceof SimpleNode){
+
+
+	if (graph instanceof SimpleNode) {
 
 		var connectors = findType(["Flow", "Transition", "Link"]);
-		primitive.forEach(function(x){
+		primitive.forEach(function (x) {
 			x.parent.children.splice(x.parent.children.indexOf(x), 1);
-			connectors.forEach(function(c){
-				if(c.source == x){
+			connectors.forEach(function (c) {
+				if (c.source == x) {
 					c.source = null;
-					if(c.target && c.target.parent !== c.parent){
+					if (c.target && c.target.parent !== c.parent) {
 						setParent(c, c.target.parent);
 					}
 				}
-				if(c.target == x){
+				if (c.target == x) {
 					c.target = null;
-					if(c.source && c.source.parent !== c.parent){
+					if (c.source && c.source.parent !== c.parent) {
 						setParent(c, c.source.parent);
 					}
 				}
 			})
 		});
 		clearPrimitiveCache();
-	}else{
+	} else {
 		graph.removeCells(primitive, false);
 	}
 
@@ -1873,7 +1873,7 @@ See also:
 
 function isSelected(primitive) {
 	var selected = getSelected();
-	return map(primitive, function(primitive) {
+	return map(primitive, function (primitive) {
 		return (primitiveIndex(selected, primitive) > -1);
 	});
 }
@@ -1907,7 +1907,7 @@ See also:
 
 
 function getID(primitive) {
-	return map(primitive, function(primitive) {
+	return map(primitive, function (primitive) {
 		return primitive.id;
 	});
 }
@@ -1930,7 +1930,7 @@ The type of the primitive as a string. If an array of primitives was passed, ret
 
 
 function getType(primitive) {
-	return map(primitive, function(primitive) {
+	return map(primitive, function (primitive) {
 		return primitive.value.nodeName;
 	});
 }
@@ -1956,7 +1956,7 @@ See also:
 */
 
 function getName(primitive) {
-	return map(primitive, function(primitive) {
+	return map(primitive, function (primitive) {
 		return primitive.getAttribute("name");
 	});
 }
@@ -1978,7 +1978,7 @@ See also:
 
 function setName(primitive, name) {
 
-	map(primitive, function(primitive) {
+	map(primitive, function (primitive) {
 		if (validPrimitiveName(String(name), primitive)) {
 			setAttributeUndoable(primitive, "name", String(name));
 			propogateGhosts(primitive);
@@ -2008,7 +2008,7 @@ See also:
 
 
 function getUnits(primitive) {
-	return map(primitive, function(primitive) {
+	return map(primitive, function (primitive) {
 		return primitive.getAttribute("Units");
 	});
 }
@@ -2031,7 +2031,7 @@ See also:
 
 function setUnits(primitive, units) {
 
-	map(primitive, function(primitive) {
+	map(primitive, function (primitive) {
 		setAttributeUndoable(primitive, "Units", String(units));
 	});
 
@@ -2057,7 +2057,7 @@ See also:
 
 
 function getConstraints(primitive) {
-	return map(primitive, function(primitive) {
+	return map(primitive, function (primitive) {
 		return [primitive.getAttribute("MinConstraint"), isTrue(primitive.getAttribute("MinConstraintUsed")), primitive.getAttribute("MaxConstraint"), isTrue(primitive.getAttribute("MaxConstraintUsed"))];
 	});
 }
@@ -2080,7 +2080,7 @@ See also:
 
 
 function setConstraints(primitive, constraints) {
-	map(primitive, function(primitive) {
+	map(primitive, function (primitive) {
 		setAttributeUndoable(primitive, "MinConstraint", constraints[0]);
 		setAttributeUndoable(primitive, "MinConstraintUsed", constraints[1]);
 		setAttributeUndoable(primitive, "MaxConstraint", constraints[2]);
@@ -2108,7 +2108,7 @@ See also:
 */
 
 function getNote(primitive) {
-	return map(primitive, function(primitive) {
+	return map(primitive, function (primitive) {
 		return primitive.getAttribute("Note");
 	});
 }
@@ -2130,7 +2130,7 @@ See also:
 
 function setNote(primitive, note) {
 
-	map(primitive, function(primitive) {
+	map(primitive, function (primitive) {
 		setAttributeUndoable(primitive, "Note", String(note));
 	});
 
@@ -2153,7 +2153,7 @@ See also:
 
 
 function showNote(primitive) {
-	return map(primitive, function(cell) {
+	return map(primitive, function (cell) {
 		if (!(cell.value.getAttribute("Note", null) === null || cell.value.getAttribute("Note") == "")) {
 			var x = Ext.getCmp("note" + cell.id);
 			if (isUndefined(x)) {
@@ -2196,7 +2196,7 @@ See also:
 
 
 function hideNote(primitive) {
-	return map(primitive, function(cell) {
+	return map(primitive, function (cell) {
 		var x = Ext.getCmp("note" + cell.id);
 		if (!isUndefined(x)) {
 			x.destroy();
@@ -2230,55 +2230,55 @@ function showEditor(primitive, annotations) {
 			interpolation: primitive.getAttribute("Interpolation")
 		});
 		editorWindow.show();
-	} else if(primitive.value.nodeName == "Stock"){
+	} else if (primitive.value.nodeName == "Stock") {
 		var checkbox = new Ext.form.field.Checkbox({
 			xtype: "checkboxfield",
 			boxLabel: getText('Restrict this stock to positive values'),
 			checked: getNonNegative(primitive),
 			autoEl: {
-                'data-qtip': "If checked, the value of the stock will not be allowed to fall below zero. The rates of outflows may be adjusted to ensure this condition is met."
-            }
+				'data-qtip': "If checked, the value of the stock will not be allowed to fall below zero. The rates of outflows may be adjusted to ensure this condition is met."
+			}
 		});
-				
+
 		var editorWindow = new EquationWindow({
 			parent: "",
 			cell: primitive,
 			equation: getValue(primitive),
 			annotations: annotations,
 			extra: checkbox,
-			saveExtra: function(extra){
+			saveExtra: function (extra) {
 				setNonNegative(primitive, checkbox.getValue())
 			}
 		});
 		editorWindow.show();
-	} else if(primitive.value.nodeName == "Flow"){
+	} else if (primitive.value.nodeName == "Flow") {
 		var checkbox = new Ext.form.field.Checkbox({
 			xtype: "checkboxfield",
 			boxLabel: getText('Restrict this flow to positive rates'),
 			checked: getNonNegative(primitive),
 			autoEl: {
-                'data-qtip': "If checked, the flow will not be applied if the calculated rate is less than zero."
-            }
+				'data-qtip': "If checked, the flow will not be applied if the calculated rate is less than zero."
+			}
 		});
-				
+
 		var editorWindow = new EquationWindow({
 			parent: "",
 			cell: primitive,
 			equation: getValue(primitive),
 			annotations: annotations,
 			extra: checkbox,
-			saveExtra: function(extra){
+			saveExtra: function (extra) {
 				setNonNegative(primitive, checkbox.getValue());
 			}
 		});
 		editorWindow.show();
-	} else if(primitive.value.nodeName == "Transition"){
-		var testVisibility = function(){
+	} else if (primitive.value.nodeName == "Transition") {
+		var testVisibility = function () {
 			var cond = trigger.getValue() == "Condition";
 			recalculate.setDisabled(cond);
 			repeat.setDisabled(cond);
 		}
-		
+
 		var trigger = new Ext.form.ComboBox({
 			triggerAction: "all",
 			store: ['Timeout', 'Probability', 'Condition'],
@@ -2288,47 +2288,47 @@ function showEditor(primitive, annotations) {
 			fieldLabel: 'Trigger Type',
 			width: 240,
 			listeners: {
-				change: function(){
+				change: function () {
 					testVisibility();
 				}
 			}
 		});
-		
+
 		var recalculate = new Ext.form.field.Checkbox({
 			xtype: "checkboxfield",
 			boxLabel: getText('Recalculate each time step'),
 			checked: getTriggerRecalculate(primitive),
 			margin: '0 0 0 15',
 			autoEl: {
-                'data-qtip': "If this is not true, the equation will be evaluated once and the trigger time scheduled based on that calculation. If this is true, the timeout or probability will be recalculated as the state of the system changes."
-            }
+				'data-qtip': "If this is not true, the equation will be evaluated once and the trigger time scheduled based on that calculation. If this is true, the timeout or probability will be recalculated as the state of the system changes."
+			}
 		});
-		
+
 		var repeat = new Ext.form.field.Checkbox({
 			xtype: "checkboxfield",
 			boxLabel: getText('Repeat after triggering'),
 			checked: getTriggerRepeat(primitive),
 			margin: '0 0 0 15',
 			autoEl: {
-                'data-qtip': "If this is true, the transition will be rescheduled after it is triggered. If this is not true, the transition will only be rescheduled if its source state becomes active again."
-            }
+				'data-qtip': "If this is true, the transition will be rescheduled after it is triggered. If this is not true, the transition will only be rescheduled if its source state becomes active again."
+			}
 		});
-		
+
 		var items = {
 			xtype: 'container',
 			layout: 'hbox',
 			items: [trigger, recalculate, repeat]
 		}
-				
+
 		testVisibility();
-		
+
 		var editorWindow = new EquationWindow({
 			parent: "",
 			cell: primitive,
 			equation: getValue(primitive),
 			annotations: annotations,
 			extra: items,
-			saveExtra: function(extra){
+			saveExtra: function (extra) {
 				setTriggerType(primitive, trigger.value);
 				setTriggerRecalculate(primitive, recalculate.getValue());
 				setTriggerRepeat(primitive, repeat.getValue());
@@ -2367,7 +2367,7 @@ See also:
 
 
 function getValue(primitive) {
-	return map(primitive, function(primitive) {
+	return map(primitive, function (primitive) {
 		var n = primitive.value.nodeName;
 		var v;
 		if (n == "Stock") {
@@ -2415,7 +2415,7 @@ See also:
 
 function setValue(primitive, value) {
 
-	map(primitive, function(primitive) {
+	map(primitive, function (primitive) {
 		if (getValue(primitive) != value) {
 			var n = primitive.value.nodeName;
 			if (n == "Stock") {
@@ -2466,9 +2466,9 @@ The size as an array of the form: [width, height].
 
 
 function getSize(primitive) {
-	return map(primitive, function(primitive) {
-		if(graph instanceof SimpleNode){
-			return [0,0];
+	return map(primitive, function (primitive) {
+		if (graph instanceof SimpleNode) {
+			return [0, 0];
 		}
 		var size = graph.getCellBounds(primitive);
 		var scale = graph.view.getScale();
@@ -2499,9 +2499,9 @@ See also:
 
 
 function getPosition(primitive) {
-	return map(primitive, function(primitive) {
-		if(graph instanceof SimpleNode){
-			return [0,0];
+	return map(primitive, function (primitive) {
+		if (graph instanceof SimpleNode) {
+			return [0, 0];
 		}
 		var state = graph.view.getState(primitive);
 		var scale = graph.view.getScale();
@@ -2528,7 +2528,7 @@ See also:
 
 function setPosition(primitive, position) {
 
-	map(primitive, function(primitive) {
+	map(primitive, function (primitive) {
 		var state = graph.view.getState(primitive);
 
 		var scale = graph.view.getScale();
@@ -2571,14 +2571,14 @@ Example:
 
 */
 
-function flash(primitive, opacity, duration){
-	map(primitive, function(primitive){
-		if(primitive.value.nodeName == "Folder"){
+function flash(primitive, opacity, duration) {
+	map(primitive, function (primitive) {
+		if (primitive.value.nodeName == "Folder") {
 			flash(getChildren(primitive, false), opacity, duration);
 		}
 		var orig = getOpacity(primitive);
 		setOpacity(primitive, opacity || 0);
-		setTimeout(function(){
+		setTimeout(function () {
 			setOpacity(primitive, orig);
 		}, duration || 100);
 	})
@@ -2600,7 +2600,7 @@ Whether to show the slider property of the primitive. A boolean.
 */
 
 function getShowSlider(primitive) {
-	return map(primitive, function(primitive) {
+	return map(primitive, function (primitive) {
 		return isTrue(primitive.getAttribute("ShowSlider"));
 	});
 
@@ -2620,7 +2620,7 @@ showSlider - Boolean whether to show the slider.
 
 function setShowSlider(primitive, showSlider) {
 
-	map(primitive, function(primitive) {
+	map(primitive, function (primitive) {
 		setAttributeUndoable(primitive, "ShowSlider", showSlider);
 	});
 
@@ -2642,7 +2642,7 @@ The minimum allowed value for the slider
 */
 
 function getSliderMin(primitive) {
-	return map(primitive, function(primitive) {
+	return map(primitive, function (primitive) {
 		return primitive.getAttribute("SliderMin");
 	});
 
@@ -2662,7 +2662,7 @@ sliderMin - The minimum value of the slider.
 
 function setSliderMin(primitive, sliderMin) {
 
-	map(primitive, function(primitive) {
+	map(primitive, function (primitive) {
 		setAttributeUndoable(primitive, "SliderMin", sliderMin);
 	});
 
@@ -2684,7 +2684,7 @@ The maximum allowed value for the slider
 */
 
 function getSliderMax(primitive) {
-	return map(primitive, function(primitive) {
+	return map(primitive, function (primitive) {
 		return primitive.getAttribute("SliderMax");
 	});
 
@@ -2704,7 +2704,7 @@ sliderMax - The maximum value of the slider.
 
 function setSliderMax(primitive, sliderMax) {
 
-	map(primitive, function(primitive) {
+	map(primitive, function (primitive) {
 		setAttributeUndoable(primitive, "SliderMax", sliderMax);
 	});
 
@@ -2726,7 +2726,7 @@ The step value for the slider
 */
 
 function getSliderStep(primitive) {
-	return map(primitive, function(primitive) {
+	return map(primitive, function (primitive) {
 		return primitive.getAttribute("SliderStep");
 	});
 
@@ -2746,7 +2746,7 @@ sliderStep - The step value of the slider.
 
 function setSliderStep(primitive, sliderStep) {
 
-	map(primitive, function(primitive) {
+	map(primitive, function (primitive) {
 		setAttributeUndoable(primitive, "SliderStep", sliderStep);
 	});
 
@@ -2769,7 +2769,7 @@ The opacity of the primitive
 */
 
 function getOpacity(primitive) {
-	return map(primitive, function(primitive) {
+	return map(primitive, function (primitive) {
 		return graph.getCellStyle(primitive).opacity;
 	});
 
@@ -2789,7 +2789,7 @@ opacity - The new opacity for the primitive.
 
 function setOpacity(primitive, opacity) {
 
-	map(primitive, function(primitive) {
+	map(primitive, function (primitive) {
 		var style = primitive.getStyle();
 		style = mxUtils.setStyle(style, "opacity", opacity);
 		style = mxUtils.setStyle(style, mxConstants.STYLE_TEXT_OPACITY, opacity);
@@ -2821,7 +2821,7 @@ The line color of the primitive
 */
 
 function getLineColor(primitive) {
-	return map(primitive, function(primitive) {
+	return map(primitive, function (primitive) {
 		return graph.getCellStyle(primitive).strokeColor;
 	});
 }
@@ -2840,7 +2840,7 @@ lineColor - The new line color for the primitive.
 
 function setLineColor(primitive, lineColor) {
 
-	map(primitive, function(primitive) {
+	map(primitive, function (primitive) {
 		var style = primitive.getStyle();
 		style = mxUtils.setStyle(style, "strokeColor", lineColor);
 
@@ -2870,7 +2870,7 @@ The font color of the primitive
 */
 
 function getFontColor(primitive) {
-	return map(primitive, function(primitive) {
+	return map(primitive, function (primitive) {
 		return graph.getCellStyle(primitive).fontColor;
 	});
 
@@ -2890,7 +2890,7 @@ fontColor - The new font color for the primitive.
 
 function setFontColor(primitive, fontColor) {
 
-	map(primitive, function(primitive) {
+	map(primitive, function (primitive) {
 		var style = primitive.getStyle();
 		style = mxUtils.setStyle(style, "fontColor", fontColor);
 
@@ -2920,7 +2920,7 @@ The fill color of the primitive
 */
 
 function getFillColor(primitive) {
-	return map(primitive, function(primitive) {
+	return map(primitive, function (primitive) {
 		return graph.getCellStyle(primitive).fillColor;
 	});
 
@@ -2940,7 +2940,7 @@ fillColor - The new fill color for the primitive.
 
 function setFillColor(primitive, fillColor) {
 
-	map(primitive, function(primitive) {
+	map(primitive, function (primitive) {
 		var style = primitive.getStyle();
 		style = mxUtils.setStyle(style, "fillColor", fillColor);
 
@@ -2971,7 +2971,7 @@ The image of the primitive as a string
 */
 
 function getImage(primitive) {
-	return map(primitive, function(primitive) {
+	return map(primitive, function (primitive) {
 		return primitive.getAttribute("Image");
 	});
 
@@ -2991,7 +2991,7 @@ image - The image url or alias as a string.
 
 function setImage(primitive, image) {
 
-	map(primitive, function(primitive) {
+	map(primitive, function (primitive) {
 		primitive.setAttribute("Image", image);
 		setPicture(primitive);
 	});
@@ -3024,7 +3024,7 @@ See also:
 
 
 function getNonNegative(primitive) {
-	return map(primitive, function(primitive) {
+	return map(primitive, function (primitive) {
 		if (primitive.value.nodeName == "Stock") {
 			return isTrue(primitive.getAttribute("NonNegative"));
 		} else {
@@ -3050,21 +3050,21 @@ See also:
 
 
 function setNonNegative(primitive, nonNegative) {
-	map(primitive, function(primitive) {
+	map(primitive, function (primitive) {
 		if (primitive.value.nodeName == "Stock") {
 			setAttributeUndoable(primitive, "NonNegative", nonNegative);
 		} else {
 			setAttributeUndoable(primitive, "OnlyPositive", nonNegative);
-			if(!(primitive instanceof SimpleNode)){
+			if (!(primitive instanceof SimpleNode)) {
 				if (nonNegative) {
-	                graph.setCellStyles(mxConstants.STYLE_STARTARROW, "", [primitive]);
-	            } else {
-	                graph.setCellStyles(mxConstants.STYLE_STARTARROW, "block", [primitive]);
-	                graph.setCellStyles("startFill", 0, [primitive]);
-	            }
+					graph.setCellStyles(mxConstants.STYLE_STARTARROW, "", [primitive]);
+				} else {
+					graph.setCellStyles(mxConstants.STYLE_STARTARROW, "block", [primitive]);
+					graph.setCellStyles("startFill", 0, [primitive]);
+				}
 			}
-           
-			
+
+
 		}
 	});
 }
@@ -3088,7 +3088,7 @@ See also:
 */
 
 function getStockType(primitive) {
-	return map(primitive, function(primitive) {
+	return map(primitive, function (primitive) {
 		return primitive.getAttribute("StockMode");
 	});
 }
@@ -3109,7 +3109,7 @@ See also:
 */
 
 function setStockType(primitive, type) {
-	map(primitive, function(primitive) {
+	map(primitive, function (primitive) {
 		setAttributeUndoable(primitive, "StockMode", type);
 	});
 }
@@ -3134,7 +3134,7 @@ See also:
 */
 
 function getDelay(primitive) {
-	return map(primitive, function(primitive) {
+	return map(primitive, function (primitive) {
 		return primitive.getAttribute("Delay");
 	});
 }
@@ -3155,7 +3155,7 @@ See also:
 */
 
 function setDelay(primitive, delay) {
-	map(primitive, function(primitive) {
+	map(primitive, function (primitive) {
 		setAttributeUndoable(primitive, "Delay", delay);
 	});
 
@@ -3188,7 +3188,7 @@ See also:
 */
 
 function getEnds(connector) {
-	return map(connector, function(primitive) {
+	return map(connector, function (primitive) {
 		return [primitive.source, primitive.target];
 	});
 }
@@ -3209,18 +3209,18 @@ See also:
 */
 
 function setEnds(connector, ends) {
-	map(connector, function(primitive) {
-		if(! (connector instanceof SimpleNode)){
+	map(connector, function (primitive) {
+		if (!(connector instanceof SimpleNode)) {
 			var edit = new mxTerminalChange(graph.model, primitive, ends[0], true);
 			graph.getModel().execute(edit);
 			edit = new mxTerminalChange(graph.model, primitive, ends[1], false);
 			graph.getModel().execute(edit);
-		}else{
+		} else {
 			primitive.source = ends[0];
 			primitive.target = ends[1];
 			clearPrimitiveCache();
 		}
-		
+
 	});
 }
 
@@ -3294,7 +3294,7 @@ See also:
 */
 
 function getResidency(state) {
-	return map(state, function(state) {
+	return map(state, function (state) {
 		return state.getAttribute("Residency");
 	});
 }
@@ -3315,7 +3315,7 @@ See also:
 */
 
 function setResidency(state, residency) {
-	map(state, function(primitive) {
+	map(state, function (primitive) {
 		setAttributeUndoable(primitive, "Residency", residency);
 	});
 }
@@ -3345,7 +3345,7 @@ See also:
 */
 
 function getTriggerType(primitive) {
-	return map(primitive, function(primitive) {
+	return map(primitive, function (primitive) {
 		return primitive.getAttribute("Trigger");
 	});
 }
@@ -3366,7 +3366,7 @@ See also:
 */
 
 function setTriggerType(primitive, trigger) {
-	map(primitive, function(primitive) {
+	map(primitive, function (primitive) {
 		setAttributeUndoable(primitive, "Trigger", trigger);
 	});
 }
@@ -3390,7 +3390,7 @@ See also:
 */
 
 function getTriggerValue(primitive) {
-	return map(primitive, function(primitive) {
+	return map(primitive, function (primitive) {
 		return primitive.getAttribute("Value");
 	});
 }
@@ -3411,7 +3411,7 @@ See also:
 */
 
 function setTriggerValue(primitive, value) {
-	map(primitive, function(primitive) {
+	map(primitive, function (primitive) {
 		setAttributeUndoable(primitive, "Value", value);
 	});
 }
@@ -3435,7 +3435,7 @@ See also:
 */
 
 function getTriggerRepeat(primitive) {
-	return map(primitive, function(primitive) {
+	return map(primitive, function (primitive) {
 		return isTrue(primitive.getAttribute("Repeat"));
 	});
 }
@@ -3456,7 +3456,7 @@ See also:
 */
 
 function setTriggerRepeat(primitive, repeat) {
-	map(primitive, function(primitive) {
+	map(primitive, function (primitive) {
 		setAttributeUndoable(primitive, "Repeat", repeat);
 	});
 }
@@ -3480,7 +3480,7 @@ See also:
 */
 
 function getTriggerRecalculate(primitive) {
-	return map(primitive, function(primitive) {
+	return map(primitive, function (primitive) {
 		return isTrue(primitive.getAttribute("Recalculate"));
 	});
 }
@@ -3501,7 +3501,7 @@ See also:
 */
 
 function setTriggerRecalculate(primitive, recalculate) {
-	map(primitive, function(primitive) {
+	map(primitive, function (primitive) {
 		setAttributeUndoable(primitive, "Recalculate", recalculate);
 	});
 }
@@ -3531,7 +3531,7 @@ See also:
 */
 
 function getData(converter) {
-	return map(converter, function(primitive) {
+	return map(converter, function (primitive) {
 		return primitive.getAttribute("Data");
 	});
 }
@@ -3552,7 +3552,7 @@ See also:
 */
 
 function setData(converter, data) {
-	map(converter, function(primitive) {
+	map(converter, function (primitive) {
 		setAttributeUndoable(primitive, "Data", data);
 	});
 }
@@ -3577,7 +3577,7 @@ See also:
 */
 
 function getConverterInput(converter) {
-	return map(converter, function(primitive) {
+	return map(converter, function (primitive) {
 		var x = primitive.getAttribute("Source");
 		if (x == "Time") {
 			return null;
@@ -3603,7 +3603,7 @@ See also:
 */
 
 function setConverterInput(converter, input) {
-	map(converter, function(primitive) {
+	map(converter, function (primitive) {
 		if (input == null) {
 			setAttributeUndoable(primitive, "Source", "Time");
 		} else {
@@ -3632,7 +3632,7 @@ See also:
 */
 
 function getInterpolation(converter) {
-	return map(converter, function(primitive) {
+	return map(converter, function (primitive) {
 		return primitive.getAttribute("Interpolation");
 	});
 }
@@ -3653,7 +3653,7 @@ See also:
 */
 
 function setInterpolation(converter, interpolation) {
-	map(converter, function(primitive) {
+	map(converter, function (primitive) {
 		setAttributeUndoable(primitive, "Interpolation", interpolation);
 	});
 }
@@ -3683,7 +3683,7 @@ function pressButton(button) {
 
 	graph.getModel().beginUpdate();
 
-	map(button, function(primitive) {
+	map(button, function (primitive) {
 		runAction(primitive.getAttribute("Function"), '<p>There was an error with the Action for the button <i>' + primitive.getAttribute("name") + '</i>.</p><br/>', primitive);
 
 	});
@@ -3697,6 +3697,11 @@ function runAction(code, errHeader, button) {
 	try {
 		var msg = 'This insight is requesting permission to execute custom code. For security reasons, you should only run custom code in trusted insights.\n\nAre you sure you want to run code in this insight?';
 		if (trusted || confirm(msg)) {
+			if (!trusted) {
+				sendToParent({
+					type: 'start_action'
+				});
+			}
 			trusted = true;
 			eval("\"use strict;\"\n\n" + code);
 		}
@@ -3710,7 +3715,7 @@ function runAction(code, errHeader, button) {
 		});
 
 		if (button) {
-			setTimeout(function() {
+			setTimeout(function () {
 				highlight(button);
 			}, 100)
 		}
@@ -3745,7 +3750,7 @@ See also:
 */
 
 function getPopulationSize(agents) {
-	return map(agents, function(primitive) {
+	return map(agents, function (primitive) {
 		return primitive.getAttribute("Size");
 	});
 }
@@ -3766,7 +3771,7 @@ See also:
 */
 
 function setPopulationSize(agents, size) {
-	map(agents, function(primitive) {
+	map(agents, function (primitive) {
 		setAttributeUndoable(primitive, "Size", size);
 	});
 }
@@ -3790,7 +3795,7 @@ See also:
 */
 
 function getAgentBase(agents) {
-	return map(agents, function(primitive) {
+	return map(agents, function (primitive) {
 		return findID(primitive.getAttribute("Agent"));
 	});
 }
@@ -3811,7 +3816,7 @@ See also:
 */
 
 function setAgentBase(agents, folder) {
-	map(agents, function(primitive) {
+	map(agents, function (primitive) {
 		setAttributeUndoable(primitive, "Agent", folder.id);
 	});
 }
@@ -3836,7 +3841,7 @@ See also:
 */
 
 function getGeometryWrap(agents) {
-	return map(agents, function(primitive) {
+	return map(agents, function (primitive) {
 		return isTrue(primitive.getAttribute("GeoWrap"));
 	});
 }
@@ -3857,7 +3862,7 @@ See also:
 */
 
 function setGeometryWrap(agents, wrap) {
-	map(agents, function(primitive) {
+	map(agents, function (primitive) {
 		setAttributeUndoable(primitive, "GeoWrap", wrap);
 	});
 }
@@ -3881,7 +3886,7 @@ See also:
 */
 
 function getGeometryUnits(agents) {
-	return map(agents, function(primitive) {
+	return map(agents, function (primitive) {
 		return primitive.getAttribute("GeoDimUnits");
 	});
 }
@@ -3902,7 +3907,7 @@ See also:
 */
 
 function setGeometryUnits(agents, units) {
-	map(agents, function(primitive) {
+	map(agents, function (primitive) {
 		setAttributeUndoable(primitive, "GeoDimUnits", units);
 	});
 }
@@ -3926,7 +3931,7 @@ See also:
 */
 
 function getGeometryWidth(agents) {
-	return map(agents, function(primitive) {
+	return map(agents, function (primitive) {
 		return primitive.getAttribute("GeoWidth");
 	});
 }
@@ -3947,7 +3952,7 @@ See also:
 */
 
 function setGeometryWidth(agents, width) {
-	map(agents, function(primitive) {
+	map(agents, function (primitive) {
 		setAttributeUndoable(primitive, "GeoWidth", width);
 	});
 }
@@ -3971,7 +3976,7 @@ See also:
 */
 
 function getGeometryHeight(agents) {
-	return map(agents, function(primitive) {
+	return map(agents, function (primitive) {
 		return primitive.getAttribute("GeoHeight");
 	});
 }
@@ -3992,7 +3997,7 @@ See also:
 */
 
 function setGeometryHeight(agents, height) {
-	map(agents, function(primitive) {
+	map(agents, function (primitive) {
 		setAttributeUndoable(primitive, "GeoHeight", height);
 	});
 }
@@ -4016,7 +4021,7 @@ See also:
 */
 
 function getAgentPlacement(agents) {
-	return map(agents, function(primitive) {
+	return map(agents, function (primitive) {
 		return primitive.getAttribute("Placement");
 	});
 }
@@ -4037,7 +4042,7 @@ See also:
 */
 
 function setAgentPlacement(agents, method) {
-	map(agents, function(primitive) {
+	map(agents, function (primitive) {
 		setAttributeUndoable(primitive, "Placement", method);
 	});
 }
@@ -4061,7 +4066,7 @@ See also:
 */
 
 function getAgentPlacementFunction(agents) {
-	return map(agents, function(primitive) {
+	return map(agents, function (primitive) {
 		return primitive.getAttribute("PlacementFunction");
 	});
 }
@@ -4082,7 +4087,7 @@ See also:
 */
 
 function setAgentPlacementFunction(agents, func) {
-	map(agents, function(primitive) {
+	map(agents, function (primitive) {
 		setAttributeUndoable(primitive, "PlacementFunction", func);
 	});
 }
@@ -4106,7 +4111,7 @@ See also:
 */
 
 function getAgentNetwork(agents) {
-	return map(agents, function(primitive) {
+	return map(agents, function (primitive) {
 		return primitive.getAttribute("Network");
 	});
 }
@@ -4119,7 +4124,7 @@ Sets the network method for the agent population.
 Parameters:
 
 agents - The agent population for which network method will be set. May also be an array of agent populations.
-method - The desired placemennt method. One of "None" or "Custom Function".
+method - The desired placement method. One of "None" or "Custom Function".
 
 See also:
 
@@ -4127,7 +4132,7 @@ See also:
 */
 
 function setAgentNetwork(agents, method) {
-	map(agents, function(primitive) {
+	map(agents, function (primitive) {
 		setAttributeUndoable(primitive, "Network", method);
 	});
 }
@@ -4151,7 +4156,7 @@ See also:
 */
 
 function getAgentNetworkFunction(agents) {
-	return map(agents, function(primitive) {
+	return map(agents, function (primitive) {
 		return primitive.getAttribute("NetworkFunction");
 	});
 }
@@ -4172,7 +4177,7 @@ See also:
 */
 
 function setAgentNetworkFunction(agents, func) {
-	map(agents, function(primitive) {
+	map(agents, function (primitive) {
 		setAttributeUndoable(primitive, "NetworkFunction", func);
 	});
 }
@@ -4200,7 +4205,7 @@ See also:
 
 function collapseFolder(folder) {
 
-	map(folder, function(folder) {
+	map(folder, function (folder) {
 		graph.foldCells(true, false, [folder]);
 	});
 
@@ -4221,7 +4226,7 @@ See also:
 */
 
 function expandFolder(folder) {
-	map(folder, function(folder) {
+	map(folder, function (folder) {
 		graph.foldCells(false, false, [folder]);
 	});
 }
@@ -4245,7 +4250,7 @@ See also:
 */
 
 function getCollapsed(folder) {
-	return map(folder, function(f) {
+	return map(folder, function (f) {
 		return f.isCollapsed();
 	});
 }
@@ -4271,11 +4276,11 @@ See also:
 
 function getParent(primitive) {
 	var defaultID = "1"; //graph.getDefaultParent().id;
-	return map(primitive, function(primitive) {
-		
+	return map(primitive, function (primitive) {
+
 		var p = primitive.parentNode || primitive.parent;
-		
-		if ((p.value && p.value.nodeName =="root") || p.nodeName=="root" || p.id == defaultID) {
+
+		if ((p.value && p.value.nodeName == "root") || p.nodeName == "root" || p.id == defaultID) {
 			return null;
 		} else {
 			return p;
@@ -4298,33 +4303,33 @@ See also:
 <getParent>
 */
 
-function setParent(primitive, parent, perserveLoc) {
-	if(graph instanceof SimpleNode){
-		if(parent == null){
+function setParent(primitive, parent, preserveLoc) {
+	if (graph instanceof SimpleNode) {
+		if (parent == null) {
 			parent = graph.children[0].children[0];
 		}
-	}else{
+	} else {
 		var p = (parent == null ? graph.getDefaultParent() : parent);
 	}
 	//console.log(p)
 	//console.log(primitive);
-	map(primitive, function(primitive) {
+	map(primitive, function (primitive) {
 		//console.log(primitive.getAttribute("name"));
 
-		if(graph instanceof SimpleNode){
-			primitive.parent.children.splice(primitive.parent.children.indexOf(primitive),1);
+		if (graph instanceof SimpleNode) {
+			primitive.parent.children.splice(primitive.parent.children.indexOf(primitive), 1);
 			primitive.parent = parent;
 			primitive.parentNode = parent;
-			if(!parent.children){
+			if (!parent.children) {
 				parent.children = [];
 			}
 			parent.children.push(primitive);
-		}else{
+		} else {
 			var loc = getPosition(primitive);
 			var edit = new mxChildChange(graph.getModel(), p, primitive);
 			graph.getModel().execute(edit);
-			if (!perserveLoc) {
-					setPosition(primitive, loc);
+			if (!preserveLoc) {
+				setPosition(primitive, loc);
 			}
 		}
 	});
@@ -4349,8 +4354,7 @@ See also:
 */
 
 function getFrozen(primitive) {
-	return map(primitive, function(primitive) {
-		
+	return map(primitive, function (primitive) {
 		return isTrue(primitive.getAttribute("Frozen"));
 	});
 }
@@ -4371,8 +4375,7 @@ See also:
 */
 
 function setFrozen(primitive, frozen) {
-	
-	map(primitive, function(primitive) {
+	map(primitive, function (primitive) {
 		setAttributeUndoable(primitive, "Frozen", frozen);
 	});
 }
@@ -4390,7 +4393,7 @@ recursive - Optional. Whether the children of inner folders will be returned. De
 
 Return:
 
-The children primitves of the folder.
+The children primitives of the folder.
 
 */
 
@@ -4398,13 +4401,13 @@ function getChildren(folder, recursive) {
 	if (isUndefined(recursive)) {
 		recursive = true;
 	}
-	
-	if(!folder.children){
+
+	if (!folder.children) {
 		return [];
 	}
 
 	if (recursive) {
-		return flatten(map(folder.children, function(x) {
+		return flatten(map(folder.children, function (x) {
 			if (x.value.nodeName == "Folder") {
 				return x.children.concat([x]);
 			} else {
@@ -4435,7 +4438,7 @@ See also:
 */
 
 function getFolderType(folder) {
-	return map(folder, function(primitive) {
+	return map(folder, function (primitive) {
 		return primitive.getAttribute("Type");
 	});
 }
@@ -4456,7 +4459,7 @@ See also:
 */
 
 function setFolderType(folder, type) {
-	map(folder, function(primitive) {
+	map(folder, function (primitive) {
 		setAttributeUndoable(primitive, "Type", type);
 	});
 }
@@ -4480,7 +4483,7 @@ See also:
 */
 
 function getFolderAgentParent(folder) {
-	return map(folder, function(primitive) {
+	return map(folder, function (primitive) {
 		return primitive.getAttribute("AgentBase");
 	});
 }
@@ -4501,7 +4504,7 @@ See also:
 */
 
 function setFolderAgentParent(folder, agentParent) {
-	map(folder, function(primitive) {
+	map(folder, function (primitive) {
 		setAttributeUndoable(primitive, "AgentBase", agentParent);
 	});
 }
@@ -4510,7 +4513,7 @@ function setFolderAgentParent(folder, agentParent) {
 /*
 Method: getFolderSolver
 
-Gets the solver configuation for a folder. The configuration is an object with the properties:
+Gets the solver configuration for a folder. The configuration is an object with the properties:
 
 enabled - true is the folder should have its own solver
 algorithm - the solution algorithm. Current allowed values are "RK1" for Euler's method and "RK4" for a fourth order Runge-Kutta method
@@ -4530,7 +4533,7 @@ See also:
 */
 
 function getFolderSolver(folder) {
-	return map(folder, function(primitive) {
+	return map(folder, function (primitive) {
 		return JSON.parse(primitive.getAttribute("Solver"));
 	});
 }
@@ -4551,7 +4554,7 @@ See also:
 */
 
 function setFolderSolver(folder, solver) {
-	map(folder, function(primitive) {
+	map(folder, function (primitive) {
 		setAttributeUndoable(primitive, "Solver", JSON.stringify(solver));
 	});
 }
@@ -4582,7 +4585,7 @@ A duplicate of the input array without any primitives of the specified type.
 
 
 function excludeType(array, type) {
-	var removeSingle = function(array, type){
+	var removeSingle = function (array, type) {
 		if (array instanceof Array) {
 			var res = [];
 			for (var i = 0; i < array.length; i++) {
@@ -4601,16 +4604,16 @@ function excludeType(array, type) {
 			return array;
 		}
 	}
-	
-	if(Array.isArray(type)){
-		for(var i = 0; i < type.length; i++){
+
+	if (Array.isArray(type)) {
+		for (var i = 0; i < type.length; i++) {
 			array = removeSingle(array, type[i]);
 		}
 		return array;
-	}else{
+	} else {
 		return removeSingle(array, type);
 	}
-	
+
 }
 
 /*
@@ -4769,15 +4772,13 @@ function toggleTopBar() {
 	if (!toolbar.isVisible()) {
 		toolbar.show();
 		try {
-			Ext.get("toolbarToggle").update("&uarr;");
 			Ext.get("toplinks-holder").removeCls("collapsed");
-		} catch (err) {}
+		} catch (err) { }
 	} else {
 		toolbar.hide();
 		try {
-			Ext.get("toolbarToggle").update("&darr;");
 			Ext.get("toplinks-holder").addCls("collapsed");
-		} catch (err) {}
+		} catch (err) { }
 	}
 }
 

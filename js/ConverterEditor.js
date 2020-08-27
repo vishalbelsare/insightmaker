@@ -1,7 +1,7 @@
 "use strict";
 /*
 
-Copyright 2010-2018 Scott Fortmann-Roe. All rights reserved.
+Copyright 2010-2020 Scott Fortmann-Roe. All rights reserved.
 
 This file may distributed and/or modified under the
 terms of the Insight Maker Public License (https://InsightMaker.com/impl).
@@ -16,7 +16,7 @@ var ConverterEditor = Ext.extend(Ext.form.TextField, {
 		edit: {
 
 			hideOnReadOnly: false,
-			handler: function() {
+			handler: function () {
 				this.editorWindow = new ConverterWindow({
 					parent: this,
 					oldKeys: this.getValue(),
@@ -28,12 +28,12 @@ var ConverterEditor = Ext.extend(Ext.form.TextField, {
 	},
 
 	listeners: {
-		'keydown': function(field) {
+		'keydown': function (field) {
 			field.setEditable(false);
 		},
-		'beforerender': function() {
+		'beforerender': function () {
 			if (this.regex != undefined) {
-				this.validator = function(value) {
+				this.validator = function (value) {
 					return this.regex.test(value);
 				};
 			}
@@ -80,6 +80,7 @@ function ConverterWindow(config) {
 		width: 600,
 		region: 'center',
 		plugins: [editor],
+		bufferedRenderer: false,
 		viewConfig: {
 			headersDisabled: true,
 			markDirty: false
@@ -89,30 +90,30 @@ function ConverterWindow(config) {
 			text: getText('Import'),
 			glyph: 0xf0ce,
 			tooltip: getText('Import data from a CSV or other text file'),
-			handler: function() {
+			handler: function () {
 				importData(store);
 			}
 		}, {
-			glyph: 0xf055,
-			iconCls: 'green-icon',
-			text: getText('Add Point'),
-			handler: function() {
-				var e = {
-					xVal: 0,
-					yVal: 0
-				};
-				editor.completeEdit();
-				store.insert(0, e);
-				store.sort('xVal', 'ASC');
-				gridPan.getView().refresh();
+				glyph: 0xf055,
+				iconCls: 'green-icon',
+				text: getText('Add Point'),
+				handler: function () {
+					var e = {
+						xVal: 0,
+						yVal: 0
+					};
+					editor.completeEdit();
+					store.insert(0, e);
+					store.sort('xVal', 'ASC');
+					gridPan.getView().refresh();
 
-				var index = store.findBy(function(record) {
-					return record.get("xVal") == 0 && record.get("yVal") == 0;
-				});
-				gridPan.getSelectionModel().selectRange(index, index);
-				editor.startEdit(index, index);
-			}
-		}],
+					var index = store.findBy(function (record) {
+						return record.get("xVal") == 0 && record.get("yVal") == 0;
+					});
+					gridPan.getSelectionModel().selectRange(index, index);
+					editor.startEdit(index, index);
+				}
+			}],
 
 		columns: [{
 			id: 'xVal',
@@ -145,7 +146,7 @@ function ConverterWindow(config) {
 			items: [{
 				iconCls: "units-remove-icon",
 				tooltip: getText("Delete"),
-				handler: function(grid, rowIndex, columnIndex) {
+				handler: function (grid, rowIndex, columnIndex) {
 					store.remove(store.getAt(rowIndex));
 
 					store.sort('xVal', 'ASC');
@@ -252,7 +253,7 @@ function ConverterWindow(config) {
 		tools: [{
 			type: 'help',
 			tooltip: getText('Get Help'),
-			callback: function(panel, tool, event) {
+			callback: function (panel, tool, event) {
 				showURL("/converters");
 			}
 		}],
@@ -268,9 +269,9 @@ function ConverterWindow(config) {
 			columns: 1
 		},
 		listeners: {
-			'afterrender': function() {
+			'afterrender': function () {
 				chart.getEl().on({
-					click: function(e) {
+					click: function (e) {
 
 
 						var xy = chart.getEventXY(e);
@@ -310,7 +311,7 @@ function ConverterWindow(config) {
 						}
 
 						if (e.shiftKey) {
-							var pt = store.findBy(function(record) {
+							var pt = store.findBy(function (record) {
 								return (record.get("xVal") > x - dx * 4 && record.get("xVal") < x + dx * 4 && record.get("yVal") > y - dy * 4 && record.get("yVal") < y + dy * 4)
 							});
 							if (pt > -1) {
@@ -330,7 +331,7 @@ function ConverterWindow(config) {
 
 							}
 						} else {
-							var pt = store.findBy(function(record) {
+							var pt = store.findBy(function (record) {
 								return (record.get("xVal") > x - dx * 5 && record.get("xVal") < x + dx * 5)
 							});
 							if (pt > -1) {
@@ -355,7 +356,7 @@ function ConverterWindow(config) {
 						store.sort('xVal', 'ASC');
 
 						if (!e.shiftKey) {
-							var index = store.findBy(function(record) {
+							var index = store.findBy(function (record) {
 								return record.get("xVal") == nx && record.get("yVal") == ny;
 							});
 							if (index >= 0) {
@@ -374,58 +375,58 @@ function ConverterWindow(config) {
 		minHeight: 500,
 		items: [chartPanel, gridPan],
 		buttons: [{
-				hidden: !viewConfig.allowEdits,
-				scale: "large",
-				id: 'equationUnitsBut',
-				text: formatUnitsBut(cell.getAttribute("Units")),
-				glyph: 0xf1de,
-				tooltip: getText('Primitive units'),
-				handler: function() {
-					var unitsWindow = new UnitsWindow({
-						parent: "",
-						cell: config.cell,
-						units: config.cell.getAttribute("Units")
-					});
-					unitsWindow.show();
-				}
-			},
+			hidden: !viewConfig.allowEdits,
+			scale: "large",
+			id: 'equationUnitsBut',
+			text: formatUnitsBut(cell.getAttribute("Units")),
+			glyph: 0xf1de,
+			tooltip: getText('Primitive units'),
+			handler: function () {
+				var unitsWindow = new UnitsWindow({
+					parent: "",
+					cell: config.cell,
+					units: config.cell.getAttribute("Units")
+				});
+				unitsWindow.show();
+			}
+		},
 			'->', {
-				scale: "large",
-				glyph: 0xf05c,
-				text: getText('Cancel'),
-				handler: function() {
-					win.close();
-					if (config.parent != "") {
-						config.parent.resumeEvents();
-					}
-				}
-			}, {
-				hidden: !viewConfig.allowEdits,
-				scale: "large",
-				glyph: 0xf00c,
-				text: getText('Apply'),
-				handler: function() {
-					editor.completeEdit();
-					if (config.parent != "") {
-						editingRecord.set("value", getKeys());
-						saveConfigRecord(editingRecord);
-					} else {
-						graph.getModel().beginUpdate();
-						setValue(cell, getKeys());
-						graph.getModel().endUpdate();
-					}
-
-					win.close();
-
-
-					if (config.parent != "") {
-						config.parent.resumeEvents();
-						grid.plugins[0].completeEdit();
-					} else {
-						selectionChanged(false);
-					}
+			scale: "large",
+			glyph: 0xf05c,
+			text: getText('Cancel'),
+			handler: function () {
+				win.close();
+				if (config.parent != "") {
+					config.parent.resumeEvents();
 				}
 			}
+		}, {
+			hidden: !viewConfig.allowEdits,
+			scale: "large",
+			glyph: 0xf00c,
+			text: getText('Apply'),
+			handler: function () {
+				editor.completeEdit();
+				if (config.parent != "") {
+					editingRecord.set("value", getKeys());
+					saveConfigRecord(editingRecord);
+				} else {
+					graph.getModel().beginUpdate();
+					setValue(cell, getKeys());
+					graph.getModel().endUpdate();
+				}
+
+				win.close();
+
+
+				if (config.parent != "") {
+					config.parent.resumeEvents();
+					grid.plugins[0].completeEdit();
+				} else {
+					selectionChanged(false);
+				}
+			}
+		}
 		]
 
 	});
@@ -456,12 +457,12 @@ function ConverterWindow(config) {
 
 
 	store.on('update',
-		function() {
+		function () {
 			store.sort('xVal', 'ASC');
 		});
 
 
-	me.show = function() {
+	me.show = function () {
 		win.show();
 
 		/*chart.on({

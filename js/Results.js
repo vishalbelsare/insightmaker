@@ -1,7 +1,7 @@
 "use strict";
 /*
 
-Copyright 2010-2018 Scott Fortmann-Roe. All rights reserved.
+Copyright 2010-2020 Scott Fortmann-Roe. All rights reserved.
 
 This file may distributed and/or modified under the
 terms of the Insight Maker Public License (https://InsightMaker.com/impl).
@@ -158,24 +158,24 @@ function openDisplayConfigure(win) {
 					width: 425
 				},
 				items: [{
-						xtype: 'fieldset',
-						title: getText('General Settings'),
-						defaultType: 'textfield',
-						defaults: {
-							anchor: '100%'
-						},
-					
-						layout: 'anchor',
-						items: [
-							{
-								name: 'chartType',
-								id: 'chartType',
-								fieldLabel: getText('Type'),
-								xtype: "segmentedbutton",
-								style: {
-									"margin-bottom": "10px"
-								},
-								items: [
+					xtype: 'fieldset',
+					title: getText('General Settings'),
+					defaultType: 'textfield',
+					defaults: {
+						anchor: '100%'
+					},
+
+					layout: 'anchor',
+					items: [
+						{
+							name: 'chartType',
+							id: 'chartType',
+							fieldLabel: getText('Type'),
+							xtype: "segmentedbutton",
+							style: {
+								"margin-bottom": "10px"
+							},
+							items: [
 								{
 									text: getText("Time Series"),
 									itemId: "Time Series",
@@ -203,144 +203,144 @@ function openDisplayConfigure(win) {
 									itemId: "Map",
 									tooltip: "An agent map plots the geographic locations of agents within an Agent Population primitive. Connections between agents and agent states are also plotted."
 								}
-								],
-								listeners: {
-									toggle: function(t, button, isPressed){
-										if(isPressed){
-											var newV = button.getItemId();
-											
-											if (newV == "Scatterplot") {
-												Ext.getCmp("xAxisLabel")
-													.setValue("%o");
-												Ext.getCmp("yAxisLabel")
-													.setValue("%o");
-												Ext.getCmp("showMarkers")
-													.setValue(true);
-												Ext.getCmp("showLines")
-													.setValue(false);
-											} else if (newV == "Time Series") {
-												Ext.getCmp("xAxisLabel")
-													.setValue("Time (%u)");
-												Ext.getCmp("yAxisLabel")
-													.setValue("");
-												Ext.getCmp("showMarkers")
-													.setValue(false);
-												Ext.getCmp("showLines")
-													.setValue(true);
-											} else if (newV == "Map") {
-												Ext.getCmp("xAxisLabel")
-													.setValue("%o");
-												Ext.getCmp("yAxisLabel")
-													.setValue("%o");
-												Ext.getCmp("showMarkers")
-													.setValue(true);
-												Ext.getCmp("showLines")
-													.setValue(false);
-											}
-											/*
-											Ext.getCmp("chartSettings")
-												.setDisabled(newV == "Tabular");
-											*/
-											if(newV == "Tabular"){
-												Ext.getCmp("chartSettings").setStyle("opacity", 0.4);
-											}else{
-												Ext.getCmp("chartSettings").setStyle("opacity", 1);
-											}
+							],
+							listeners: {
+								toggle: function (t, button, isPressed) {
+									if (isPressed) {
+										var newV = button.getItemId();
+
+										if (newV == "Scatterplot") {
+											Ext.getCmp("xAxisLabel")
+												.setValue("%o");
+											Ext.getCmp("yAxisLabel")
+												.setValue("%o");
+											Ext.getCmp("showMarkers")
+												.setValue(true);
+											Ext.getCmp("showLines")
+												.setValue(false);
+										} else if (newV == "Time Series") {
+											Ext.getCmp("xAxisLabel")
+												.setValue("Time (%u)");
+											Ext.getCmp("yAxisLabel")
+												.setValue("");
+											Ext.getCmp("showMarkers")
+												.setValue(false);
+											Ext.getCmp("showLines")
+												.setValue(true);
+										} else if (newV == "Map") {
+											Ext.getCmp("xAxisLabel")
+												.setValue("%o");
+											Ext.getCmp("yAxisLabel")
+												.setValue("%o");
+											Ext.getCmp("showMarkers")
+												.setValue(true);
+											Ext.getCmp("showLines")
+												.setValue(false);
 										}
-										
+										/*
+										Ext.getCmp("chartSettings")
+											.setDisabled(newV == "Tabular");
+										*/
+										if (newV == "Tabular") {
+											Ext.getCmp("chartSettings").setStyle("opacity", 0.4);
+										} else {
+											Ext.getCmp("chartSettings").setStyle("opacity", 1);
+										}
 									}
+
 								}
-							},
-							
-							{
-															fieldLabel: getText('Title'),
-															id: 'chartTitle',
-															name: 'chartTitle',
-															allowBlank: false
-														}
-							
-							, Ext.create('Ext.form.field.Tag', {
-								fieldLabel: getText('Data'),
-								name: 'chartPrimitives',
-								id: 'chartPrimitives',
-								displayField: 'pname',
-								valueField: 'pid',
-								filterPickList: true,
-								queryMode: 'local',
-								store: displayConfigStore,
-								emptyText: getText('Select which data to display')
-							}), {
-								xtype: 'checkboxfield',
-								fieldLabel: '',
-								name: 'autoAdd',
-								id: 'autoAdd',
-								boxLabel: getText("Add newly created primitives to the data")
 							}
+						},
 
-						]
+						{
+							fieldLabel: getText('Title'),
+							id: 'chartTitle',
+							name: 'chartTitle',
+							allowBlank: false
+						}
+
+						, Ext.create('Ext.form.field.Tag', {
+							fieldLabel: getText('Data'),
+							name: 'chartPrimitives',
+							id: 'chartPrimitives',
+							displayField: 'pname',
+							valueField: 'pid',
+							filterPickList: true,
+							queryMode: 'local',
+							store: displayConfigStore,
+							emptyText: getText('Select which data to display')
+						}), {
+							xtype: 'checkboxfield',
+							fieldLabel: '',
+							name: 'autoAdd',
+							id: 'autoAdd',
+							boxLabel: getText("Add newly created primitives to the data")
+						}
+
+					]
+				},
+
+				{
+					xtype: 'fieldset',
+					title: getText('Chart Settings'),
+					defaultType: 'textfield',
+					id: "chartSettings",
+					defaults: {
+						anchor: '100%'
 					},
-
-					 {
+					layout: 'anchor',
+					items: [{
+						xtype: 'container',
+						layout: 'column',
+						anchor: '100%',
+						margin: 7,
+						items: [{
+							columnWidth: .33,
+							xtype: 'checkboxfield',
+							boxLabel: getText('Show Markers'),
+							name: 'showMarkers',
+							inputValue: '1',
+							id: 'showMarkers'
+						}, {
+							columnWidth: .33,
+							xtype: 'checkboxfield',
+							boxLabel: getText('Show Lines'),
+							name: 'showLines',
+							inputValue: '1',
+							id: 'showLines'
+						}, {
+							columnWidth: .33,
+							xtype: 'checkboxfield',
+							boxLabel: getText('Use Areas'),
+							name: 'showArea',
+							inputValue: '1',
+							id: 'showArea'
+						}]
+					}, {
+						xtype: "combo",
+						id: "legendPosition",
+						fieldLabel: getText('Legend Position'),
+						allowBlank: false,
+						labelWidth: 140,
+						store: [
+							["Automatic", getText("Automatic")],
+							["Top", getText("Top")],
+							["Right", getText("Right")],
+							["Bottom", getText("Bottom")],
+							["Left", getText("Left")],
+							["None", getText("None")]
+						],
+						queryMode: 'local',
+						forceSelection: true
+					}, {
 						xtype: 'fieldset',
-						title: getText('Chart Settings'),
+						title: getText('X-Axis'),
 						defaultType: 'textfield',
-						id: "chartSettings",
 						defaults: {
 							anchor: '100%'
 						},
 						layout: 'anchor',
 						items: [{
-							xtype: 'container',
-							layout: 'column',
-							anchor: '100%',
-							margin: 7,
-							items: [{
-								columnWidth: .33,
-								xtype: 'checkboxfield',
-								boxLabel: getText('Show Markers'),
-								name: 'showMarkers',
-								inputValue: '1',
-								id: 'showMarkers'
-							}, {
-								columnWidth: .33,
-								xtype: 'checkboxfield',
-								boxLabel: getText('Show Lines'),
-								name: 'showLines',
-								inputValue: '1',
-								id: 'showLines'
-							}, {
-								columnWidth: .33,
-								xtype: 'checkboxfield',
-								boxLabel: getText('Use Areas'),
-								name: 'showArea',
-								inputValue: '1',
-								id: 'showArea'
-							}]
-						},{
-							xtype: "combo",
-							id: "legendPosition",
-							fieldLabel: getText('Legend Position'),
-							allowBlank: false,
-							labelWidth: 140,
-							store: [
-								["Automatic", getText("Automatic")],
-								["Top", getText("Top")],
-								["Right", getText("Right")],
-								["Bottom", getText("Bottom")],
-								["Left", getText("Left")],
-								["None", getText("None")]
-							],
-							queryMode: 'local',
-							forceSelection: true
-						},{
-							xtype: 'fieldset',
-							title: getText('X-Axis'),
-							defaultType: 'textfield',
-							defaults: {
-								anchor: '100%'
-							},
-							layout: 'anchor',
-							items: [{
 							xtype: 'fieldcontainer',
 							fieldLabel: '',
 							layout: 'hbox',
@@ -372,15 +372,16 @@ function openDisplayConfigure(win) {
 								name: 'xAxisMax',
 								margin: '0 0 0 5'
 							}]
-						}]}, {
-							xtype: 'fieldset',
-							title: getText('Y-Axis'),
-							defaultType: 'textfield',
-							defaults: {
-								anchor: '100%'
-							},
-							layout: 'anchor',
-							items: [{
+						}]
+					}, {
+						xtype: 'fieldset',
+						title: getText('Y-Axis'),
+						defaultType: 'textfield',
+						defaults: {
+							anchor: '100%'
+						},
+						layout: 'anchor',
+						items: [{
 							xtype: 'fieldcontainer',
 							fieldLabel: '',
 							layout: 'hbox',
@@ -412,207 +413,208 @@ function openDisplayConfigure(win) {
 								name: 'yAxisMax',
 								margin: '0 0 0 5'
 							}]
-						}]},  {
-							xtype: 'fieldset',
-							title: getText('Secondary Y-Axis'),
-							defaultType: 'textfield',
-							defaults: {
-								anchor: '100%'
-							},
-							layout: 'anchor',
-							items: [Ext.create('Ext.form.field.Tag', {
-									fieldLabel: getText('Data'),
-									name: 'chartPrimitives2',
-									id: 'chartPrimitives2',
-									displayField: 'pname',
-									filterPickList: true,
-									valueField: 'pid',
-									queryMode: 'local',
-									store: displayConfigStore2,
-									emptyText: getText('Select which data to display')
-								}),{
-									xtype: 'fieldcontainer',
-									layout: 'hbox',
-									defaultType: 'textfield',
-
-									fieldDefaults: {
-										labelAlign: 'top'
-									},
-
-									items: [{
-										flex: 1,
-										fieldLabel: getText('Label'),
-										id: 'yAxisLabel2',
-										name: 'yAxisLabel2'
-									}, {
-										hidden: false,
-										xtype: "numberfield",
-										fieldLabel: getText('Min'),
-										width: 110,
-										id: 'yAxisMin2',
-										name: 'yAxisMin2',
-										margin: '0 0 0 5'
-									}, {
-										hidden: false,
-										xtype: "numberfield",
-										fieldLabel: getText('Max'),
-										width: 110,
-										id: 'yAxisMax2',
-										name: 'yAxisMax2',
-										margin: '0 0 0 5'
-									}]
-								}
-							]
 						}]
-					}
+					}, {
+						xtype: 'fieldset',
+						title: getText('Secondary Y-Axis'),
+						defaultType: 'textfield',
+						defaults: {
+							anchor: '100%'
+						},
+						layout: 'anchor',
+						items: [Ext.create('Ext.form.field.Tag', {
+							fieldLabel: getText('Data'),
+							name: 'chartPrimitives2',
+							id: 'chartPrimitives2',
+							displayField: 'pname',
+							filterPickList: true,
+							valueField: 'pid',
+							queryMode: 'local',
+							store: displayConfigStore2,
+							emptyText: getText('Select which data to display')
+						}), {
+							xtype: 'fieldcontainer',
+							layout: 'hbox',
+							defaultType: 'textfield',
+
+							fieldDefaults: {
+								labelAlign: 'top'
+							},
+
+							items: [{
+								flex: 1,
+								fieldLabel: getText('Label'),
+								id: 'yAxisLabel2',
+								name: 'yAxisLabel2'
+							}, {
+								hidden: false,
+								xtype: "numberfield",
+								fieldLabel: getText('Min'),
+								width: 110,
+								id: 'yAxisMin2',
+								name: 'yAxisMin2',
+								margin: '0 0 0 5'
+							}, {
+								hidden: false,
+								xtype: "numberfield",
+								fieldLabel: getText('Max'),
+								width: 110,
+								id: 'yAxisMax2',
+								name: 'yAxisMax2',
+								margin: '0 0 0 5'
+							}]
+						}
+						]
+					}]
+				}
 				]
 			})],
 
 			buttons: [{
-					scale: "large",
-					glyph: 0xf05c,
-					text: getText('Cancel'),
-					handler: function() {
-						displayConfigWin.close();
-					}
-				}, {
-					glyph: 0xf00c,
-					scale: "large",
-					text: getText('Apply'),
-					handler: function() {
-						var d = displayConfigWin.myDisplay;
-						var w = displayConfigWin.myWin;
-						if (Ext.getCmp("chartTitle")
-							.validate() && Ext.getCmp("chartPrimitives")
+				scale: "large",
+				glyph: 0xf05c,
+				text: getText('Cancel'),
+				handler: function () {
+					displayConfigWin.close();
+				}
+			}, {
+				glyph: 0xf00c,
+				scale: "large",
+				text: getText('Apply'),
+				handler: function () {
+					var d = displayConfigWin.myDisplay;
+					var w = displayConfigWin.myWin;
+					if (Ext.getCmp("chartTitle")
+						.validate() && Ext.getCmp("chartPrimitives")
 							.validate()) {
 
-							graph.getModel()
-								.beginUpdate();
-							graph.getModel()
-								.execute(new mxCellAttributeChange(d, "name", Ext.getCmp("chartTitle")
-									.getValue()));
-							w.tabs.getActiveTab()
-								.setTitle(Ext.getCmp("chartTitle")
-									.getValue());
-								
-							var type;	
-							Ext.getCmp("chartType").items.each(function(x){
-								if(x.pressed){
-									type = x.getItemId();
-								}
-							});
-							
-							graph.getModel()
-								.execute(new mxCellAttributeChange(d, "Type", type));
-							graph.getModel()
-								.execute(new mxCellAttributeChange(d, "AutoAddPrimitives", Ext.getCmp("autoAdd")
-									.getValue().toString()));
+						graph.getModel()
+							.beginUpdate();
+						graph.getModel()
+							.execute(new mxCellAttributeChange(d, "name", Ext.getCmp("chartTitle")
+								.getValue()));
+						w.tabs.getActiveTab()
+							.setTitle(Ext.getCmp("chartTitle")
+								.getValue());
 
-							graph.getModel()
-								.execute(new mxCellAttributeChange(d, "legendPosition", Ext.getCmp("legendPosition")
-									.getValue()));
-
-							graph.getModel()
-								.execute(new mxCellAttributeChange(d, "xAxis", Ext.getCmp("xAxisLabel")
-									.getValue()));
-							graph.getModel()
-								.execute(new mxCellAttributeChange(d, "yAxis", Ext.getCmp("yAxisLabel")
-									.getValue()));
-							graph.getModel()
-								.execute(new mxCellAttributeChange(d, "yAxis2", Ext.getCmp("yAxisLabel2")
-									.getValue()));
-
-							graph.getModel()
-								.execute(new mxCellAttributeChange(d, "xAxisMin", Ext.getCmp("xAxisMin")
-									.getValue()));
-							graph.getModel()
-								.execute(new mxCellAttributeChange(d, "yAxisMin", Ext.getCmp("yAxisMin")
-									.getValue()));
-							graph.getModel()
-								.execute(new mxCellAttributeChange(d, "yAxisMin2", Ext.getCmp("yAxisMin2")
-									.getValue()));
-
-							graph.getModel()
-								.execute(new mxCellAttributeChange(d, "xAxisMax", Ext.getCmp("xAxisMax")
-									.getValue()));
-							graph.getModel()
-								.execute(new mxCellAttributeChange(d, "yAxisMax", Ext.getCmp("yAxisMax")
-									.getValue()));
-							graph.getModel()
-								.execute(new mxCellAttributeChange(d, "yAxisMax2", Ext.getCmp("yAxisMax2")
-									.getValue()));
-
-							var items = Ext.getCmp("chartPrimitives")
-								.getValue();
-							if (type == "Scatterplot") {
-								if (items.length > 2) {
-									items.length = 2;
-									mxUtils.alert(getText("The primitive list for the scatterplot has been truncated to two items. One for the x-Axis and one for the y-Axis."));
-								} else if (items.length == 1) {
-									mxUtils.alert(getText("You need two primitives to create a scatterplot. One for the x-Axis and one for the y-Axis."));
-								}
-							} else if (type == "Map") {
-								//console.log(items);
-								var removed = false;
-								for (var i = items.length - 1; i >= 0; i--) {
-									//console.log("--")
-									//console.log(items[i]);
-									//console.log(findID(items[i]));
-									if (items[i] && findID(items[i])
-										.value.nodeName != "Agents") {
-										items.splice(i, 1);
-										removed = true;
-									} else if (!items[i]) {
-										items.splice(i, 1);
-									}
-
-								}
-								if (removed) {
-									mxUtils.alert(getText("Map charts can only show agent population primitives."));
-								}
+						var type;
+						Ext.getCmp("chartType").items.each(function (x) {
+							if (x.pressed) {
+								type = x.getItemId();
 							}
-							graph.getModel()
-								.execute(new mxCellAttributeChange(d, "Primitives", items.join(",")));
-							graph.getModel()
-								.execute(new mxCellAttributeChange(d, "Primitives2", Ext.getCmp("chartPrimitives2")
-									.getValue()
-									.join(",")));
+						});
 
-							graph.getModel()
-								.execute(new mxCellAttributeChange(d, "showMarkers", Ext.getCmp("showMarkers")
-									.getValue().toString()));
-							graph.getModel()
-								.execute(new mxCellAttributeChange(d, "showLines", Ext.getCmp("showLines")
-									.getValue().toString()));
-							graph.getModel()
-								.execute(new mxCellAttributeChange(d, "showArea", Ext.getCmp("showArea")
-									.getValue().toString()));
+						graph.getModel()
+							.execute(new mxCellAttributeChange(d, "Type", type));
+						graph.getModel()
+							.execute(new mxCellAttributeChange(d, "AutoAddPrimitives", Ext.getCmp("autoAdd")
+								.getValue().toString()));
 
-							w.tabs.getActiveTab()
-								.removeAll();
-							for (var i = w.displayInformation.maps.length - 1; i >= 0; i--) {
-								if (w.displayInformation.maps[i].id == d.id) {
-									w.displayInformation.maps.splice(i, 1);
-								}
+						graph.getModel()
+							.execute(new mxCellAttributeChange(d, "legendPosition", Ext.getCmp("legendPosition")
+								.getValue()));
+
+						graph.getModel()
+							.execute(new mxCellAttributeChange(d, "xAxis", Ext.getCmp("xAxisLabel")
+								.getValue()));
+						graph.getModel()
+							.execute(new mxCellAttributeChange(d, "yAxis", Ext.getCmp("yAxisLabel")
+								.getValue()));
+						graph.getModel()
+							.execute(new mxCellAttributeChange(d, "yAxis2", Ext.getCmp("yAxisLabel2")
+								.getValue()));
+
+						graph.getModel()
+							.execute(new mxCellAttributeChange(d, "xAxisMin", Ext.getCmp("xAxisMin")
+								.getValue()));
+						graph.getModel()
+							.execute(new mxCellAttributeChange(d, "yAxisMin", Ext.getCmp("yAxisMin")
+								.getValue()));
+						graph.getModel()
+							.execute(new mxCellAttributeChange(d, "yAxisMin2", Ext.getCmp("yAxisMin2")
+								.getValue()));
+
+						graph.getModel()
+							.execute(new mxCellAttributeChange(d, "xAxisMax", Ext.getCmp("xAxisMax")
+								.getValue()));
+						graph.getModel()
+							.execute(new mxCellAttributeChange(d, "yAxisMax", Ext.getCmp("yAxisMax")
+								.getValue()));
+						graph.getModel()
+							.execute(new mxCellAttributeChange(d, "yAxisMax2", Ext.getCmp("yAxisMax2")
+								.getValue()));
+
+						var items = Ext.getCmp("chartPrimitives")
+							.getValue();
+						if (type == "Scatterplot") {
+							if (items.length > 2) {
+								items.length = 2;
+								mxUtils.alert(getText("The primitive list for the scatterplot has been truncated to two items. One for the x-Axis and one for the y-Axis."));
+							} else if (items.length == 1) {
+								mxUtils.alert(getText("You need two primitives to create a scatterplot. One for the x-Axis and one for the y-Axis."));
 							}
-							for (var i = w.displayInformation.histograms.length - 1; i >= 0; i--) {
-								if (w.displayInformation.histograms[i].id == d.id) {
-									w.displayInformation.histograms.splice(i, 1);
+						} else if (type == "Map") {
+							//console.log(items);
+							var removed = false;
+							for (var i = items.length - 1; i >= 0; i--) {
+								//console.log("--")
+								//console.log(items[i]);
+								//console.log(findID(items[i]));
+								if (items[i] && findID(items[i])
+									.value.nodeName != "Agents") {
+									items.splice(i, 1);
+									removed = true;
+								} else if (!items[i]) {
+									items.splice(i, 1);
 								}
-							}
-							w.tabs.getActiveTab()
-								.add(renderDisplay(d, w.displayInformation));
-							displayConfigWin.close();
 
-							graph.getModel()
-								.endUpdate();
-						
-								win.enableTabs();
-						} else {
-							mxUtils.alert(getText("Correct the display configuration before applying."));
+							}
+							if (removed) {
+								mxUtils.alert(getText("Map charts can only show agent population primitives."));
+							}
 						}
+						graph.getModel()
+							.execute(new mxCellAttributeChange(d, "Primitives", items.join(",")));
+						graph.getModel()
+							.execute(new mxCellAttributeChange(d, "Primitives2", Ext.getCmp("chartPrimitives2")
+								.getValue()
+								.join(",")));
+
+						graph.getModel()
+							.execute(new mxCellAttributeChange(d, "showMarkers", Ext.getCmp("showMarkers")
+								.getValue().toString()));
+						graph.getModel()
+							.execute(new mxCellAttributeChange(d, "showLines", Ext.getCmp("showLines")
+								.getValue().toString()));
+						graph.getModel()
+							.execute(new mxCellAttributeChange(d, "showArea", Ext.getCmp("showArea")
+								.getValue().toString()));
+
+						w.tabs.getActiveTab()
+							.removeAll();
+						for (var i = w.displayInformation.maps.length - 1; i >= 0; i--) {
+							if (w.displayInformation.maps[i].id == d.id) {
+								w.displayInformation.maps.splice(i, 1);
+							}
+						}
+						for (var i = w.displayInformation.histograms.length - 1; i >= 0; i--) {
+							if (w.displayInformation.histograms[i].id == d.id) {
+								w.displayInformation.histograms.splice(i, 1);
+							}
+						}
+						w.tabs.getActiveTab()
+							.add(renderDisplay(d, w.displayInformation));
+						displayConfigWin.close();
+
+						graph.getModel()
+							.endUpdate();
+
+						win.enableTabs();
+					} else {
+						mxUtils.alert(getText("Correct the display configuration before applying."));
 					}
 				}
+			}
 
 			]
 		});
@@ -627,7 +629,7 @@ function openDisplayConfigure(win) {
 		});
 	}
 
-	storeData.sort(function(a, b) {
+	storeData.sort(function (a, b) {
 		return a.pname.localeCompare(b.pname);
 	});
 
@@ -637,7 +639,7 @@ function openDisplayConfigure(win) {
 		.display;
 	Ext.getCmp("chartTitle")
 		.setValue(d.getAttribute("name"));
-	Ext.getCmp("chartType").items.each(function(x){
+	Ext.getCmp("chartType").items.each(function (x) {
 		x.setPressed(x.getItemId() == d.getAttribute("Type"));
 	});
 	Ext.getCmp("xAxisLabel")
@@ -677,7 +679,7 @@ function openDisplayConfigure(win) {
 	Ext.getCmp("chartPrimitives")
 		.setValue([]);
 	if (!isUndefined(d.getAttribute("Primitives"))) {
-		
+
 		Ext.getCmp("chartPrimitives")
 			.setValue(d.getAttribute("Primitives")
 				.split(","));
@@ -730,7 +732,7 @@ function renderDisplay(display, displayInformation) {
 			sortable: true,
 			flex: 1,
 			dataIndex: "Time",
-			renderer: function(x) {
+			renderer: function (x) {
 				return round(x, 9);
 			}
 		}];
@@ -751,7 +753,10 @@ function renderDisplay(display, displayInformation) {
 		var grid = new Ext.grid.GridPanel({
 			store: displayInformation.store,
 			columns: cols,
+			layout: 'fit',
+			scrollable: true,
 			stripeRows: true,
+			bufferedRenderer: false,
 			border: false,
 			frame: false,
 			header: false,
@@ -771,7 +776,7 @@ function renderDisplay(display, displayInformation) {
 		var displayNames2 = [];
 		var displaySeries = [];
 
-		
+
 		var defaultColorIndex = 0;
 		var colors = [];
 
@@ -859,7 +864,7 @@ function renderDisplay(display, displayInformation) {
 								displayNames2.push(displayInformation.headers[i])
 								displayIds2.push(x);
 							};
-							
+
 							displaySeries.push({
 								type: 'line',
 								axis: left ? "left" : "right",
@@ -881,7 +886,7 @@ function renderDisplay(display, displayInformation) {
 									trackMouse: true,
 									width: 160,
 									style: 'background-color: #fff',
-									renderer: function(storeItem, item) {
+									renderer: function (storeItem, item) {
 										this.setHtml("Time: " + storeItem.get("Time") + "<br/>" + clean(item.series.getTitle()) + ": " + commaStr(storeItem.get(item.field)));
 									}
 								}
@@ -908,7 +913,7 @@ function renderDisplay(display, displayInformation) {
 			},
 			grid: true,
 			titleMargin: 16,
-			renderer: function(x) {
+			renderer: function (x) {
 				return round(x, 9);
 			}
 		}];
@@ -952,9 +957,9 @@ function renderDisplay(display, displayInformation) {
 
 		chart = {
 			flex: 1,
-			interactions: ['crosszoom',  'itemhighlight'],
+			interactions: ['crosszoom', 'itemhighlight'],
 
-			
+
 			animation: false,
 			shadow: false,
 			store: displayInformation.store,
@@ -1000,19 +1005,19 @@ function renderDisplay(display, displayInformation) {
 			//strokeStyle.opacity = 0
 			strokeStyle.stroke = "none";
 		}
-		
-		var createTooltip = function(xfield, xname, yfield, yname){
-			return function(storeItem, item) {
-				this.setHtml(clean(xname)+": " + commaStr(storeItem.get(xfield)) + "<br/>" + clean(yname) + ": " + commaStr(storeItem.get(yfield)));
+
+		var createTooltip = function (xfield, xname, yfield, yname) {
+			return function (storeItem, item) {
+				this.setHtml(clean(xname) + ": " + commaStr(storeItem.get(xfield)) + "<br/>" + clean(yname) + ": " + commaStr(storeItem.get(yfield)));
 			}
 		}
 
 		chart = Ext.create("Ext.chart.CartesianChart", {
 			flex: 1,
-			interactions: ['crosszoom',  'itemhighlight'],
+			interactions: ['crosszoom', 'itemhighlight'],
 			xtype: 'chart',
 			animation: false,
-			
+
 			shadow: false,
 			store: displayInformation.store,
 			axes: [{
@@ -1069,7 +1074,7 @@ function renderDisplay(display, displayInformation) {
 		});
 
 	} else if (type == "Map") {
-		
+
 		var defaultColorIndex = 0;
 		var colors = [];
 
@@ -1087,12 +1092,12 @@ function renderDisplay(display, displayInformation) {
 		var yfields = [];
 		var agents = [];
 
-		var createAgentTips = function(agentName) {
-			return function(storeItem, item) {
+		var createAgentTips = function (agentName) {
+			return function (storeItem, item) {
 				var label = item.field;
-				label = label.substr(0, label.length-1);
-				this.setTitle(agentName+  " " + storeItem.get("agentIndex"));
-				this.setHtml((storeItem.get("states")?("<p>" + storeItem.get("states") + "</p>"):"")+"<p>(" + commaStr(storeItem.get(label+"x")) + "; " + commaStr(storeItem.get(label+"y")) + ")</p>");
+				label = label.substr(0, label.length - 1);
+				this.setTitle(agentName + " " + storeItem.get("agentIndex"));
+				this.setHtml((storeItem.get("states") ? ("<p>" + storeItem.get("states") + "</p>") : "") + "<p>(" + commaStr(storeItem.get(label + "x")) + "; " + commaStr(storeItem.get(label + "y")) + ")</p>");
 			}
 		}
 
@@ -1122,13 +1127,13 @@ function renderDisplay(display, displayInformation) {
 		chart = Ext.create("Ext.chart.CartesianChart", {
 
 			flex: 1,
-			interactions: ['crosszoom',  'itemhighlight'],
+			interactions: ['crosszoom', 'itemhighlight'],
 			legend: display.getAttribute('legendPosition') == "None" ? false : {
 				docked: display.getAttribute('legendPosition') == "Automatic" ? (seriesBase.length > 4 ? 'right' : 'top') : display.getAttribute('legendPosition').toLowerCase()
 			},
 			animation: false,
 			animate: false,
-			
+
 			shadow: false,
 			store: store,
 			axes: [{
@@ -1144,7 +1149,7 @@ function renderDisplay(display, displayInformation) {
 				renderer: commaStr,
 				minimum: 0,
 				maximum: parseFloat(simpleNum(a.data.height, a.data.units))
-			},{
+			}, {
 				type: 'numeric',
 				position: 'bottom',
 				fields: xfields,
@@ -1160,67 +1165,67 @@ function renderDisplay(display, displayInformation) {
 			}],
 			series: displaySeries,
 			listeners: {
-				'redraw': function(chart){
-					
-					if(this.oldLinks){
-						for(var i=0; i<this.oldLinks.length; i++){
+				'redraw': function (chart) {
+
+					if (this.oldLinks) {
+						for (var i = 0; i < this.oldLinks.length; i++) {
 							this.oldLinks[i].destroy();
 						}
-						this.oldLinks = []; 
+						this.oldLinks = [];
 					}
-					if(this.links){
+					if (this.links) {
 						//window.chart=chart;
-						var scaleX = function(v){
+						var scaleX = function (v) {
 							var box = chart.getInnerRect();
 							var outX = chart.getAxes()[1].getRange();
-							
-							return (v-outX[0])/(outX[1]-outX[0]) * box[2];
+
+							return (v - outX[0]) / (outX[1] - outX[0]) * box[2];
 						}
-						var scaleY = function(v){
+						var scaleY = function (v) {
 							var box = chart.getInnerRect();
 							var outY = chart.getAxes()[0].getRange();
-							
-							return box[3] - (v-outY[0])/(outY[1]-outY[0]) * box[3];
+
+							return box[3] - (v - outY[0]) / (outY[1] - outY[0]) * box[3];
 						}
-						
+
 						this.oldLinks = [];
 
-						var color = "#aaa"; 
+						var color = "#aaa";
 						var opacity = 0.5;
 						var strokeWidth = 1;
-						
+
 						var defs = [];
 
-						for(var link in this.links){
+						for (var link in this.links) {
 
 							var start = this.links[link][0];
 							var end = this.links[link][1];
 							//console.log(start)
 							//console.log(end)
 							var points = [[scaleX(start.items[0]), scaleY(start.items[1])], [scaleX(end.items[0]), scaleY(end.items[1])]];
-						//	console.log(points)
-						
-						    var path = "M"+points[0][0]+" "+points[0][1]+" "; // start svg path parameters with given array
-						    for (i = 1; i < points.length; i++) {
-						        path = path+"L"+points[i][0]+" "+points[i][1]+" ";
-						    }
-						    path = path + "Z"; // end svg path params
+							//	console.log(points)
+
+							var path = "M" + points[0][0] + " " + points[0][1] + " "; // start svg path parameters with given array
+							for (i = 1; i < points.length; i++) {
+								path = path + "L" + points[i][0] + " " + points[i][1] + " ";
+							}
+							path = path + "Z"; // end svg path params
 							//console.log(path)
-							
-						    defs.push({
-						        type: 'path',
-						        opacity: opacity,
-						        fill: color,
-						        path: path,
-						        stroke: color,
-						        'stroke-width': strokeWidth
-						    });
-	
+
+							defs.push({
+								type: 'path',
+								opacity: opacity,
+								fill: color,
+								path: path,
+								stroke: color,
+								'stroke-width': strokeWidth
+							});
+
 						}
-						
-					    this.oldLinks = chart.getSurface("main").add.apply(chart.getSurface("main"), defs);
+
+						this.oldLinks = chart.getSurface("main").add.apply(chart.getSurface("main"), defs);
 					}
-					
+
 				}
 			}
 		});
@@ -1252,7 +1257,7 @@ function renderDisplay(display, displayInformation) {
 				align: 'stretch'
 			},
 
-			html: "<div id='scratchpad" + analysisCount + "_" +display.id + "' style='z-index:1000;position:absolute; left:0px;bottom:0px;top:0px;right:0px;display:none;'></div>"
+			html: "<div id='scratchpad" + analysisCount + "_" + display.id + "' style='z-index:1000;position:absolute; left:0px;bottom:0px;top:0px;right:0px;display:none;'></div>"
 			/*,
 			dockedItems: [{
 				xtype: 'toolbar',
@@ -1308,42 +1313,42 @@ function renderDisplay(display, displayInformation) {
 		//console.log(color);
 
 		var markers = [{
-				type: "circle",
-				radius: 5
-			}, {
-				type: "rect",
-				width: 9,
-				height: 9
-			}, {
-				type: 'path',
-				path: [
-					['M', 0, 1],
-					['L', 1, 0],
-					['L', 0, -1],
-					['L', -1, 0],
-					['Z']
-				],
-				scale: 6
-			},
+			type: "circle",
+			radius: 5
+		}, {
+			type: "rect",
+			width: 9,
+			height: 9
+		}, {
+			type: 'path',
+			path: [
+				['M', 0, 1],
+				['L', 1, 0],
+				['L', 0, -1],
+				['L', -1, 0],
+				['Z']
+			],
+			scale: 6
+		},
 
-			{
-				type: 'path',
-				path: [
-					['M', 0, -145],
-					['L', 48, -50],
-					['L', 153, -36],
-					['L', 76, 39],
-					['L', 93, 143],
-					['L', 0, 95],
-					['L', -93, 143],
-					['L', -76, 39],
-					['L', -153, -36],
-					['L', -48, -50],
-					['Z']
-				],
-				scalingX: 0.05,
-				scalingY: -0.05
-			}
+		{
+			type: 'path',
+			path: [
+				['M', 0, -145],
+				['L', 48, -50],
+				['L', 153, -36],
+				['L', 76, 39],
+				['L', 93, 143],
+				['L', 0, 95],
+				['L', -93, 143],
+				['L', -76, 39],
+				['L', -153, -36],
+				['L', -48, -50],
+				['Z']
+			],
+			scalingX: 0.05,
+			scalingY: -0.05
+		}
 
 		];
 
@@ -1399,7 +1404,7 @@ function createResultsWindow(displayInformation, config) {
 			layout: "fit",
 			display: displays[i]
 		});
-		if(config && displays[i] == config.selectedDisplay){
+		if (config && displays[i] == config.selectedDisplay) {
 			selectedTab = i;
 		}
 	}
@@ -1428,7 +1433,7 @@ function createResultsWindow(displayInformation, config) {
 
 	scripter.updatingSlider = false;
 	scripter.timeIndex = 0;
-	scripter.maxTime = function() {
+	scripter.maxTime = function () {
 		//console.log("Max: "+this.simulator.displayInformation.store.maxLoaded)
 		return this.simulator.displayInformation.store.maxLoaded;
 	};
@@ -1437,7 +1442,7 @@ function createResultsWindow(displayInformation, config) {
 	scripter.times = displayInformation.times;
 	scripter.simulator = simulate;
 
-	scripter.showSliders = function() {
+	scripter.showSliders = function () {
 		if (!scripter.slidersShown) {
 			if (sliderPrimitives(["Variable", "Flow"]).length > 0) {
 				scripter.dockedPanel = Ext.create("Ext.Panel", {
@@ -1446,7 +1451,7 @@ function createResultsWindow(displayInformation, config) {
 						type: "vbox",
 						align: "stretch"
 					},
-					items: [createSliders(["Variable", "Flow"], function(cell, value) {
+					items: [createSliders(["Variable", "Flow"], function (cell, value) {
 						if (!scripter.isFinished) {
 							var val = new Material(value);
 							for (var i = 0; i < simulate.sliders[cell.id].length; i++) {
@@ -1457,7 +1462,7 @@ function createResultsWindow(displayInformation, config) {
 						} else {
 							mxUtils.alert("The simulation has finished and slider values cannot be changed.")
 						}
-					}, function(slider, setValue, textField, newValue) {
+					}, function (slider, setValue, textField, newValue) {
 						setValue(slider.sliderCell, newValue)
 					})],
 					dock: "right",
@@ -1487,7 +1492,7 @@ function createResultsWindow(displayInformation, config) {
 		step: scripter.timeStep,
 		margin: '0 10 0 10',
 		useTips: true,
-		tipText: function(thumb) {
+		tipText: function (thumb) {
 			return "" + thumb.slider.s.times[thumb.slider.getValue()];
 		}
 	});
@@ -1507,12 +1512,12 @@ function createResultsWindow(displayInformation, config) {
 			[-1, getText("Full Speed")]
 		],
 		queryMode: 'local',
-		value: window.storyConverter?-1:((config && config.rate!==undefined)?config.rate:parseFloat(getSetting()
+		value: window.storyConverter ? -1 : ((config && config.rate !== undefined) ? config.rate : parseFloat(getSetting()
 			.getAttribute("Throttle"))),
 		width: 140,
 		forceSelection: true,
 		listeners: {
-			select: function(me) {
+			select: function (me) {
 				graph.getModel()
 					.beginUpdate();
 				var edit = new mxCellAttributeChange(getSetting(), "Throttle", me.getValue());
@@ -1527,7 +1532,7 @@ function createResultsWindow(displayInformation, config) {
 
 	scripter.slider.s = scripter;
 
-	scripter.slider.on('change', function(slider, newValue) {
+	scripter.slider.on('change', function (slider, newValue) {
 		if (!this.s.updatingSlider) {
 			if (newValue > this.s.maxTime()) {
 				this.setValue(this.s.maxTime());
@@ -1550,12 +1555,12 @@ function createResultsWindow(displayInformation, config) {
 		scale: 'medium',
 		margin: '0 10 0 10',
 		glyph: 0xf04d,
-		handler: function(btn) {
+		handler: function (btn) {
 			endRunningSimulation();
 		}
 	});
 
-	scripter.finished = function() {
+	scripter.finished = function () {
 		this.isFinished = true;
 		this.stopBut.hide();
 		//this.spinner.hide();
@@ -1568,9 +1573,9 @@ function createResultsWindow(displayInformation, config) {
 	scripter.playBut.s = scripter;
 
 	scripter.animInter = -1;
-	scripter.playBut.on("toggle", function(b, pressed) {
+	scripter.playBut.on("toggle", function (b, pressed) {
 		if (pressed) {
-			
+
 			scripter.endMode = "wait";
 
 			if (scripter.slider.getValue() == displayInformation.times.length - 1) {
@@ -1578,9 +1583,9 @@ function createResultsWindow(displayInformation, config) {
 			}
 			scripter.playBut.setGlyph(0xf04c);
 			scripter.advanceTimer();
-			
+
 			clearInterval(scripter.animInter);
-			scripter.animInter = setInterval(function() {
+			scripter.animInter = setInterval(function () {
 				scripter.advanceTimer()
 			}, 100 / Math.min(0.5, scripter.combo.getValue()));
 
@@ -1588,13 +1593,13 @@ function createResultsWindow(displayInformation, config) {
 				scripter.simulator.shouldSleep = false;
 				scripter.simulator.resume();
 			}
-			
+
 		} else {
 			scripter.pause(true);
 		}
 	});
 
-	scripter.pause = function(shouldSleep) {
+	scripter.pause = function (shouldSleep) {
 		//console.log("scripter pause")
 
 		if (this.slider.isDisabled()) {
@@ -1620,7 +1625,7 @@ function createResultsWindow(displayInformation, config) {
 
 	scripter.endMode = "wait"; // "wait" or "pause"
 
-	scripter.advanceTimer = function() {
+	scripter.advanceTimer = function () {
 		//console.log("advance")
 		if ((this.slider.getValue() < this.maxTime()) || (this.maxTime() == displayInformation.times.length - 1)) {
 			if (this.slider.getValue() < displayInformation.times.length - 1) {
@@ -1640,20 +1645,20 @@ function createResultsWindow(displayInformation, config) {
 		}
 	}
 
-	scripter.loadTime = function(time) {
+	scripter.loadTime = function (time) {
 		displayInformation.store.clearFilter(true);
 		this.time = time;
 		//console.log(time);
 		displayInformation.store.filter([{
-			filterFn: function(item) {
+			filterFn: function (item) {
 				return item.get("id") <= time;
 			}
 		}]);
 
-		displayInformation.maps.forEach(function(x) {
+		displayInformation.maps.forEach(function (x) {
 			buildMapStore(x, time);
 		});
-		displayInformation.histograms.forEach(function(x) {
+		displayInformation.histograms.forEach(function (x) {
 			buildHistogramStore(x, time);
 		});
 
@@ -1667,7 +1672,7 @@ function createResultsWindow(displayInformation, config) {
 		var index = tabs.items.indexOf(tabs.getActiveTab())
 		win.down("#delete").setDisabled(win.displays.length == 0);
 		win.down("#left").setDisabled(win.displays.length < 2 || index == 0);
-		win.down("#right").setDisabled(win.displays.length < 2 || index == win.displays.length-1);
+		win.down("#right").setDisabled(win.displays.length < 2 || index == win.displays.length - 1);
 		win.down("#scratchpad").setDisabled(win.displays.length == 0 || win.displays[index].getAttribute("Type") == "Tabular");
 		win.down("#configure").setDisabled(win.displays.length == 0);
 	}
@@ -1712,181 +1717,181 @@ function createResultsWindow(displayInformation, config) {
 			dock: 'top',
 			hidden: (!viewConfig.showResultsEdit),
 			items: [{
-					glyph: 0xf055,
-					scale: "large",
-					text: getText('Add Display'),
-					iconCls: 'green-icon',
-					handler: function() {
-						var parent = graph.getDefaultParent();
-						var win = this.findParentByType("window");
-						var vertex;
-						graph.getModel()
-							.beginUpdate();
-						vertex = graph.insertVertex(parent, null, primitiveBank.display.cloneNode(true), 10, 10, 64, 64, "display");
-						vertex.visible = false;
+				glyph: 0xf055,
+				scale: "large",
+				text: getText('Add Display'),
+				iconCls: 'green-icon',
+				handler: function () {
+					var parent = graph.getDefaultParent();
+					var win = this.findParentByType("window");
+					var vertex;
+					graph.getModel()
+						.beginUpdate();
+					vertex = graph.insertVertex(parent, null, primitiveBank.display.cloneNode(true), 10, 10, 64, 64, "display");
+					vertex.visible = false;
 
-						setName(vertex, "New Display");
-						graph.getModel()
-							.endUpdate();
-						win.displays.push(vertex);
-						win.tabs.add({
-							title: vertex.getAttribute("name"),
-							items: [renderDisplay(vertex, win.displayInformation)],
-							layout: "fit",
-							display: vertex
-						});
-						win.tabs.setActiveTab(primitives("Display")
-							.length - 1);
-						openDisplayConfigure(win);
-
-
-						enableTabs();
-					}
-				}, {
-					scale: "large",
-					glyph: 0xf014,
-					iconCls: 'red-icon',
-					tooltip: getText('Delete Display'),
-					itemId: "delete",
-					handler: function() {
-
-						var win = this.findParentByType("window");
-						if (win.displays.length > 0) {
-
-							Ext.MessageBox.confirm('Delete Display', 'Are you sure you want to delete the display? This cannot be undone.', function(btn) {
-								if (btn === 'yes') {
-
-									var tabs = win.tabs;
-									var tabIndex = tabs.items.indexOf(tabs.getActiveTab());
-
-									graph.getModel()
-										.beginUpdate();
-									graph.removeCells([win.displays[tabIndex]], false);
-									graph.getModel()
-										.endUpdate();
-									win.displays.splice(tabIndex, 1);
-									tabs.remove(tabs.getActiveTab());
-
-									enableTabs();
-								}
-							});
+					setName(vertex, "New Display");
+					graph.getModel()
+						.endUpdate();
+					win.displays.push(vertex);
+					win.tabs.add({
+						title: vertex.getAttribute("name"),
+						items: [renderDisplay(vertex, win.displayInformation)],
+						layout: "fit",
+						display: vertex
+					});
+					win.tabs.setActiveTab(primitives("Display")
+						.length - 1);
+					openDisplayConfigure(win);
 
 
-						} else {
+					enableTabs();
+				}
+			}, {
+				scale: "large",
+				glyph: 0xf014,
+				iconCls: 'red-icon',
+				tooltip: getText('Delete Display'),
+				itemId: "delete",
+				handler: function () {
 
-							mxUtils.alert(getText("No chart or table to delete."), "error", true);
-						}
-					}
-				}, '-', {
-					scale: "large",
-					glyph: 0xf137,
-					text: '',
-					tooltip: getText("Move display to the left."),
-					itemId: "left",
-					handler: function() {
+					var win = this.findParentByType("window");
+					if (win.displays.length > 0) {
 
-						var win = this.findParentByType("window");
-						if (win.displays.length > 0) {
-							var tabs = win.tabs;
-							var tabIndex = tabs.items.indexOf(tabs.getActiveTab());
+						Ext.MessageBox.confirm('Delete Display', 'Are you sure you want to delete the display? This cannot be undone.', function (btn) {
+							if (btn === 'yes') {
 
-							var display = win.displays[tabIndex];
-							graph.orderCells(true, [display]);
+								var tabs = win.tabs;
+								var tabIndex = tabs.items.indexOf(tabs.getActiveTab());
 
-							var child = tabs.getActiveTab();
-							win.displays.splice(tabIndex, 1);
-							win.displays = [display].concat(win.displays);
+								graph.getModel()
+									.beginUpdate();
+								graph.removeCells([win.displays[tabIndex]], false);
+								graph.getModel()
+									.endUpdate();
+								win.displays.splice(tabIndex, 1);
+								tabs.remove(tabs.getActiveTab());
 
-							tabs.remove(child, false);
-							tabs.insert(0, child);
-							tabs.setActiveTab(child);
-
-						} else {
-							mxUtils.alert(getText("No chart or table to reorder."), "error", true);
-						}
-					}
-				}, {
-					scale: "large",
-					glyph: 0xf138,
-					text: '',
-					tooltip: getText("Move display to the right."),
-					itemId: "right",
-					handler: function() {
-
-						var win = this.findParentByType("window");
-						if (win.displays.length > 0) {
-							var tabs = win.tabs;
-							var tabIndex = tabs.items.indexOf(tabs.getActiveTab());
-
-							var display = win.displays[tabIndex];
-							graph.orderCells(false, [display]);
-
-							win.displays.splice(tabIndex, 1);
-							win.displays.push(display);
-
-							var child = tabs.getActiveTab();
-							tabs.remove(child, false);
-							tabs.add(child);
-							tabs.setActiveTab(child);
-						} else {
-							mxUtils.alert(getText("No chart or table to reorder."), "error", true);
-						}
-					}
-				}, '->', {
-					scale: "large",
-					glyph: 0xf040,
-					text: getText(''),
-					tooltip: getText('Scratchpad'),
-					itemId: "scratchpad",
-					handler: function() {
-
-						var win = this.findParentByType("window");
-						if (win.displays.length > 0) {
-							var tabs = win.tabs;
-							var tabIndex = tabs.items.indexOf(tabs.getActiveTab());
-
-							var display = win.displays[tabIndex];
-							if (display.getAttribute("Type") != "Tabular") {
-
-								var id = "scratchpad" + win.analysisCount + "_" + display.id;
-								if (win.scratchPadStatus[id] == "shown") {
-									Ext.get(id)
-										.setDisplayed("none");
-									win.scratchPadStatus[id] = "hidden";
-								} else if (win.scratchPadStatus[id] == "hidden") {
-									Ext.get(id)
-										.setDisplayed("block");
-									win.scratchPadStatus[id] = "shown";
-								} else {
-									if (Ext.get(id)) {
-										Ext.get(id)
-											.setDisplayed("block");
-										Scratchpad($('#' + id));
-										win.scratchPadStatus[id] = "shown";
-									} else {
-										mxUtils.alert(getText("Scratchpads can only be shown for charts with data."), "error", true);
-									}
-								}
-								return;
+								enableTabs();
 							}
-						}
-						mxUtils.alert(getText("Scratchpads can only be shown for charts."), "error", true);
+						});
 
-					}
-				}, {
-					scale: "large",
-					glyph: 0xf085,
-					text: getText('Configure'),
-					itemId: "configure",
-					handler: function() {
-						var win = this.findParentByType("window");
-						if (win.displays.length > 0) {
-							openDisplayConfigure(win);
-						} else {
-							mxUtils.alert(getText("Add a chart or table to configure it."), "notice", true);
-						}
+
+					} else {
+
+						mxUtils.alert(getText("No chart or table to delete."), "error", true);
 					}
 				}
+			}, '-', {
+				scale: "large",
+				glyph: 0xf137,
+				text: '',
+				tooltip: getText("Move display to the left."),
+				itemId: "left",
+				handler: function () {
+
+					var win = this.findParentByType("window");
+					if (win.displays.length > 0) {
+						var tabs = win.tabs;
+						var tabIndex = tabs.items.indexOf(tabs.getActiveTab());
+
+						var display = win.displays[tabIndex];
+						graph.orderCells(true, [display]);
+
+						var child = tabs.getActiveTab();
+						win.displays.splice(tabIndex, 1);
+						win.displays = [display].concat(win.displays);
+
+						tabs.remove(child, false);
+						tabs.insert(0, child);
+						tabs.setActiveTab(child);
+
+					} else {
+						mxUtils.alert(getText("No chart or table to reorder."), "error", true);
+					}
+				}
+			}, {
+				scale: "large",
+				glyph: 0xf138,
+				text: '',
+				tooltip: getText("Move display to the right."),
+				itemId: "right",
+				handler: function () {
+
+					var win = this.findParentByType("window");
+					if (win.displays.length > 0) {
+						var tabs = win.tabs;
+						var tabIndex = tabs.items.indexOf(tabs.getActiveTab());
+
+						var display = win.displays[tabIndex];
+						graph.orderCells(false, [display]);
+
+						win.displays.splice(tabIndex, 1);
+						win.displays.push(display);
+
+						var child = tabs.getActiveTab();
+						tabs.remove(child, false);
+						tabs.add(child);
+						tabs.setActiveTab(child);
+					} else {
+						mxUtils.alert(getText("No chart or table to reorder."), "error", true);
+					}
+				}
+			}, '->', {
+				scale: "large",
+				glyph: 0xf040,
+				text: getText(''),
+				tooltip: getText('Scratchpad'),
+				itemId: "scratchpad",
+				handler: function () {
+
+					var win = this.findParentByType("window");
+					if (win.displays.length > 0) {
+						var tabs = win.tabs;
+						var tabIndex = tabs.items.indexOf(tabs.getActiveTab());
+
+						var display = win.displays[tabIndex];
+						if (display.getAttribute("Type") != "Tabular") {
+
+							var id = "scratchpad" + win.analysisCount + "_" + display.id;
+							if (win.scratchPadStatus[id] == "shown") {
+								Ext.get(id)
+									.setDisplayed("none");
+								win.scratchPadStatus[id] = "hidden";
+							} else if (win.scratchPadStatus[id] == "hidden") {
+								Ext.get(id)
+									.setDisplayed("block");
+								win.scratchPadStatus[id] = "shown";
+							} else {
+								if (Ext.get(id)) {
+									Ext.get(id)
+										.setDisplayed("block");
+									Scratchpad($('#' + id));
+									win.scratchPadStatus[id] = "shown";
+								} else {
+									mxUtils.alert(getText("Scratchpads can only be shown for charts with data."), "error", true);
+								}
+							}
+							return;
+						}
+					}
+					mxUtils.alert(getText("Scratchpads can only be shown for charts."), "error", true);
+
+				}
+			}, {
+				scale: "large",
+				glyph: 0xf085,
+				text: getText('Configure'),
+				itemId: "configure",
+				handler: function () {
+					var win = this.findParentByType("window");
+					if (win.displays.length > 0) {
+						openDisplayConfigure(win);
+					} else {
+						mxUtils.alert(getText("Add a chart or table to configure it."), "notice", true);
+					}
+				}
+			}
 
 			]
 		}]
@@ -1901,46 +1906,46 @@ function createResultsWindow(displayInformation, config) {
 
 	winConfig.stateful = is_editor && (!is_embed);
 	winConfig.stateId = "results_window";
-	
+
 	winConfig.tools = [
 		{
-		    type: 'pin',
-		    tooltip: getText('Link Results to Model'),
+			type: 'pin',
+			tooltip: getText('Link Results to Model'),
 			pinned: false,
 			itemId: "pinTool",
-		    callback: function(panel, tool, event) {
-				if(tool.pinned){
+			callback: function (panel, tool, event) {
+				if (tool.pinned) {
 					tool.pinned = false;
 					tool.setStyle('opacity', 0.4);
 					linkedResults = undefined;
-					
-				}else{
+
+				} else {
 					tool.pinned = true;
 					tool.setStyle('opacity', 1);
 					linkedResults = win;
-					
+
 					Ext.WindowMgr.each(
-					      function(other){
-	  						if (win != other) {
-	  							var t = other.down("#pinTool");
-	  							if(t && t.pinned){
-	  								t.pinned = false;
-	  								t.setStyle('opacity', 0.4);
-	  							}
-	  						}
-					      }
-					  );
-					  
-					  for(var id in win.sliders){
-						  var cell = win.sliders[id][0];
-						  var v = evaluateTree(trimTree(cell.dna.value), varBank).value
-						  setValue(findID(id), v);
-					  }
-					  
-					  selectionChanged(true);
-				
+						function (other) {
+							if (win != other) {
+								var t = other.down("#pinTool");
+								if (t && t.pinned) {
+									t.pinned = false;
+									t.setStyle('opacity', 0.4);
+								}
+							}
+						}
+					);
+
+					for (var id in win.sliders) {
+						var cell = win.sliders[id][0];
+						var v = evaluateTree(trimTree(cell.dna.value), varBank).value
+						setValue(findID(id), v);
+					}
+
+					selectionChanged(true);
+
 				}
-		    },
+			},
 			style: {
 				opacity: 0.4
 			}
@@ -1948,18 +1953,18 @@ function createResultsWindow(displayInformation, config) {
 		{
 			type: 'gear',
 			tooltip: 'Edit Title',
-			handler: function(){
-				Ext.Msg.prompt('Edit Results Title', 'Enter the title for these simulation results:', function(btn, text){
-					if (btn == 'ok'){
+			handler: function () {
+				Ext.Msg.prompt('Edit Results Title', 'Enter the title for these simulation results:', function (btn, text) {
+					if (btn == 'ok') {
 						win.setTitle(text);
-					 }
+					}
 				}, this, false, win.getTitle());
 			}
 		}
 	]
 
 	var win = new Ext.Window(winConfig);
-	win.on('minimize', function(w) {
+	win.on('minimize', function (w) {
 		if (w.expandedState) {
 			w.expandedState = false;
 			w.collapse();
@@ -1968,7 +1973,7 @@ function createResultsWindow(displayInformation, config) {
 			win.expand();
 		}
 	});
-	
+
 
 
 	enableTabs();
@@ -1976,8 +1981,8 @@ function createResultsWindow(displayInformation, config) {
 	win.enableTabs = enableTabs;
 
 
-	win.on('close', function(w) {
-		if(linkedResults == win){
+	win.on('close', function (w) {
+		if (linkedResults == win) {
 			linkedResults = undefined;
 		}
 		if (!scripter.simulator.completed()) {
@@ -2013,7 +2018,7 @@ function buildMapStore(item, time) {
 			connections[data[j].instanceId] = data[j].connected;
 
 			if (data[j].state !== null) {
-				var states = data[j].state.map(function(x) {
+				var states = data[j].state.map(function (x) {
 					return x.dna.name
 				}).join(", ");
 			} else {
@@ -2120,7 +2125,7 @@ function createHistogramChart(displayInformation, i) {
 		xtype: 'chart',
 		flex: 1,
 		animation: false,
-		interactions: ['crosszoom' ],
+		interactions: ['crosszoom'],
 		shadow: false,
 		store: store,
 		axes: [{
@@ -2145,7 +2150,7 @@ function createHistogramChart(displayInformation, i) {
 			tooltip: {
 				trackMouse: true,
 				width: 80,
-				renderer: function(storeItem, item) {
+				renderer: function (storeItem, item) {
 					this.setTitle("<center>" + commaStr(item.value[1]) + "</center>");
 				}
 			}

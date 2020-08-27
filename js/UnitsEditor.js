@@ -1,7 +1,7 @@
 "use strict";
 /*
 
-Copyright 2010-2018 Scott Fortmann-Roe. All rights reserved.
+Copyright 2010-2020 Scott Fortmann-Roe. All rights reserved.
 
 This file may distributed and/or modified under the
 terms of the Insight Maker Public License (https://InsightMaker.com/impl).
@@ -15,7 +15,7 @@ var UnitsEditor = Ext.extend(Ext.form.TextField, {
 	triggers: {
 		edit: {
 			hideOnReadOnly: false,
-			handler: function() {
+			handler: function () {
 				this.editorWindow = new UnitsWindow({
 					parent: this,
 					units: this.getValue()
@@ -25,12 +25,12 @@ var UnitsEditor = Ext.extend(Ext.form.TextField, {
 		}
 	},
 	listeners: {
-		'keydown': function(field) {
+		'keydown': function (field) {
 			field.setEditable(false);
 		},
-		'beforerender': function() {
+		'beforerender': function () {
 			if (this.regex != undefined) {
-				this.validator = function(value) {
+				this.validator = function (value) {
 					return this.regex.test(value);
 				};
 			}
@@ -75,8 +75,9 @@ function UnitsWindow(config) {
 		margin: '5,5,5,5',
 		rootVisible: false,
 		folderSort: false,
+		bufferedRenderer: false,
 		listeners: {
-			selectionchange: function(v, selections, opts) {
+			selectionchange: function (v, selections, opts) {
 
 				if (selections[0].data.leaf) {
 					setUnitsText(selections[0].data.text);
@@ -86,7 +87,7 @@ function UnitsWindow(config) {
 	});
 
 
-	var setupUnits = function(tree) {
+	var setupUnits = function (tree) {
 
 		var root = tree.getRootNode();
 
@@ -188,7 +189,7 @@ function UnitsWindow(config) {
 		tools: [{
 			type: 'help',
 			tooltip: getText('Get Help'),
-			callback: function(panel, tool, event) {
+			callback: function (panel, tool, event) {
 				showURL("/units");
 			}
 		}],
@@ -212,11 +213,11 @@ function UnitsWindow(config) {
 			scale: "large",
 			text: getText('Unit Conversions'),
 			glyph: 0xf1de,
-			handler: function() {
+			handler: function () {
 				var setting = getSetting();
 
 
-				var genData = function() {
+				var genData = function () {
 					var data = [];
 					var items = customUnits();
 					for (var i = 0; i < items.length; i++) {
@@ -291,13 +292,14 @@ function UnitsWindow(config) {
 					store: store,
 					plugins: [editor],
 					features: [],
+					bufferedRenderer: false,
 					tbar: [{
 						glyph: 0xf056,
 						iconCls: 'red-icon',
 						itemId: "removeBut",
 						text: getText('Remove Conversion'),
 						disabled: true,
-						handler: function() {
+						handler: function () {
 							editor.completeEdit();
 							var s = grid.getSelectionModel().getSelection();
 							for (var i = 0, r; r = s[i]; i++) {
@@ -308,7 +310,7 @@ function UnitsWindow(config) {
 						glyph: 0xf055,
 						text: getText('Add Conversion'),
 						iconCls: 'green-icon',
-						handler: function() {
+						handler: function () {
 							var e = {
 								name: getText('New Unit Name'),
 								synonym: '',
@@ -326,7 +328,7 @@ function UnitsWindow(config) {
 					columns: columnsList
 				});
 
-				var saveUnits = function() {
+				var saveUnits = function () {
 					grid.plugins[0].completeEdit();
 					var c = store.getCount();
 					for (var i = 0; i < c; i++) {
@@ -355,7 +357,7 @@ function UnitsWindow(config) {
 				}
 
 
-				grid.getSelectionModel().on('selectionchange', function(sm) {
+				grid.getSelectionModel().on('selectionchange', function (sm) {
 					grid.getDockedItems()[0].getComponent("removeBut").setDisabled(sm.getCount() < 1);
 				});
 
@@ -373,7 +375,7 @@ function UnitsWindow(config) {
 						scale: "large",
 						glyph: 0xf05c,
 						text: getText('Cancel'),
-						handler: function() {
+						handler: function () {
 							unitsWin.close()
 						}
 					}, {
@@ -392,7 +394,7 @@ function UnitsWindow(config) {
 			scale: "large",
 			glyph: 0xf05c,
 			text: getText('Cancel'),
-			handler: function() {
+			handler: function () {
 				win.close();
 				if (config.parent != "") {
 					config.parent.resumeEvents();
@@ -403,7 +405,7 @@ function UnitsWindow(config) {
 			scale: "large",
 			glyph: 0xf00c,
 			text: getText('Apply'),
-			handler: function() {;
+			handler: function () {
 				if (config.parent != "") {
 					win.close();
 					editingRecord.set("value", unitsLabel.getValue());
@@ -422,7 +424,7 @@ function UnitsWindow(config) {
 
 	});
 
-	me.show = function() {
+	me.show = function () {
 		win.show();
 		setUnitsText(config.units);
 	}

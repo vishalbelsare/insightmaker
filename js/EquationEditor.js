@@ -1,7 +1,7 @@
 "use strict";
 /*
 
-Copyright 2010-2018 Scott Fortmann-Roe. All rights reserved.
+Copyright 2010-2020 Scott Fortmann-Roe. All rights reserved.
 
 This file may distributed and/or modified under the
 terms of the Insight Maker Public License (https://InsightMaker.com/impl).
@@ -22,7 +22,7 @@ var EquationEditor = Ext.extend(Ext.form.TextField, {
 	triggers: {
 		edit: {
 			hideOnReadOnly: false,
-			handler: function() {
+			handler: function () {
 
 				this.editorWindow = new EquationWindow({
 					parent: this,
@@ -35,13 +35,13 @@ var EquationEditor = Ext.extend(Ext.form.TextField, {
 		}
 	},
 	listeners: {
-		'keydown': function(field) {
+		'keydown': function (field) {
 			field.setEditable(!/\\n/.test(field.getValue()));
 		},
-		'beforerender': function() {
+		'beforerender': function () {
 
 			if (this.regex != undefined) {
-				this.validator = function(value) {
+				this.validator = function (value) {
 					return this.regex.test(value);
 				};
 			}
@@ -339,6 +339,7 @@ function EquationWindow(config) {
 		width: viewConfig.referenceBarWidth,
 		margin: '0 0 0 4',
 		hideGroupedHeader: true,
+		bufferedRenderer: false,
 		columns: [{
 			header: 'References',
 			flex: 1,
@@ -356,11 +357,11 @@ function EquationWindow(config) {
 
 	referenceItems.view.getFeature("typeGrouping").expand(" References");
 
-	referenceItems.view.on("groupexpand", function(view, node) {
+	referenceItems.view.on("groupexpand", function (view, node) {
 		var items = referenceItems.getEl().query(".moreExpander", false);
-		items.forEach(function(x) {
+		items.forEach(function (x) {
 			if (x.getAttribute("data-processed") != 1) {
-				x.on("click", function(evt) {
+				x.on("click", function (evt) {
 					var a = Ext.get("expander" + x.getAttribute("data-id"));
 					a.setVisibilityMode(2);
 					a.toggle();
@@ -381,7 +382,7 @@ function EquationWindow(config) {
 			margin: '5 0 0 3'
 		});
 	} else {
-		var but = function(text, config) {
+		var but = function (text, config) {
 			config = config || {};
 			return new Ext.Button({
 				text: text,
@@ -390,14 +391,14 @@ function EquationWindow(config) {
 				height: config.height || s,
 				rowspan: config.rowspan,
 				style: config.opacity ? ("opacity:" + config.opacity) : 'opacity: .7',
-				handler: config.handler || function() {
+				handler: config.handler || function () {
 					insertAtCursor(config.insert || text, config.start, config.end);
 				},
 				margin: config.margin || m
 			});
 		}
-		
-		var s= 40;
+
+		var s = 40;
 		var m = 3;
 
 
@@ -516,7 +517,7 @@ function EquationWindow(config) {
 		Stock: "The initial value of the stock will be calculated by this equation. Inflows and outflows can increase or decrease the stock's value over time.",
 		Variable: "The variable will take on the value calculated from this equation. The value will be recalculated as the simulation progresses.",
 		Action: "This code will be executed when the action triggers. You can use it to adjust values in your simulation or make other changes such as moving agents.",
-		Transition: function(config) {
+		Transition: function (config) {
 			var cell = config.cell;
 			if (cell.getAttribute("Trigger") == "Probability") {
 				return "The transition is currently using the <i>Probability</i> trigger. For this trigger type, the value of the equation is the probability of the transition happening each unit of time.";
@@ -535,10 +536,10 @@ function EquationWindow(config) {
 			help = genericHelp[type](config);
 		}
 	}
-	
+
 	var extraBox = {
 		xtype: "container",
-		hidden: ! config.extra,
+		hidden: !config.extra,
 		items: [config.extra],
 		region: "south",
 		padding: 6,
@@ -574,7 +575,7 @@ function EquationWindow(config) {
 			{
 				type: 'help',
 				tooltip: getText('About Equations'),
-				callback: function(panel, tool, event) {
+				callback: function (panel, tool, event) {
 					showURL("/equations");
 				}
 			}, {
@@ -582,7 +583,7 @@ function EquationWindow(config) {
 				type: 'up',
 				tooltip: getText('Hide Description'),
 				hidden: (!help) || Ext.state.Manager.get('equationHelpCollapsed', false),
-				callback: function(panel, tool, event) {
+				callback: function (panel, tool, event) {
 					helpBox.setVisible(false);
 					tool.hide();
 					Ext.getCmp('downButton').show();
@@ -594,7 +595,7 @@ function EquationWindow(config) {
 				type: 'down',
 				tooltip: getText('Show Description'),
 				hidden: (!help) || (!Ext.state.Manager.get('equationHelpCollapsed', false)),
-				callback: function(panel, tool, event) {
+				callback: function (panel, tool, event) {
 					helpBox.setVisible(true);
 					tool.hide();
 					Ext.getCmp('upButton').show();
@@ -618,7 +619,7 @@ function EquationWindow(config) {
 			text: formatUnitsBut(cell.getAttribute("Units")),
 			glyph: 0xf1de,
 			tooltip: getText('Primitive units'),
-			handler: function() {
+			handler: function () {
 				var unitsWindow = new UnitsWindow({
 					parent: "",
 					cell: cell,
@@ -630,7 +631,7 @@ function EquationWindow(config) {
 			scale: "large",
 			glyph: 0xf05c,
 			text: getText('Cancel'),
-			handler: function() {
+			handler: function () {
 				win.close();
 				if (config.parent != "") {
 					config.parent.resumeEvents();
@@ -641,7 +642,7 @@ function EquationWindow(config) {
 			glyph: 0xf00c,
 			scale: "large",
 			text: getText('Apply'),
-			handler: function() {
+			handler: function () {
 				var newEquation = equationEditor.getValue();
 				newEquation = newEquation.replace(/\n|\r/g, "\\n");
 
@@ -651,17 +652,17 @@ function EquationWindow(config) {
 					editingRecord.set("value", newEquation);
 					saveConfigRecord(editingRecord);
 
-					if(config.saveExtra){
+					if (config.saveExtra) {
 						config.saveExtra();
 					}
 				} else {
 					graph.getModel().beginUpdate();
 					setValue(config.cell, newEquation);
 
-					if(config.saveExtra){
+					if (config.saveExtra) {
 						config.saveExtra();
 					}
-					
+
 					graph.getModel().endUpdate();
 					selectionChanged(false);
 				}
@@ -670,7 +671,7 @@ function EquationWindow(config) {
 	});
 
 
-	referenceItems.on('beforeselect', function(view, node, items, options) {
+	referenceItems.on('beforeselect', function (view, node, items, options) {
 		if (node.data.insert) {
 			insertAtCursor(node.data.insert);
 		}
@@ -679,11 +680,11 @@ function EquationWindow(config) {
 
 
 
-	me.show = function() {
+	me.show = function () {
 		win.show();
 		equationEditor.focus(true, true);
 		equationEditor.editor.focus();
-		setTimeout(function() {
+		setTimeout(function () {
 			equationEditor.editor.focus();
 		}, 100)
 	}

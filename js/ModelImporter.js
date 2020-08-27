@@ -1,7 +1,7 @@
 "use strict";
 /*
 
-Copyright 2010-2018 Scott Fortmann-Roe. All rights reserved.
+Copyright 2010-2020 Scott Fortmann-Roe. All rights reserved.
 
 This file may distributed and/or modified under the
 terms of the Insight Maker Public License (https://InsightMaker.com/impl).
@@ -11,86 +11,57 @@ terms of the Insight Maker Public License (https://InsightMaker.com/impl).
 
 
 function showInsertModelWindow(pt) {
-	Ext.Msg.prompt('Insert Insight Maker Model', 'Enter the URL for the Insight Maker model you wish to insert (e.g. <i>' + base_path + '/insight/1234</i>). This model will be inserted as a component into your current model.', function(btn, url) {
-		if (btn == 'ok') {
-			var progress = Ext.MessageBox.wait(getText("Inserting Model..."), undefined, {
-				icon: 'run-icon',
-				width: 300,
-				closable: false,
-				modal: true,
-				progress: true,
-				progressText: ' '
-			});
-			$.ajax({
-				url: url,
-				dataType: "html",
-				success: function(txt) {
-					var matches = txt.match(/var graph_source_data = (".*?");\n/);
-
-					if ((!matches) || matches[1].trim() == "") {
-						mxUtils.alert("Model could not be inserted. Please ensure the model URL is correct.");
-						progress.close();
-					} else {
-						var data = JSON.parse(matches[1]);
-
-						var title = JSON.parse(txt.match(/var graph_title = (".*?");\n/)[1]);
-						var description = JSON.parse(txt.match(/var graph_description = (".*?");\n/)[1]);
-
-						var doc = mxUtils.parseXml(data);
-						var dec = new mxCodec(doc);
-
-						var model = dec.decode(doc.documentElement);
-
-						var cells = model.cells;
-						
-
-						graph.getModel().beginUpdate();
-
-						var folder = createPrimitive(title, "Folder", [pt.x, pt.y], [100, 100]);
-
-						cells = cells[1].children;
-
-						cells = excludeType(cells, "Setting");
-						cells = excludeType(cells, "Display");
-
-						var getEdgeValidationError = graph.getEdgeValidationError;
-						graph.getEdgeValidationError = function(){
-							return mxGraph.prototype.getEdgeValidationError.apply(this, arguments);
-						};
-						graph.importCells(cells, 0, 0, folder);
-						graph.getEdgeValidationError = getEdgeValidationError;
+	sendToParent({
+		type: 'import_model_url',
+		point: pt
+	});
+}
 
 
-						
-						setImage(folder, "Plugin");
-						setNote(folder, description);
+function insertModel(data, title, description, point) {
+		var doc = mxUtils.parseXml(data);
+		var dec = new mxCodec(doc);
 
-						var geo = folder.geometry;
-						geo.alternateBounds = new mxRectangle(0, 0, 128, 128);
-						graph.getModel().setGeometry(folder, geo);
+		var model = dec.decode(doc.documentElement);
 
-						collapseFolder(folder);
-						folder.setAttribute("LabelPosition", "Bottom");
-						setLabelPosition(folder);
+		var cells = model.cells;
+		
 
-						//Converter and agent population rewire
+		graph.getModel().beginUpdate();
 
-						graph.getModel().endUpdate();
+		var folder = createPrimitive(title, "Folder", [point.x, point.y], [100, 100]);
+
+		cells = cells[1].children;
+
+		cells = excludeType(cells, "Setting");
+		cells = excludeType(cells, "Display");
+
+		var getEdgeValidationError = graph.getEdgeValidationError;
+		graph.getEdgeValidationError = function(){
+			return mxGraph.prototype.getEdgeValidationError.apply(this, arguments);
+		};
+		graph.importCells(cells, 0, 0, folder);
+		graph.getEdgeValidationError = getEdgeValidationError;
 
 
-						clearPrimitiveCache();
-						setAllConnectable();
+		
+		setImage(folder, "Plugin");
+		setNote(folder, description);
 
-						progress.close();
-					}
-				},
-				error: function() {
-					mxUtils.alert("Model could not be inserted. Please ensure the morel URL is correct.");
-					progress.close();
-				}
-			})
-		}
-	})
+		var geo = folder.geometry;
+		geo.alternateBounds = new mxRectangle(0, 0, 128, 128);
+		graph.getModel().setGeometry(folder, geo);
+
+		collapseFolder(folder);
+		folder.setAttribute("LabelPosition", "Bottom");
+		setLabelPosition(folder);
+
+		//Converter and agent population rewire
+
+		graph.getModel().endUpdate();
+
+		clearPrimitiveCache();
+		setAllConnectable();
 }
 
 
@@ -104,83 +75,6 @@ function importMXGraph(txt) {
 	setAllConnectable();
 }
 
-function importSimgua(txt) {
-
-	clearModel();
-
-	graph.getModel().beginUpdate();
-
-	var tempStock = createPrimitive("temp stock xyzz", "Stock", [200, 200], [100, 100])
-
-	//console.log("0");
-	var rows = txt.split("\n");
-
-	//console.log(rows);
-
-	for (var i = 0; i < rows.length; i++) {
-		var items = rows[i].split(" --- ");
-		var type = items[0];
-		if (type == "STOCK") {
-			var s = createPrimitive(items[1], "Stock", [500 * Math.random(), 500 * Math.random()], [100, 40]);
-			setValue(s, items[3]);
-			setNonNegative(s, items[2] == "true");
-		} else if (type == "VARIABLE") {
-			var s = createPrimitive(items[1], "Variable", [500 * Math.random(), 500 * Math.random()], [120, 50]);
-			setValue(s, items[2]);
-		} else if (type == "CONVERTER") {
-			var s = createPrimitive(items[1], "Converter", [500 * Math.random(), 500 * Math.random()], [120, 50]);
-			setData(s, items[4]);
-			setInterpolation(s, items[2] == 1 ? "Linear" : "Discrete");
-		} else if (type == "SETTING") {
-			setTimeStart(items[1]);
-			setTimeLength(items[2]);
-			setTimeStep(items[3]);
-		}
-	}
-
-	//console.log("A");
-
-	for (var i = 0; i < rows.length; i++) {
-		var items = rows[i].split(" --- ");
-		var type = items[0];
-		if (type == "FLOW") {
-			var s = createConnector(items[1], "Flow", simguaPrim(findName(items[2])), simguaPrim(findName(items[3])));
-			setValue(s, items[5]);
-			setNonNegative(s, items[4] == "true");
-		}
-	}
-
-	//console.log("B");
-
-	for (var i = 0; i < rows.length; i++) {
-		var items = rows[i].split(" --- ");
-
-		var type = items[0];
-		if (type == "LINK") {
-			var s = createConnector(items[1], "Link", findName(items[2]), findName(items[3]));
-		} else if (type == "CONVERTER") {
-			setConverterInput(findName(items[1]), findName(items[3]));
-		}
-	}
-
-	//console.log("C");
-
-
-
-	layoutModel("organic");
-
-
-	graph.getModel().endUpdate();
-
-	function simguaPrim(item) {
-		if (item == null) {
-			return tempStock;
-		} else {
-			return item;
-		}
-	}
-
-}
 
 function cleanMXGraphSnippet(xml) {
 	var padding = "" + Math.floor(Math.random() * 10000);
