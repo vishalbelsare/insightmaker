@@ -93,7 +93,6 @@ Simulator.prototype.step = function (solver) {
 
 	if (solver.displayed.length > 0) {
 		for (var i = this.results[solver.displayed[0].id].results.length; i < this.results.Time.length; i++) {
-			//console.log(i)
 			for (var j = 0; j < solver.displayed.length; j++) {
 				this.results[solver.displayed[j].id].results.push(this.results.data[i][solver.displayed[j].id])
 			}
@@ -214,7 +213,7 @@ Simulator.prototype.run = function (config) {
 			this.tasks.step();
 
 			if (this.shouldSleep) {
-				for (var solver in this.model.solvers) {
+				for (let solver in this.model.solvers) {
 					updateDisplayed(this.model.solvers[solver]);
 				}
 				if (this.shouldUpdateScripter) {
@@ -289,7 +288,7 @@ Simulator.prototype.run = function (config) {
 
 	if (this.resultsWindow) {
 		this.results.window = this.resultsWindow;
-		for (var solver in this.model.solvers) {
+		for (let solver in this.model.solvers) {
 			updateDisplayed(this.model.solvers[solver]);
 		}
 	}
@@ -322,7 +321,6 @@ Simulator.prototype.printStates = function (displayed) {
 
 	for (var i = 0; i < displayed.length; i++) {
 		var v = displayed[i];
-		//console.log(v.dna.name);
 
 		if (!((v instanceof State) && isDefined(data[v.id]))) {
 			if (v instanceof Agents) {
@@ -332,12 +330,14 @@ Simulator.prototype.printStates = function (displayed) {
 				var x = v.value();
 
 				if ((x instanceof Vector) && (!x.names)) {
+					x.recurseApply((x) => {
+						return this.adjustNum(v, x);
+					});
 					data[v.id] = x;
 					this.results[v.id].dataMode = "auto";
 				} else if (x instanceof Vector) {
-					var me = this;
-					x.recurseApply(function (x) {
-						return me.adjustNum(v, x);
+					x.recurseApply((x) => {
+						return this.adjustNum(v, x);
 					});
 					data[v.id] = x;
 				} else if (x instanceof Agent) {
@@ -345,7 +345,6 @@ Simulator.prototype.printStates = function (displayed) {
 					this.results[v.id].dataMode = "auto";
 				} else {
 					data[v.id] = this.adjustNum(v, x);
-					//console.log(this.adjustNum(v, x));
 				}
 
 			}
@@ -378,30 +377,31 @@ Simulator.prototype.adjustNum = function (v, x) {
 	if (v.unitless && x.units) {
 		error(getText("The result of the calculation has units %s, but the primitive is unitless. Please set the units for the primitive so we can determine the proper output.", x.units.toString()), findID(v.id), true);
 	}
-	//console.log(x);
+
 	if ((v instanceof Flow) && (!v.dna.flowUnitless)) {
 		x = mult(x, new Material(1, this.timeUnits));
 	}
-	//console.log(x);
 
 	if ((v instanceof State) || ((!x.units) && (!(v instanceof Flow)))) {
-		x = x.value;
+		if (typeof x === 'object' && 'value' in x) {
+			return +x.value;
+		}
+		// string, boolean, ...
+		return x;
 	} else {
 		x = fn["*"](x.value, this.unitsToBase(v, x.units, v instanceof Flow));
 	}
 
-	return x + 0;
+	return +x;
 }
 
 Simulator.prototype.createSolver = function (solver) {
-
 	var me = this;
 
 	var stocks = solver.stocks;
 	var flows = solver.flows;
 
 	var actions = solver.actions;
-	var states = solver.states;
 	var transitions = solver.transitions;
 	var valued = solver.valued;
 	var displayed = solver.displayed;

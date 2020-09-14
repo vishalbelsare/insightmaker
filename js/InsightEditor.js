@@ -8,6 +8,10 @@ terms of the Insight Maker Public License (https://InsightMaker.com/impl).
 
 */
 
+if (window.failedLoading) {
+	throw 'Error';
+}
+
 
 Ext.onReady(function () {
 	main();
@@ -1280,19 +1284,9 @@ function main() {
 		return items.join(", ");
 	};
 
-	var labelRenderer = function (eq) {
-		var res = eq;
-
-		res = res.replace(/(%.)/g, "<font color='DeepSkyBlue'>$1</font>");
-
-		return clean(res);
-	};
-
-
 
 
 	selectionChanged = function (forceClear) {
-
 		if (isDefined(grid)) {
 			grid.plugins[0].completeEdit();
 			configPanel.removeAll()

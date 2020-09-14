@@ -11,20 +11,20 @@ terms of the Insight Maker Public License (http://insightMaker.com/impl).
 
 
 
-
 var test;
-var errorCount = 0 ;
+var errorCount = 0;
 var testCount = 0;
-function runTests(){
+function runTests() {
 
 	testCount = 0;
 
 	errorCount = 0;
 
-	if(window.ribbonPanel){
+	if (window.ribbonPanel) {
 		testUI();
 	}
 
+	testResultsFormatting();
 	testCreate();
 	testClearModel();
 	testFolders();
@@ -40,51 +40,51 @@ function runTests(){
 
 	clearModel();
 
-	console.log("Tests complete!\n\n Errors: "+errorCount+"/"+testCount);
-	alert("Tests complete! \n\n Errors: "+errorCount+"/"+testCount);
+	console.log("Tests complete!\n\n Errors: " + errorCount + "/" + testCount);
+	alert("Tests complete! \n\n Errors: " + errorCount + "/" + testCount);
 }
 
-function testError(txt){
+function testError(txt) {
 	console.log(txt);
 	errorCount++;
 }
 
-function 	assertEqual(type, a, b) {
+function assertEqual(type, a, b) {
 	testCount++;
-	console.log("- "+test+" - "+type);
-	if(a != b){
+	console.log("- " + test + " - " + type);
+	if (a != b) {
 		testError(" *** FAILED  ***  " + test + " " + type + ". Found (" + a + ") expected (" + b + ")");
 	}
 }
 function assertUnequal(type, a, b) {
 	testCount++;
-	console.log("- "+test+" - "+type);
-	if(a == b){
+	console.log("- " + test + " - " + type);
+	if (a == b) {
 		testError(" *** FAILED ***  " + test + " " + type + ". Found (" + a + ") expected not (" + b + ")");
 	}
 }
 function assertNull(type, a) {
 	testCount++;
-	console.log("- "+test+" - "+type);
-	if(a !== null){
+	console.log("- " + test + " - " + type);
+	if (a !== null) {
 		testError(" *** FAILED *** " + test + " " + type + ". Found (" + a + ") expected null.");
 	}
 }
 function assertNotNull(type, a) {
 	testCount++;
-	console.log("- "+test+" - "+type);
-	if(a === null){
+	console.log("- " + test + " - " + type);
+	if (a === null) {
 		testError(" *** FAILED *** " + test + " " + type + ". Found null expected (" + a + ").");
 	}
 }
 
-function testRunModel(){
+function testRunModel() {
 
 	test = "RunModel";
 
 	clearModel();
 
-	var v = createPrimitive("Var", "Variable", [100,100], [100,100]);
+	var v = createPrimitive("Var", "Variable", [100, 100], [100, 100]);
 	setTimeUnits("Years");
 	setTimeStep(1);
 	setTimeLength(10);
@@ -98,50 +98,56 @@ function testRunModel(){
 	assertEqual("Pause Interval", res.value(v)[2], 4);
 	setPauseInterval(0);
 
-	runModel({silent: true, onSuccess: function(x){
-		assertEqual("Silent Callback", x.value(v)[2], 4);
-	}});
+	runModel({
+		silent: true, onSuccess: function (x) {
+			assertEqual("Silent Callback", x.value(v)[2], 4);
+		}
+	});
 
 	setValue(v, "sds");
 	var res = runModel(true)
 	assertUnequal("Old Silent Error", res.error, "none");
 
 
-	runModel({silent: true, onError: function(x){
-		assertUnequal("Silent Callback Error", x.error, "none");
-	}});
+	runModel({
+		silent: true, onError: function (x) {
+			assertUnequal("Silent Callback Error", x.error, "none");
+		}
+	});
 
-	if(!(graph instanceof SimpleNode)){
-		runModel({silent: false, onError: function(x){
-			assertUnequal("Non-Silent Callback Error", x.error, "none");
-		}});
+	if (!(graph instanceof SimpleNode)) {
+		runModel({
+			silent: false, onError: function (x) {
+				assertUnequal("Non-Silent Callback Error", x.error, "none");
+			}
+		});
 	}
 
 	clearModel();
 
 	//Test Pausing
-	setTimeout(function(){
+	setTimeout(function () {
 		//Test Pausing Simulations
-		var p = createPrimitive("p", "Variable", [100,100], [100,100]);
+		var p = createPrimitive("p", "Variable", [100, 100], [100, 100]);
 		setShowSlider(p, true);
 		setPauseInterval(2);
 		setValue(p, 1);
 		var counter = 1;
 		runModel({
 			silent: true,
-			onPause: function(res){
-				assertEqual("Pause "+counter, res.lastValue(p), counter);
+			onPause: function (res) {
+				assertEqual("Pause " + counter, res.lastValue(p), counter);
 
 				counter++;
 				res.setValue(p, counter);
 
 				res.resume()
 			},
-			onSuccess: function(res){
-				assertEqual("Pause "+counter, res.lastValue(p), counter);
+			onSuccess: function (res) {
+				assertEqual("Pause " + counter, res.lastValue(p), counter);
 				assertEqual("Pause done", true, true);
 			},
-			onError: function(){
+			onError: function () {
 				assertEqual("Pause failed", true, false);
 			}
 		});
@@ -152,7 +158,7 @@ function testRunModel(){
 
 }
 
-function testBothAgents(){
+function testBothAgents() {
 	setAlgorithm("RK1");
 	console.log("---RK1---")
 	testAgents();
@@ -162,7 +168,7 @@ function testBothAgents(){
 	testAgents();
 }
 
-function testSubscripting(){
+function testSubscripting() {
 	var prevTest = test;
 	var prevTimeLength = getTimeLength();
 	var prevTimeUnits = getTimeUnits();
@@ -171,7 +177,7 @@ function testSubscripting(){
 	setTimeLength(20)
 	test = "Subscripting";
 
-	var RK4 = getAlgorithm()=="RK4";
+	var RK4 = getAlgorithm() == "RK4";
 
 	clearModel();
 
@@ -203,7 +209,7 @@ function testSubscripting(){
 	setValue(a, '[Population]«mean»');
 	setValue(b, '[Population]«max»');
 	var res = runModel(true);
-	assertEqual("Subscripting 3", res.value(a)[10], 45/2);
+	assertEqual("Subscripting 3", res.value(a)[10], 45 / 2);
 	assertEqual("Subscripting 4", res.value(b)[10], 30);
 
 	setValue(r, "2");
@@ -212,7 +218,7 @@ function testSubscripting(){
 
 	setValue(r, "repeat(2, <<'a', 'b'>>)");
 	var res = runModel(true);
-	assertEqual("Subscripting 5", res.value(a)[10], 55/2);
+	assertEqual("Subscripting 5", res.value(a)[10], 55 / 2);
 	assertEqual("Subscripting 6", res.value(b)[10], 30);
 
 	setValue(p, "«'males': «canada:1, usa:2,'mexico':3», 'females': «'usa':20, 'canada':10, 'mexico': 30» »");
@@ -224,48 +230,48 @@ function testSubscripting(){
 
 	setValue(r, "repeat(repeat(2, <<'canada', 'usa', 'mexico'>>), <<'males', 'females'>>)");
 	var res = runModel(true);
-	assertEqual("Subscripting 7", res.value(a)[10], 2+20);
-	assertEqual("Subscripting 8", res.value(b)[10], 30+20);
+	assertEqual("Subscripting 7", res.value(a)[10], 2 + 20);
+	assertEqual("Subscripting 8", res.value(b)[10], 30 + 20);
 
 	setValue(a, '[Population]«"males", max»');
 	setValue(b, '[Population]«min, "canada"»');
 	var res = runModel(true);
-	assertEqual("Subscripting 9", res.value(a)[10], 3+20);
-	assertEqual("Subscripting 10", res.value(b)[10], 1+20);
+	assertEqual("Subscripting 9", res.value(a)[10], 3 + 20);
+	assertEqual("Subscripting 10", res.value(b)[10], 1 + 20);
 
 	setValue(a, '([Population]«"males", *»)«"USA"»');
 	setValue(b, '([Population]«* , "mexico"»)«"Females"»');
 	var res = runModel(true);
-	assertEqual("Subscripting 11", res.value(a)[10], 2+20);
-	assertEqual("Subscripting 12", res.value(b)[10], 30+20);
+	assertEqual("Subscripting 11", res.value(a)[10], 2 + 20);
+	assertEqual("Subscripting 12", res.value(b)[10], 30 + 20);
 
 	setValue(a, '([Population]{"males", *}){"USA"}');
 	setValue(b, '([Population]{* , "mexico"}).Females');
 	var res = runModel(true);
-	assertEqual("Subscripting 13", res.value(a)[10], 2+20);
-	assertEqual("Subscripting 14", res.value(b)[10], 30+20);
+	assertEqual("Subscripting 13", res.value(a)[10], 2 + 20);
+	assertEqual("Subscripting 14", res.value(b)[10], 30 + 20);
 
 
 	setValue(r, "{males: repeat(3, {'canada', 'usa', 'mexico'}), females: repeat(1, {'canada', 'usa', 'mexico'})}");
 	var res = runModel(true);
-	assertEqual("Subscripting 15", res.value(a)[10], 2+30);
-	assertEqual("Subscripting 16", res.value(b)[10], 30+10);
+	assertEqual("Subscripting 15", res.value(a)[10], 2 + 30);
+	assertEqual("Subscripting 16", res.value(b)[10], 30 + 10);
 
 	setNonNegative(p, false);
 	setNonNegative(f, true);
 	setValue(r, "«'males': repeat(3, <<'canada', 'usa', 'mexico'>>), 'females': repeat(-4, <<'canada', 'usa', 'mexico'>>)»");
 	var res = runModel(true);
-	assertEqual("Flow OnlyPositive 1", res.value(a)[10], 2+30);
-	assertEqual("Flow OnlyPositive  2", res.value(b)[10], 30+0);
+	assertEqual("Flow OnlyPositive 1", res.value(a)[10], 2 + 30);
+	assertEqual("Flow OnlyPositive  2", res.value(b)[10], 30 + 0);
 
 	setNonNegative(f, false);
 	var res = runModel(true);
-	assertEqual("Flow OnlyPositive  3", res.value(a)[10], 2+30);
-	assertEqual("Flow OnlyPositive  4", res.value(b)[10], 30-40);
+	assertEqual("Flow OnlyPositive  3", res.value(a)[10], 2 + 30);
+	assertEqual("Flow OnlyPositive  4", res.value(b)[10], 30 - 40);
 
 	setNonNegative(p, true);
 	var res = runModel(true);
-	assertEqual("Stock Non Negative 1", res.value(a)[10], 2+30);
+	assertEqual("Stock Non Negative 1", res.value(a)[10], 2 + 30);
 	assertEqual("Stock Non Negative 2", res.value(b)[10], 0);
 
 	setNonNegative(p, false);
@@ -285,8 +291,8 @@ function testSubscripting(){
 	var res = runModel(true);
 	assertEqual("Constraints 4", runModel(true).error, "none");
 
-	setUnits([p,a,b], "Widgets");
-	setUnits([f,r], "Widgets/Year");var res = runModel(true);
+	setUnits([p, a, b], "Widgets");
+	setUnits([f, r], "Widgets/Year"); var res = runModel(true);
 	var res = runModel(true);
 	assertEqual("Units 1", runModel(true).error, "none");
 
@@ -302,8 +308,8 @@ function testSubscripting(){
 	setStockType(p, "Conveyor");
 	setDelay(p, 5);
 	var res = runModel(true);
-	assertEqual("Conveyor 1", res.value(a)[14], 2+30);
-	assertEqual("Conveyor 2", Math.round(res.value(b)[14]*100000), (30-40)*100000);
+	assertEqual("Conveyor 1", res.value(a)[14], 2 + 30);
+	assertEqual("Conveyor 2", Math.round(res.value(b)[14] * 100000), (30 - 40) * 100000);
 
 
 	setValue(a, '([Population]«"males", *»)«"India"»');
@@ -331,36 +337,36 @@ function testSubscripting(){
 	setValue(f, "[Rate]");
 	setValue(r, "<<'dogs':1, 'cats':2>>");
 	var res = runModel(true);
-	assertEqual("Collapsing 1", res.value(p)[10], 100-10*3);
-	assertEqual("Collapsing 2", res.value(p2)[10], 0+10*3);
+	assertEqual("Collapsing 1", res.value(p)[10], 100 - 10 * 3);
+	assertEqual("Collapsing 2", res.value(p2)[10], 0 + 10 * 3);
 
 	setValue(p2, "<<'dogs':5, 'cats':4>>");
 	setValue(a, "[population 2]<<'dogs'>>");
 	var res = runModel(true);
-	assertEqual("Collapsing 3", res.value(p)[10], 100-10*3);
-	assertEqual("Collapsing 4", res.value(a)[10], 5+10*1);
+	assertEqual("Collapsing 3", res.value(p)[10], 100 - 10 * 3);
+	assertEqual("Collapsing 4", res.value(a)[10], 5 + 10 * 1);
 
 	setValue(r, "<<'dogs': <<'x': 1, 'y':2>>, 'cats': <<'x':3, 'y':4>> >>")
 	var res = runModel(true);
-	assertEqual("Collapsing 5", res.value(p)[10], 100-10*10);
-	assertEqual("Collapsing 6", res.value(a)[10], 5+10*3);
+	assertEqual("Collapsing 5", res.value(p)[10], 100 - 10 * 10);
+	assertEqual("Collapsing 6", res.value(a)[10], 5 + 10 * 3);
 
 	setValue(p, "<<x:40, y:60>>");
 	setValue(b, "[Population]<<'x'>>");
 	var res = runModel(true);
-	assertEqual("Collapsing 7", res.value(b)[10], 40-4*10);
-	assertEqual("Collapsing 8", res.value(a)[10], 5+10*3);
+	assertEqual("Collapsing 7", res.value(b)[10], 40 - 4 * 10);
+	assertEqual("Collapsing 8", res.value(a)[10], 5 + 10 * 3);
 
 	setValue(p2, "<<'dogs':5, 'cats':4, rats:6>>");
 	setValue(r, "<<'dogs': <<'x': 1, 'y':2>>, 'cats': <<'x':3, 'y':4>>, 'rats': <<'x':9, 'y':10>> >>")
 	var res = runModel(true);
-	assertEqual("Collapsing 9", res.value(b)[10], 40-13*10);
-	assertEqual("Collapsing 10", res.value(a)[10], 5+10*3);
+	assertEqual("Collapsing 9", res.value(b)[10], 40 - 13 * 10);
+	assertEqual("Collapsing 10", res.value(a)[10], 5 + 10 * 3);
 
 	setEnds(f, [p2, p]);
 	var res = runModel(true);
-	assertEqual("Collapsing 11", res.value(b)[10], 40+13*10);
-	assertEqual("Collapsing 12", res.value(a)[10], 5-10*3);
+	assertEqual("Collapsing 11", res.value(b)[10], 40 + 13 * 10);
+	assertEqual("Collapsing 12", res.value(a)[10], 5 - 10 * 3);
 
 
 	clearModel();
@@ -371,16 +377,16 @@ function testSubscripting(){
 	setTimeLength(prevTimeLength)
 }
 
-function testAgents(){
+function testAgents() {
 	var prevTest = test;
 	test = "Agents";
 
-	var RK4 = getAlgorithm()=="RK4";
+	var RK4 = getAlgorithm() == "RK4";
 
 	clearModel();
 
-	var s = createPrimitive("My State", "State", [100,100], [100,100]);
-	var s2  = createPrimitive("My State 2", "State", [100,100], [100,100]);
+	var s = createPrimitive("My State", "State", [100, 100], [100, 100]);
+	var s2 = createPrimitive("My State 2", "State", [100, 100], [100, 100]);
 	setValue(s, "false || true");
 	setValue(s2, "false || 0");
 	var res = runModel(true);
@@ -392,11 +398,11 @@ function testAgents(){
 	setValue(s, "true");
 	setValue(s2, "false");
 
-	var act = createPrimitive("Action 1", "Action", [100,100], [100,100]);
+	var act = createPrimitive("Action 1", "Action", [100, 100], [100, 100]);
 	setValue(act, "[My State] <- false")
 	setTriggerType(act, "Timeout");
 	setTriggerValue(act, 5);
-	var act2 = createPrimitive("Action 2", "Action", [100,100], [100,100]);
+	var act2 = createPrimitive("Action 2", "Action", [100, 100], [100, 100]);
 	setTriggerType(act2, "Timeout");
 	setTriggerValue(act2, 100);
 	setValue(act2, "[My State 2] <- true")
@@ -585,8 +591,8 @@ function testAgents(){
 
 	clearModel();
 
-	var s = createPrimitive("State", "State", [100,100], [100,100]);
-	var v  = createPrimitive("Variable", "State", [300,100], [100,100]);
+	var s = createPrimitive("State", "State", [100, 100], [100, 100]);
+	var v = createPrimitive("Variable", "State", [300, 100], [100, 100]);
 	var l = createConnector("My Link", "Link", s, v);
 
 	setValue(s, "true");
@@ -610,8 +616,8 @@ function testAgents(){
 	clearModel();
 
 
-	var s = createPrimitive("State 1", "State", [100,100], [100,100]);
-	var s2  = createPrimitive("State 2", "State", [100,100], [100,100]);
+	var s = createPrimitive("State 1", "State", [100, 100], [100, 100]);
+	var s2 = createPrimitive("State 2", "State", [100, 100], [100, 100]);
 	var l = createConnector("My Link", "Link", s, s2);
 	var t = createConnector("My Transition", "Transition", s, s2);
 	var t2 = createConnector("My Transition", "Transition", s2, s);
@@ -623,17 +629,17 @@ function testAgents(){
 	setValue(s, "1");
 	setValue(s2, "! [State 1]")
 
-	var f = createPrimitive("My Agent", "Folder", [200,150], [400,400]);
+	var f = createPrimitive("My Agent", "Folder", [200, 150], [400, 400]);
 	setParent([s, s2, l, t, t2], f);
 	setFolderType(f, "Agent");
 
-	var pop = createPrimitive("Population", "Agents", [1210,0], [200,200])
-	createConnector("Link","Link", f, pop);
+	var pop = createPrimitive("Population", "Agents", [1210, 0], [200, 200])
+	createConnector("Link", "Link", f, pop);
 	setAgentBase(pop, f);
 	setPopulationSize(pop, 10);
 
-	var v = createPrimitive("My Variable", "Variable", [1200,150], [150,100]);
-	var v2 = createPrimitive("My Variable 2", "Variable", [1200,150], [150,100]);
+	var v = createPrimitive("My Variable", "Variable", [1200, 150], [150, 100]);
+	var v2 = createPrimitive("My Variable 2", "Variable", [1200, 150], [150, 100]);
 	setValue(v, "Count(FindAll([Population]))")
 	setValue(v2, "PopulationSize([Population])+1")
 	var l2 = createConnector("My Link", "Link", pop, v);
@@ -673,7 +679,7 @@ function testAgents(){
 	assertEqual("Pop 6 (Obj)", res.value(v2)[8], 10);
 
 
-	var v3 = createPrimitive("My Variable 3", "Variable", [1200,150], [150,100]);
+	var v3 = createPrimitive("My Variable 3", "Variable", [1200, 150], [150, 100]);
 	var l4 = createConnector("My Link", "Link", pop, v3);
 	var l5 = createConnector("My Link", "Link", v3, v2);
 
@@ -745,10 +751,10 @@ function testAgents(){
 	assertEqual("Pop 10 (obj)", res.value(v2)[8], 1);
 
 
-	var v3 = createPrimitive("Var", "Variable", [200,150], [150,100]);
+	var v3 = createPrimitive("Var", "Variable", [200, 150], [150, 100]);
 	setParent(v3, f);
 
-	var v4 = createPrimitive("Outside Var", "Variable", [200,150], [150,100]);
+	var v4 = createPrimitive("Outside Var", "Variable", [200, 150], [150, 100]);
 	setParent(v4, f);
 	setValue(v4, "IfThenElse(years<5, 1, 0)");
 
@@ -770,7 +776,7 @@ function testAgents(){
 
 	setMacros("counter <- 0");
 
-	var act = createPrimitive("Action", "Action", [200,150], [150, 100]);
+	var act = createPrimitive("Action", "Action", [200, 150], [150, 100]);
 	setTriggerType(act, "Condition");
 	setTriggerValue(act, "true");
 	setValue(act, "Counter <- counter + 1");
@@ -815,17 +821,17 @@ function testAgents(){
 	setTriggerType(act, "Condition");
 	setTriggerValue(act, "true");
 
-	var st = createPrimitive("Count", "Stock", [200,150], [150,100]);
+	var st = createPrimitive("Count", "Stock", [200, 150], [150, 100]);
 	setParent([act, st], f);
 	setValue(st, 10);
 	setValue(act, "[Count] <- [Count] + 2");
-	var l = createConnector("Link", "Link",st, v3);
-	var l2 = createConnector("Link", "Link",st, act);
+	var l = createConnector("Link", "Link", st, v3);
+	var l2 = createConnector("Link", "Link", st, act);
 	setValue(v3, "[Count]");
 
 	res = runModel(true);
 	assertEqual("Pop 10.17", res.value(v)[0], 10);
-	assertEqual("Pop 10.18", res.value(v)[8], 10+2*8);
+	assertEqual("Pop 10.18", res.value(v)[8], 10 + 2 * 8);
 
 	removePrimitive(act);
 	removePrimitive(st);
@@ -1019,19 +1025,19 @@ function testAgents(){
 	assertEqual("Custom Loc 22 (Obj)", res.value(v2)[8], 40);
 
 
-	var mover = createPrimitive("Mover", "Action", [200,150], [150,100]);
+	var mover = createPrimitive("Mover", "Action", [200, 150], [150, 100]);
 	setParent(mover, f);
 	setTriggerType(mover, "Condition");
 	setTriggerValue(mover, "true")
 	setValue(mover, "move(Self, {10, 20})");
 	res = runModel(true);
-	assertEqual("Custom Move 22", res.value(v)[2], 10+2*10);
-	assertEqual("Custom Move 23", res.value(v2)[9], 40+9*20);
+	assertEqual("Custom Move 22", res.value(v)[2], 10 + 2 * 10);
+	assertEqual("Custom Move 23", res.value(v2)[9], 40 + 9 * 20);
 
 	setValue(mover, "Self.move({10, 20})");
 	res = runModel(true);
-	assertEqual("Custom Move 22 (Obj)", res.value(v)[2], 10+2*10);
-	assertEqual("Custom Move 23 (Obj)", res.value(v2)[9], 40+9*20);
+	assertEqual("Custom Move 22 (Obj)", res.value(v)[2], 10 + 2 * 10);
+	assertEqual("Custom Move 23 (Obj)", res.value(v2)[9], 40 + 9 * 20);
 
 
 	setValue(mover, "Self.setLocation({11, 21})");
@@ -1043,23 +1049,23 @@ function testAgents(){
 	setFolderAgentParent(f, "x <- new AgentBase\n x.doMove <- function() self.move({10, 20})\n x")
 	setValue(mover, "Self.doMove()");
 	res = runModel(true);
-	assertEqual("Custom Agent Parent 1", res.value(v)[2], 10+2*10);
-	assertEqual("Custom Agent Parent 2", res.value(v2)[9], 40+9*20);
+	assertEqual("Custom Agent Parent 1", res.value(v)[2], 10 + 2 * 10);
+	assertEqual("Custom Agent Parent 2", res.value(v2)[9], 40 + 9 * 20);
 
 	setMacros("mover <- new AgentBase\n mover.doMove <- function(dist) self.move(dist*{1, 2})")
 	setFolderAgentParent(f, "mover")
 	setValue(mover, "Self.doMove(10)");
 	res = runModel(true);
-	assertEqual("Custom Agent Parent 3", res.value(v)[2], 10+2*10);
-	assertEqual("Custom Agent Parent 4", res.value(v2)[9], 40+9*20);
+	assertEqual("Custom Agent Parent 3", res.value(v)[2], 10 + 2 * 10);
+	assertEqual("Custom Agent Parent 4", res.value(v2)[9], 40 + 9 * 20);
 
 
 	setGeometryWrap(pop, true);
 	res = runModel(true);
-	assertEqual("Custom Move 24", res.value(v)[2], (10+2*10) % 200);
-	assertEqual("Custom Move 25", res.value(v2)[9], (40+9*20) % 100);
+	assertEqual("Custom Move 24", res.value(v)[2], (10 + 2 * 10) % 200);
+	assertEqual("Custom Move 25", res.value(v2)[9], (40 + 9 * 20) % 100);
 
-	createConnector("Link","Link", pop, mover);
+	createConnector("Link", "Link", pop, mover);
 	setAgentPlacementFunction(pop, "{index(Self)*10, 1}");
 
 	setValue(mover, "moveTowards(Self, findIndex([Population], 1), 1)");
@@ -1067,16 +1073,16 @@ function testAgents(){
 	res = runModel(true);
 	assertEqual("Custom Move 26", res.value(v)[2], 10);
 	assertEqual("Custom Move 27", res.value(v)[9], 10);
-	assertEqual("Custom Move 27.1", res.value(v2)[2], 20-2*1);
-	assertEqual("Custom Move 27.2", res.value(v2)[9], 20-9*1);
+	assertEqual("Custom Move 27.1", res.value(v2)[2], 20 - 2 * 1);
+	assertEqual("Custom Move 27.2", res.value(v2)[9], 20 - 9 * 1);
 
 	setValue(mover, "Self.moveTowards([Population].findIndex(1), 1)");
 	setValue(v2, "[Population].FindIndex(2).Location().x")
 	res = runModel(true);
 	assertEqual("Custom Move 26 (Obj)", res.value(v)[2], 10);
 	assertEqual("Custom Move 27 (Obj)", res.value(v)[9], 10);
-	assertEqual("Custom Move 27.1 (Obj)", res.value(v2)[2], 20-2*1);
-	assertEqual("Custom Move 27.2 (Obj)", res.value(v2)[9], 20-9*1);
+	assertEqual("Custom Move 27.1 (Obj)", res.value(v2)[2], 20 - 2 * 1);
+	assertEqual("Custom Move 27.2 (Obj)", res.value(v2)[9], 20 - 9 * 1);
 
 
 
@@ -1295,19 +1301,19 @@ function testAgents(){
 
 	clearModel()
 
-	var v = createPrimitive("Var", "Variable", [350,350], [200,200]);
-	var v2 = createPrimitive("Var2", "Variable", [0,300], [200,100]);
-	var f = createPrimitive("Agent", "Folder", [300,300], [300,300]);
+	var v = createPrimitive("Var", "Variable", [350, 350], [200, 200]);
+	var v2 = createPrimitive("Var2", "Variable", [0, 300], [200, 100]);
+	var f = createPrimitive("Agent", "Folder", [300, 300], [300, 300]);
 	setFolderType(f, "Agent");
-	setParent(v,f);
-	var p = createPrimitive("Population", "Agents", [0,0],[200,100]);
-	var a = createPrimitive("Action", "Action", [300,0],[200,100]);
-	createConnector("Link","Link", f,p);
-	createConnector("Link","Link", p,v);
-	createConnector("Link","Link", p,v2);
-	createConnector("Link","Link", p,a);
+	setParent(v, f);
+	var p = createPrimitive("Population", "Agents", [0, 0], [200, 100]);
+	var a = createPrimitive("Action", "Action", [300, 0], [200, 100]);
+	createConnector("Link", "Link", f, p);
+	createConnector("Link", "Link", p, v);
+	createConnector("Link", "Link", p, v2);
+	createConnector("Link", "Link", p, a);
 	setAgentBase(p, f)
-	setPopulationSize(p,5)
+	setPopulationSize(p, 5)
 	setValue(v, "PopulationSize([Population])")
 	setTriggerType(a, "Condition");
 	setTriggerValue(a, "years=5");
@@ -1348,28 +1354,28 @@ function testAgents(){
 
 	// Test cross boundary flows
 
-	var v = createPrimitive("Stock1", "Stock", [350,350], [200,200]);
-	var v2 = createPrimitive("Stock2", "Stock", [0,300], [200,100]);
-	var f = createPrimitive("Agent", "Folder", [300,300], [300,300]);
+	var v = createPrimitive("Stock1", "Stock", [350, 350], [200, 200]);
+	var v2 = createPrimitive("Stock2", "Stock", [0, 300], [200, 100]);
+	var f = createPrimitive("Agent", "Folder", [300, 300], [300, 300]);
 	setFolderType(f, "Agent");
-	setParent(v,f);
-	var p = createPrimitive("Population", "Agents", [0,0],[200,100]);
-	var flow = createConnector("Flow","Flow", v,v2);
+	setParent(v, f);
+	var p = createPrimitive("Population", "Agents", [0, 0], [200, 100]);
+	var flow = createConnector("Flow", "Flow", v, v2);
 	setAgentBase(p, f)
-	setPopulationSize(p,5)
+	setPopulationSize(p, 5)
 
 	res = runModel(true);
 	assertUnequal("Cross Boundary Flow 1", res.error, "none");
-	setParent(v2,f);
-	setParent(flow,f);
+	setParent(v2, f);
+	setParent(flow, f);
 	res = runModel(true);
 	assertEqual("Cross Boundary Flow 2", res.error, "none");
 	removePrimitive(v2);
 	res = runModel(true);
 	assertEqual("Cross Boundary Flow 3", res.error, "none");
-	var v2 = createPrimitive("Stock2", "Stock", [0,300], [200,100]);
+	var v2 = createPrimitive("Stock2", "Stock", [0, 300], [200, 100]);
 	setEnds(f, v, v2);
-	setParent(flow,null);
+	setParent(flow, null);
 	removePrimitive(v2);
 	res = runModel(true);
 	assertUnequal("Cross Boundary Flow 4", res.error, "none");
@@ -1380,58 +1386,58 @@ function testAgents(){
 
 }
 
-function testUI(){
+function testUI() {
 	test = "UI";
 
 	var s = topBarShown();
 	toggleTopBar();
-	assertEqual("Top bar 1", topBarShown(), ! s);
+	assertEqual("Top bar 1", topBarShown(), !s);
 	toggleTopBar();
 	assertEqual("Top bar 2", topBarShown(), s);
 
 	s = sideBarShown();
 	toggleSideBar();
-	assertEqual("Side bar 1", sideBarShown(), ! s);
+	assertEqual("Side bar 1", sideBarShown(), !s);
 	toggleSideBar();
 	assertEqual("Side bar 2", sideBarShown(), s);
 
 
 }
 
-function testMacros(){
+function testMacros() {
 
 	test = "Macros";
 
 	clearModel();
 
-	var mString  = "a <- 52\nf(x)<-x^2";
+	var mString = "a <- 52\nf(x)<-x^2";
 
 	setMacros(mString);
 	assertEqual("Get Macros", getMacros(), mString);
 
 
-	var p1  = createPrimitive("p1", "Variable",[200,0],[100,100]);
-	var p2  = createPrimitive("p2", "Variable",[0,0],[100,100]);
+	var p1 = createPrimitive("p1", "Variable", [200, 0], [100, 100]);
+	var p2 = createPrimitive("p2", "Variable", [0, 0], [100, 100]);
 	setValue(p1, "a");
 	setValue(p2, "f(2)");
 	var res = runModel(true);
-	assertEqual("Constant", res.value(p1)[3],52);
-	assertEqual("Function", res.value(p2)[3],4);
+	assertEqual("Constant", res.value(p1)[3], 52);
+	assertEqual("Function", res.value(p2)[3], 4);
 }
 
 
-function testUnitFunctions(){
+function testUnitFunctions() {
 
 	test = "Units Functions";
 
 	clearModel();
-	var p1  = createPrimitive("p1", "Variable",[200,0],[100,100]);
-	var p2  = createPrimitive("p2", "Variable",[0,0],[100,100]);
-	var p3  = createPrimitive("p3", "Variable",[0,0],[100,100]);
-	var p4  = createPrimitive("p4", "Variable",[0,0],[100,100]);
-	var p5  = createPrimitive("p5", "Variable",[0,0],[100,100]);
-	var p6  = createPrimitive("p6", "Variable",[0,0],[100,100]);
-	var p7  = createPrimitive("p7", "Variable",[0,0],[100,100]);
+	var p1 = createPrimitive("p1", "Variable", [200, 0], [100, 100]);
+	var p2 = createPrimitive("p2", "Variable", [0, 0], [100, 100]);
+	var p3 = createPrimitive("p3", "Variable", [0, 0], [100, 100]);
+	var p4 = createPrimitive("p4", "Variable", [0, 0], [100, 100]);
+	var p5 = createPrimitive("p5", "Variable", [0, 0], [100, 100]);
+	var p6 = createPrimitive("p6", "Variable", [0, 0], [100, 100]);
+	var p7 = createPrimitive("p7", "Variable", [0, 0], [100, 100]);
 	setValue(p1, "Years");
 	setValue(p2, "Months");
 	setValue(p3, "Weeks");
@@ -1440,13 +1446,13 @@ function testUnitFunctions(){
 	setValue(p6, "Minutes");
 	setValue(p7, "Seconds");
 	var res = runModel(true);
-	assertEqual("Y", res.value(p1)[3],3);
-	assertEqual("Mo", res.value(p2)[3],3*12);
-	assertEqual("W", Math.floor(res.value(p3)[3]), 3*52);
-	assertEqual("D", res.value(p4)[3],3*365);
-	assertEqual("H", res.value(p5)[3],3*365*24);
-	assertEqual("Mi", res.value(p6)[3],3*365*24*60);
-	assertEqual("S", res.value(p7)[3],3*365*24*60*60);
+	assertEqual("Y", res.value(p1)[3], 3);
+	assertEqual("Mo", res.value(p2)[3], 3 * 12);
+	assertEqual("W", Math.floor(res.value(p3)[3]), 3 * 52);
+	assertEqual("D", res.value(p4)[3], 3 * 365);
+	assertEqual("H", res.value(p5)[3], 3 * 365 * 24);
+	assertEqual("Mi", res.value(p6)[3], 3 * 365 * 24 * 60);
+	assertEqual("S", res.value(p7)[3], 3 * 365 * 24 * 60 * 60);
 
 	setValue(p1, "Years(time*2)");
 	setValue(p2, "Months(time*2)");
@@ -1456,13 +1462,13 @@ function testUnitFunctions(){
 	setValue(p6, "Minutes(time*2)");
 	setValue(p7, "Seconds(time*2)");
 	res = runModel(true);
-	assertEqual("Y", res.value(p1)[3],2*3);
-	assertEqual("Mo", res.value(p2)[3],2*3*12);
-	assertEqual("W", Math.floor(res.value(p3)[3]),2*3*52);
-	assertEqual("D", res.value(p4)[3],2*3*365);
-	assertEqual("H", res.value(p5)[3],2*3*365*24);
-	assertEqual("Mi", res.value(p6)[3],2*3*365*24*60);
-	assertEqual("S", res.value(p7)[3],2*3*365*24*60*60);
+	assertEqual("Y", res.value(p1)[3], 2 * 3);
+	assertEqual("Mo", res.value(p2)[3], 2 * 3 * 12);
+	assertEqual("W", Math.floor(res.value(p3)[3]), 2 * 3 * 52);
+	assertEqual("D", res.value(p4)[3], 2 * 3 * 365);
+	assertEqual("H", res.value(p5)[3], 2 * 3 * 365 * 24);
+	assertEqual("Mi", res.value(p6)[3], 2 * 3 * 365 * 24 * 60);
+	assertEqual("S", res.value(p7)[3], 2 * 3 * 365 * 24 * 60 * 60);
 
 	setValue(p1, "unitless(TimeStart)");
 	setValue(p2, "unitless(TimeLength)");
@@ -1472,19 +1478,19 @@ function testUnitFunctions(){
 	assertEqual("Time Start", res.value(p1)[3], getTimeStart());
 	assertEqual("Time Length", res.value(p2)[3], getTimeLength());
 	assertEqual("Time Step", res.value(p3)[3], getTimeStep());
-	assertEqual("Time End", res.value(p4)[3], getTimeStart()+getTimeLength());
+	assertEqual("Time End", res.value(p4)[3], getTimeStart() + getTimeLength());
 
 
 }
 
 
-function testUnitsAndConstraints(){
+function testUnitsAndConstraints() {
 
 	test = "Units and Constraints";
 
 	clearModel();
 
-	var x = createPrimitive("tester", "Variable", [0,0], [100,10]);
+	var x = createPrimitive("tester", "Variable", [0, 0], [100, 10]);
 	setValue(x, "time");
 	setUnits(x, "Seconds");
 
@@ -1507,7 +1513,7 @@ function testUnitsAndConstraints(){
 }
 
 
-function testPrimitiveGetSet(){
+function testPrimitiveGetSet() {
 	test = "Primitive Get Set";
 
 	setupComplexDummy();
@@ -1534,7 +1540,7 @@ function testPrimitiveGetSet(){
 	setSliderStep(x, 15);
 	assertEqual("SliderStep", getSliderStep(x), 15);
 
-	if(!(graph instanceof SimpleNode)){
+	if (!(graph instanceof SimpleNode)) {
 		setFillColor(x, "green");
 		assertEqual("Fill Color", getFillColor(x), "green");
 		setFontColor(x, "red");
@@ -1588,7 +1594,7 @@ function testPrimitiveGetSet(){
 	setInterpolation(c, "fdsf");
 	assertEqual("Set Interpolation", getInterpolation(c), "fdsf");
 
-	var state = createPrimitive("My State", "State", [100,60],[100,100]);
+	var state = createPrimitive("My State", "State", [100, 60], [100, 100]);
 	setValue(state, "abc");
 	assertEqual("State Set Value", getValue(state), "abc");
 	assertEqual("State Get Residency", getResidency(state), "0");
@@ -1610,7 +1616,7 @@ function testPrimitiveGetSet(){
 	setTriggerRecalculate(transition, true);
 	assertEqual("Transition Get Trigger Recalculate 2", getTriggerRecalculate(transition), true);
 
-	var action = createPrimitive("My Action", "Action", [100,60],[100,100]);
+	var action = createPrimitive("My Action", "Action", [100, 60], [100, 100]);
 	setValue(action, "abc1");
 	assertEqual("Action Set Value", getValue(action), "abc1");
 	setTriggerValue(action, "abc123");
@@ -1627,7 +1633,7 @@ function testPrimitiveGetSet(){
 	assertEqual("Action Get Trigger Recalculate 2", getTriggerRecalculate(action), true);
 
 
-	var agents = createPrimitive("My Agents", "Agents", [300,300],[200,100]);
+	var agents = createPrimitive("My Agents", "Agents", [300, 300], [200, 100]);
 	setPopulationSize(agents, 123);
 	assertEqual("Agents Size", getPopulationSize(agents), 123);
 	setGeometryUnits(agents, "foo bar");
@@ -1649,17 +1655,17 @@ function testPrimitiveGetSet(){
 	setGeometryWrap(agents, false);
 	assertEqual("Agents Wrap 2", getGeometryWrap(agents), false);
 
-	var f = createPrimitive("f", "Folder", [200,150], [150,100]);
-	createConnector("Link","Link", f, agents);
+	var f = createPrimitive("f", "Folder", [200, 150], [150, 100]);
+	createConnector("Link", "Link", f, agents);
 	setAgentBase(agents, f);
 	assertEqual("Agents Base", getAgentBase(agents).id, f.id);
-	setFolderSolver(f, {a:1});
+	setFolderSolver(f, { a: 1 });
 	assertEqual("Folder Solver", getFolderSolver(f).a, 1);
 
 
 }
 
-function testSimulationGetSet(){
+function testSimulationGetSet() {
 
 	test = "Simulation Get Set";
 
@@ -1683,7 +1689,7 @@ function testSimulationGetSet(){
 
 }
 
-function testSimulation(){
+function testSimulation() {
 
 	test = "Simulation Test";
 
@@ -1693,13 +1699,13 @@ function testSimulation(){
 	setTimeLength(10);
 
 	var algorithms = ["RK1", "RK4"];
-	for( var i=0; i<algorithms.length; i++){
-		console.log("--- Using Algorithm: "+algorithms[i])
+	for (var i = 0; i < algorithms.length; i++) {
+		console.log("--- Using Algorithm: " + algorithms[i])
 		setAlgorithm(algorithms[i]);
 		setTimeLength(10);
 		clearModel();
 
-		var s = createPrimitive("My Stock", "Stock", [10,10], [140, 50]);
+		var s = createPrimitive("My Stock", "Stock", [10, 10], [140, 50]);
 		var f = createConnector("My Flow", "Flow", s, null);
 		setValue(s, "100");
 		setValue(f, "0.1*[Alpha]");
@@ -1720,24 +1726,24 @@ function testSimulation(){
 		setTimeLength(2);
 
 
-		var y = createPrimitive("Y", "Stock", [10,10], [140, 50]);
-		var by = createConnector("My Flow", "Flow",  null, y);
+		var y = createPrimitive("Y", "Stock", [10, 10], [140, 50]);
+		var by = createConnector("My Flow", "Flow", null, y);
 		setValue(y, "100");
 		setValue(by, "0.04*[Y]");
 
 		res = runModel(true);
-		if(algorithms[i]=="RK1"){
-			assertEqual("Mathematica ExpGrow Small Time", Math.round(res.value(y)[20]*mathimaticaScale), Math.round(108.31142163*mathimaticaScale) );
-		}else if(algorithms[i]=="RK4"){
-			assertEqual("Mathematica ExpGrow Small Time", Math.round(res.value(y)[20]*mathimaticaScale), Math.round(108.328706767*mathimaticaScale) );
+		if (algorithms[i] == "RK1") {
+			assertEqual("Mathematica ExpGrow Small Time", Math.round(res.value(y)[20] * mathimaticaScale), Math.round(108.31142163 * mathimaticaScale));
+		} else if (algorithms[i] == "RK4") {
+			assertEqual("Mathematica ExpGrow Small Time", Math.round(res.value(y)[20] * mathimaticaScale), Math.round(108.328706767 * mathimaticaScale));
 		}
 
 		setTimeStart(.12);
 		res = runModel(true);
-		if(algorithms[i]=="RK1"){
-			assertEqual("Mathematica ExpGrow Start Time", Math.round(res.value(y)[20]*mathimaticaScale), Math.round(108.31142163*mathimaticaScale) );
-		}else if(algorithms[i]=="RK4"){
-			assertEqual("Mathematica ExpGrow Start Time", Math.round(res.value(y)[20]*mathimaticaScale), Math.round(108.328706767*mathimaticaScale) );
+		if (algorithms[i] == "RK1") {
+			assertEqual("Mathematica ExpGrow Start Time", Math.round(res.value(y)[20] * mathimaticaScale), Math.round(108.31142163 * mathimaticaScale));
+		} else if (algorithms[i] == "RK4") {
+			assertEqual("Mathematica ExpGrow Start Time", Math.round(res.value(y)[20] * mathimaticaScale), Math.round(108.328706767 * mathimaticaScale));
 		}
 		assertEqual("Mathematica ExpGrow Start Time 2", res.times[0], .12);
 		assertEqual("Mathematica ExpGrow Start Time 3", res.times[1], .22);
@@ -1748,10 +1754,10 @@ function testSimulation(){
 		setTimeStep(1);
 
 		res = runModel(true);
-		if(algorithms[i]=="RK1"){
-			assertEqual("Mathematica ExpGrow", Math.round(res.value(y)[100]*mathimaticaScale), Math.round(5050.49481843*mathimaticaScale) );
-		}else if(algorithms[i]=="RK4"){
-			assertEqual("Mathematica ExpGrow", Math.round(res.value(y)[100]*mathimaticaScale), Math.round(5459.81455268*mathimaticaScale) );
+		if (algorithms[i] == "RK1") {
+			assertEqual("Mathematica ExpGrow", Math.round(res.value(y)[100] * mathimaticaScale), Math.round(5050.49481843 * mathimaticaScale));
+		} else if (algorithms[i] == "RK4") {
+			assertEqual("Mathematica ExpGrow", Math.round(res.value(y)[100] * mathimaticaScale), Math.round(5459.81455268 * mathimaticaScale));
 		}
 
 
@@ -1760,22 +1766,22 @@ function testSimulation(){
 		setValue(by, "0.02*[Y]*(1-[Y]/100)*Sin(Years/3)^2");
 		setValue(y, 2);
 		res = runModel(true);
-		if(algorithms[i]=="RK1"){
-			assertEqual("Mathematica LogGrow", Math.round(res.value(y)[100]*mathimaticaScale), Math.round(5.2233233649*mathimaticaScale) );
-		}else if(algorithms[i]=="RK4"){
-			assertEqual("Mathematica LogGrow", Math.round(res.value(y)[100]*mathimaticaScale), Math.round(5.30387612074*mathimaticaScale) );
+		if (algorithms[i] == "RK1") {
+			assertEqual("Mathematica LogGrow", Math.round(res.value(y)[100] * mathimaticaScale), Math.round(5.2233233649 * mathimaticaScale));
+		} else if (algorithms[i] == "RK4") {
+			assertEqual("Mathematica LogGrow", Math.round(res.value(y)[100] * mathimaticaScale), Math.round(5.30387612074 * mathimaticaScale));
 		}
 
 		setValue(by, "0.02*[Y]*(1-[Y]/100)*Sin({Years/3 Radians})^2");
 		setValue(y, 2);
 		res = runModel(true);
-		if(algorithms[i]=="RK1"){
-			assertEqual("Mathematica LogGrow 2", Math.round(res.value(y)[100]*mathimaticaScale), Math.round(5.2233233649*mathimaticaScale) );
-		}else if(algorithms[i]=="RK4"){
-			assertEqual("Mathematica LogGrow 2", Math.round(res.value(y)[100]*mathimaticaScale), Math.round(5.30387612074*mathimaticaScale) );
+		if (algorithms[i] == "RK1") {
+			assertEqual("Mathematica LogGrow 2", Math.round(res.value(y)[100] * mathimaticaScale), Math.round(5.2233233649 * mathimaticaScale));
+		} else if (algorithms[i] == "RK4") {
+			assertEqual("Mathematica LogGrow 2", Math.round(res.value(y)[100] * mathimaticaScale), Math.round(5.30387612074 * mathimaticaScale));
 		}
 
-		var x = createPrimitive("X", "Stock", [10,10], [140, 50]);
+		var x = createPrimitive("X", "Stock", [10, 10], [140, 50]);
 		var bx = createConnector("My Flow", "Flow", null, x);
 		var dx = createConnector("My Flow", "Flow", x, null);
 		var dy = createConnector("My Flow", "Flow", y, null);
@@ -1790,10 +1796,10 @@ function testSimulation(){
 		setValue(y, 100);
 
 		res = runModel(true);
-		if(algorithms[i]=="RK1"){
-			assertEqual("Mathematica LV", Math.round(res.value(y)[100]*mathimaticaScale), Math.round(15.2517207902*mathimaticaScale) );
-		}else if(algorithms[i]=="RK4"){
-			assertEqual("Mathematica LV", Math.round(res.value(y)[100]*mathimaticaScale), Math.round(4118.37647504*mathimaticaScale) );
+		if (algorithms[i] == "RK1") {
+			assertEqual("Mathematica LV", Math.round(res.value(y)[100] * mathimaticaScale), Math.round(15.2517207902 * mathimaticaScale));
+		} else if (algorithms[i] == "RK4") {
+			assertEqual("Mathematica LV", Math.round(res.value(y)[100] * mathimaticaScale), Math.round(4118.37647504 * mathimaticaScale));
 		}
 
 
@@ -1802,8 +1808,8 @@ function testSimulation(){
 		clearModel();
 		//End Mathematica Parity Tests
 
-		var x = createPrimitive("X", "Stock", [10,10], [140, 50]);
-		var v = createPrimitive("V", "Variable", [10,10], [140, 50]);
+		var x = createPrimitive("X", "Stock", [10, 10], [140, 50]);
+		var v = createPrimitive("V", "Variable", [10, 10], [140, 50]);
 		var bx = createConnector("Flow", "Flow", null, x);
 		var lx = createConnector("Link", "Link", bx, v);
 
@@ -1812,32 +1818,32 @@ function testSimulation(){
 		setValue(v, "[Flow]");
 
 		res = runModel(true);
-		if(algorithms[i]=="RK1"){
-			assertEqual("Flow Time Correct 1", Math.round(res.value(bx)[0]*mathimaticaScale), Math.round(20*mathimaticaScale) );
-			assertEqual("Flow Time Correct 2", Math.round(res.value(v)[0]*mathimaticaScale), Math.round(20*mathimaticaScale) );
-		}else if(algorithms[i]=="RK4"){
-			assertEqual("Flow Time Correct 1", Math.round(res.value(bx)[0]*mathimaticaScale), Math.round(21.03416666*mathimaticaScale) );
-			assertEqual("Flow Time Correct 2", Math.round(res.value(v)[0]*mathimaticaScale), Math.round(21.03416666*mathimaticaScale) );
+		if (algorithms[i] == "RK1") {
+			assertEqual("Flow Time Correct 1", Math.round(res.value(bx)[0] * mathimaticaScale), Math.round(20 * mathimaticaScale));
+			assertEqual("Flow Time Correct 2", Math.round(res.value(v)[0] * mathimaticaScale), Math.round(20 * mathimaticaScale));
+		} else if (algorithms[i] == "RK4") {
+			assertEqual("Flow Time Correct 1", Math.round(res.value(bx)[0] * mathimaticaScale), Math.round(21.03416666 * mathimaticaScale));
+			assertEqual("Flow Time Correct 2", Math.round(res.value(v)[0] * mathimaticaScale), Math.round(21.03416666 * mathimaticaScale));
 		}
 
 		clearModel();
 
 
 
-		var p = createPrimitive("p","Variable", [0,0], [100,100]);
+		var p = createPrimitive("p", "Variable", [0, 0], [100, 100]);
 		setValue(p, "years");
 		res = runModel(true);
 		assertEqual("Generic Units 1", res.value(p)[4], 4);
 		setValue(p, "months");
 		res = runModel(true);
-		assertEqual("Generic Units 2", res.value(p)[4], 4*12);
+		assertEqual("Generic Units 2", res.value(p)[4], 4 * 12);
 
 		clearModel()
 
 		setTimeLength(100);
 
 
-		if(algorithms[i]=="RK1"){
+		if (algorithms[i] == "RK1") {
 			// More flow scaling tests
 
 			var p = createPrimitive("My Variable", "Variable", [100, 100], [140, 50]);
@@ -1916,17 +1922,17 @@ function testSimulation(){
 		setValue(f, "10");
 		setValue(s, "1");
 		res = runModel(true);
-		assertEqual("Unit Flows 1", res.value(s)[10], 10*10+1);
+		assertEqual("Unit Flows 1", res.value(s)[10], 10 * 10 + 1);
 
 		setValue(f, "{10 Euros/years}");
 		setValue(s, "{1 Euros}");
 		res = runModel(true);
-		assertEqual("Unit Flows 2", res.value(s)[10], 10*10+1);
+		assertEqual("Unit Flows 2", res.value(s)[10], 10 * 10 + 1);
 
 		clearModel()
 
 		// Test fixing of values
-		p = createPrimitive("My Variable", "Variable", [100, 100], [140,50]);
+		p = createPrimitive("My Variable", "Variable", [100, 100], [140, 50]);
 
 		setValue(p, "Fix(years+12)");
 		res = runModel(true);
@@ -1944,16 +1950,16 @@ function testSimulation(){
 
 
 		//General Tests
-		s = createPrimitive("My Stock", "Stock", [100, 100], [140,50]);
+		s = createPrimitive("My Stock", "Stock", [100, 100], [140, 50]);
 		f = createConnector("My Flow", "Flow", null, s);
-		p = createPrimitive("My Variable", "Variable", [100, 100], [140,50]);
+		p = createPrimitive("My Variable", "Variable", [100, 100], [140, 50]);
 		l = createConnector("My Link", "Link", s, p)
 		setValue(f, "1");
 		setValue(s, "0");
 
 		setStockType(s, "Conveyor");
 		setDelay(s, 5);
-		setValue(p,"[[My Stock]]");
+		setValue(p, "[[My Stock]]");
 
 		res = runModel(true);
 
@@ -1990,20 +1996,20 @@ function testSimulation(){
 		//outF.timeIndependent=true
 		setValue(f, "2");
 		res = runModel(true);
-		assertEqual("FSF 1", Math.round(res.lastValue(s)*1000), 2*1000);
+		assertEqual("FSF 1", Math.round(res.lastValue(s) * 1000), 2 * 1000);
 		assertEqual("FSF 2", res.lastValue(p), 8);
 		assertEqual("FSF 3", res.value(p)[3], 6);
-		assertEqual("FSF 4", Math.round(res.lastValue(outF)*1000), 2*1000);
+		assertEqual("FSF 4", Math.round(res.lastValue(outF) * 1000), 2 * 1000);
 		assertEqual("FSF 5", res.value(outF)[3], 0);
 		assertEqual("FSF 6", res.lastValue(f), 2);
 
 
 		clearModel();
 
-		s = createPrimitive("My Stock", "Stock", [100, 100], [140,50]);
+		s = createPrimitive("My Stock", "Stock", [100, 100], [140, 50]);
 		f = createConnector("My Flow", "Flow", null, s);
 		var f2 = createConnector("My Flow", "Flow", s, null);
-		p = createPrimitive("My Variable", "Variable", [100, 100], [140,50]);
+		p = createPrimitive("My Variable", "Variable", [100, 100], [140, 50]);
 		l = createConnector("My Link", "Link", s, p)
 		setValue(f, "10");
 		setValue(s, "50");
@@ -2011,7 +2017,7 @@ function testSimulation(){
 
 		setStockType(s, "Conveyor");
 		setDelay(s, 5);
-		setValue(p,"[[My Stock]]");
+		setValue(p, "[[My Stock]]");
 
 
 		res = runModel(true);
@@ -2031,8 +2037,8 @@ function testSimulation(){
 
 		clearModel()
 
-		s = createPrimitive("My Stock", "Stock", [100, 100], [140,50]);
-		s2 = createPrimitive("My Stock", "Stock", [100, 100], [140,50]);
+		s = createPrimitive("My Stock", "Stock", [100, 100], [140, 50]);
+		s2 = createPrimitive("My Stock", "Stock", [100, 100], [140, 50]);
 		f = createConnector("My Flow", "Flow", s, s2);
 		setValue(f, "1");
 		setValue(s, "0");
@@ -2085,17 +2091,17 @@ function testSimulation(){
 		setValue(f5, 5);
 		setUnits(f5, "1/days");
 		res = runModel(true);
-		assertEqual("Flow Value 1", Math.round(res.value(f1)[20]*1000), 1*1000);
-		assertEqual("Flow Value 2", Math.round(res.value(f2)[20]*1000), 7*1000);
-		assertEqual("Flow Value 3", Math.round(res.value(f3)[20]*1000), 3*1000);
-		assertEqual("Flow Value 4", Math.round(res.value(f4)[20]*1000), 2*1000);
-		assertEqual("Flow Value 5", Math.round(res.value(f5)[20]*1000), 5*1000);
+		assertEqual("Flow Value 1", Math.round(res.value(f1)[20] * 1000), 1 * 1000);
+		assertEqual("Flow Value 2", Math.round(res.value(f2)[20] * 1000), 7 * 1000);
+		assertEqual("Flow Value 3", Math.round(res.value(f3)[20] * 1000), 3 * 1000);
+		assertEqual("Flow Value 4", Math.round(res.value(f4)[20] * 1000), 2 * 1000);
+		assertEqual("Flow Value 5", Math.round(res.value(f5)[20] * 1000), 5 * 1000);
 
-		assertEqual("Flow Stock Value 1", res.value(s1)[2], 1*2);
-		assertEqual("Flow Stock Value 2", Math.round(res.value(s2)[2]), 7*2);
-		assertEqual("Flow Stock Value 3", res.value(s3)[2], 3*2);
-		assertEqual("Flow Stock Value 4", res.value(s4)[2], 200*2);
-		assertEqual("Flow Stock Value 5", Math.round(res.value(s5)[2]), 5*365*2);
+		assertEqual("Flow Stock Value 1", res.value(s1)[2], 1 * 2);
+		assertEqual("Flow Stock Value 2", Math.round(res.value(s2)[2]), 7 * 2);
+		assertEqual("Flow Stock Value 3", res.value(s3)[2], 3 * 2);
+		assertEqual("Flow Stock Value 4", res.value(s4)[2], 200 * 2);
+		assertEqual("Flow Stock Value 5", Math.round(res.value(s5)[2]), 5 * 365 * 2);
 
 
 		clearModel()
@@ -2133,17 +2139,17 @@ function testSimulation(){
 			setValue(outflow, 110);
 			setValue(inflow, 100);
 			res = runModel(true);
-			assertEqual("Non Negative Stock " + (i+1), res.value(s)[2], 30);
-			assertEqual("Non Negative Stock " + (i+2), res.value(s)[10], 0);
+			assertEqual("Non Negative Stock " + (i + 1), res.value(s)[2], 30);
+			assertEqual("Non Negative Stock " + (i + 2), res.value(s)[10], 0);
 
 			setValue(s, "{a:50, b:30}");
 			setValue(outflow, "{a:-10, b:110}");
 			setValue(inflow, "{a:-10, b:100}");
 			res = runModel(true);
-			assertEqual("Non Negative Stock " + (i+3), res.value(s)[2].a, 50);
-			assertEqual("Non Negative Stock " + (i+4), res.value(s)[10].a, 50);
-			assertEqual("Non Negative Stock " + (i+5), res.value(s)[2].b, 10);
-			assertEqual("Non Negative Stock " + (i+6), res.value(s)[10].b, 0);
+			assertEqual("Non Negative Stock " + (i + 3), res.value(s)[2].a, 50);
+			assertEqual("Non Negative Stock " + (i + 4), res.value(s)[10].a, 50);
+			assertEqual("Non Negative Stock " + (i + 5), res.value(s)[2].b, 10);
+			assertEqual("Non Negative Stock " + (i + 6), res.value(s)[10].b, 0);
 
 			clearModel();
 		}
@@ -2178,9 +2184,9 @@ function testSimulation(){
 		setValue(f, "years-10");
 		setNonNegative(f, false);
 		res = runModel(true);
-		if(algorithms[i]=="RK1"){
+		if (algorithms[i] == "RK1") {
 			assertEqual("Non Negative Flow 1 - stock", res.value(s)[1], 0);
-			assertEqual("Non Negative Flow 2", Math.round(res.value(f)[0]*1000), -10*1000);
+			assertEqual("Non Negative Flow 2", Math.round(res.value(f)[0] * 1000), -10 * 1000);
 		}
 		setNonNegative(f, true);
 		res = runModel(true);
@@ -2199,22 +2205,22 @@ function testSimulation(){
 		setValue(s, '{0, 0}');
 		setValue(f, '{{10,10}, {20,20}}');
 		res = runModel(true);
-		assertEqual("Vector collapsing 1", res.lastValue(s)[0], 20*100);
-		assertEqual("Vector collapsing 2", res.lastValue(s)[1], 40*100);
+		assertEqual("Vector collapsing 1", res.lastValue(s)[0], 20 * 100);
+		assertEqual("Vector collapsing 2", res.lastValue(s)[1], 40 * 100);
 
 
 		// Test Converter
 
 		clearModel();
 
-		var c = createPrimitive("my converter", "Converter", [0,0], [100,40]);
+		var c = createPrimitive("my converter", "Converter", [0, 0], [100, 40]);
 
 		setData(c, "1,1.1;1.5,4;2,4;3,9;4,16;100,200");
 
 
-		p = createPrimitive("Param", "Variable",[0,0],[100,40]);
-		l = createConnector("link", "Link",p,c);
-		setValue(p,"years+40");
+		p = createPrimitive("Param", "Variable", [0, 0], [100, 40]);
+		l = createConnector("link", "Link", p, c);
+		setValue(p, "years+40");
 		setConverterInput(c, p);
 
 		res = runModel(true);
@@ -2223,18 +2229,18 @@ function testSimulation(){
 		setConverterInput(c, null)
 
 		res = runModel(true);
-		assertEqual("Time Input Value",1.1, res.value(c)[1]);
+		assertEqual("Time Input Value", 1.1, res.value(c)[1]);
 
 		setData(c, "0,2;20,4");
 
 		res = runModel(true);
-		assertEqual("Interpolation",res.value(c)[10],3);
+		assertEqual("Interpolation", res.value(c)[10], 3);
 		setInterpolation(c, "Discrete");
 		res = runModel(true);
-		assertEqual("No Interpolation",res.value(c)[10],2)
+		assertEqual("No Interpolation", res.value(c)[10], 2)
 		setInterpolation(c, "Linear");
 		res = runModel(true);
-		assertEqual("Interpolation 2",res.value(c)[10],3)
+		assertEqual("Interpolation 2", res.value(c)[10], 3)
 
 
 
@@ -2257,55 +2263,55 @@ function testSimulation(){
 
 		//Test stock initial values
 		clearModel()
-		var p  = createPrimitive("My Stock 1", "Stock",[0,0],[100,100]);
-		var p2  = createPrimitive("My Stock 2", "Stock",[0,0],[100,100]);
-		var l = createConnector("Link","Link", p, p2);
-		setValue(p,"10");
+		var p = createPrimitive("My Stock 1", "Stock", [0, 0], [100, 100]);
+		var p2 = createPrimitive("My Stock 2", "Stock", [0, 0], [100, 100]);
+		var l = createConnector("Link", "Link", p, p2);
+		setValue(p, "10");
 		setValue(p2, "[My Stock 1]");
 		res = runModel(true);
-		assertEqual("Stock Init 1", res.value(p)[0],10);
+		assertEqual("Stock Init 1", res.value(p)[0], 10);
 		assertEqual("Stock Init 2", res.value(p2)[0], 10)
 
-		var l = createConnector("Link","Link", p2, p);
-		setValue(p,"[My Stock 2]");
+		var l = createConnector("Link", "Link", p2, p);
+		setValue(p, "[My Stock 2]");
 		setValue(p2, "20");
 		res = runModel(true);
-		assertEqual("Stock Init 3", res.value(p)[0],20);
+		assertEqual("Stock Init 3", res.value(p)[0], 20);
 		assertEqual("Stock Init 4", res.value(p2)[0], 20)
 
 		//Test Units Being Copied function
 		clearModel()
-		var p  = createPrimitive("My Variable 1", "Variable",[0,0],[100,100]);
-		var p2  = createPrimitive("My Variable 2", "Variable",[0,0],[100,100]);
-		var l = createConnector("Link","Link",p,p2);
-		setValue(p,"10");
+		var p = createPrimitive("My Variable 1", "Variable", [0, 0], [100, 100]);
+		var p2 = createPrimitive("My Variable 2", "Variable", [0, 0], [100, 100]);
+		var l = createConnector("Link", "Link", p, p2);
+		setValue(p, "10");
 		setUnits(p2, "Rabbits");
 		setValue(p2, "[My Variable 1]");
 		res = runModel(true);
-		assertEqual("Unit Conversion Vars 1", res.value(p)[3],10);
+		assertEqual("Unit Conversion Vars 1", res.value(p)[3], 10);
 		assertEqual("Unit Conversion Vars 2", res.value(p2)[3], 10);
 
 		//Test Units Being Copied function
 		clearModel()
-		var p  = createPrimitive("My Variable 1", "Variable",[0,0],[100,100]);
-		var p2  = createPrimitive("My Variable 2", "Variable",[0,0],[100,100]);
-		var p3  = createPrimitive("My Variable 3", "Variable",[0,0],[100,100]);
-		var l = createConnector("Link","Link",p,p2);
-		var l = createConnector("Link","Link",p2,p3);
-		setValue(p,"{a: 1.2, b:3.2}");
+		var p = createPrimitive("My Variable 1", "Variable", [0, 0], [100, 100]);
+		var p2 = createPrimitive("My Variable 2", "Variable", [0, 0], [100, 100]);
+		var p3 = createPrimitive("My Variable 3", "Variable", [0, 0], [100, 100]);
+		var l = createConnector("Link", "Link", p, p2);
+		var l = createConnector("Link", "Link", p2, p3);
+		setValue(p, "{a: 1.2, b:3.2}");
 		setValue(p2, "round([My Variable 1])");
 		setValue(p3, "[My Variable 2].b");
 		res = runModel(true);
-		assertEqual("Recurse Function", res.value(p3)[3],3);
+		assertEqual("Recurse Function", res.value(p3)[3], 3);
 
 		//Test Frozen Folders
 		clearModel();
-		var p  = createPrimitive("My Param", "Variable",[0,0],[100,100]);
-		var p2  = createPrimitive("Derived", "Variable",[0,0],[100,100]);
-		var l = createConnector("Link","Link",p,p2);
+		var p = createPrimitive("My Param", "Variable", [0, 0], [100, 100]);
+		var p2 = createPrimitive("Derived", "Variable", [0, 0], [100, 100]);
+		var l = createConnector("Link", "Link", p, p2);
 		setValue(p, "Years");
 		setValue(p2, "[My Param] + Years");
-		var f = createPrimitive("Folder", "Folder",[0,0],[100,100]);
+		var f = createPrimitive("Folder", "Folder", [0, 0], [100, 100]);
 		setParent(p, f);
 		setFrozen(f, false);
 		res = runModel(true);
@@ -2321,24 +2327,24 @@ function testSimulation(){
 
 		//Test Delay function
 		clearModel()
-		var p  = createPrimitive("My Param", "Variable",[0,0],[100,100]);
-		var p2  = createPrimitive("Delayed", "Variable",[0,0],[100,100]);
-		var l = createConnector("Link","Link",p,p2);
-		setValue(p,"Years");
+		var p = createPrimitive("My Param", "Variable", [0, 0], [100, 100]);
+		var p2 = createPrimitive("Delayed", "Variable", [0, 0], [100, 100]);
+		var l = createConnector("Link", "Link", p, p2);
+		setValue(p, "Years");
 		setValue(p2, "Delay([My Param], 5, -3)");
 		res = runModel(true);
-		assertEqual("Initial Value", res.value(p2)[3],-3);
-		assertEqual("End Delay", res.value(p)[res.periods-6], res.lastValue(p2));
+		assertEqual("Initial Value", res.value(p2)[3], -3);
+		assertEqual("End Delay", res.value(p)[res.periods - 6], res.lastValue(p2));
 
 		setValue(p2, "Delay([My Param], 0)");
 		res = runModel(true);
 		assertEqual("0 Delay", res.value(p2)[3], res.value(p)[3]);
 
-		setValue(p,"Years");
+		setValue(p, "Years");
 		setValue(p2, "Delay([My Param], 5, -3)");
 		res = runModel(true);
-		assertEqual("[ Initial Value", res.value(p2)[3],-3);
-		assertEqual("[ End Delay", res.value(p)[res.periods-6], res.lastValue(p2));
+		assertEqual("[ Initial Value", res.value(p2)[3], -3);
+		assertEqual("[ End Delay", res.value(p)[res.periods - 6], res.lastValue(p2));
 
 		setValue(p2, "Delay([My Param], 0)");
 		res = runModel(true);
@@ -2347,40 +2353,40 @@ function testSimulation(){
 
 		//Test Pulse function
 		clearModel()
-		p  = createPrimitive("My Param", "Variable",[0,0],[100,100]);
+		p = createPrimitive("My Param", "Variable", [0, 0], [100, 100]);
 		setValue(p, "Pulse(10,2,5)");
 		res = runModel(true);
-		assertEqual("Pulse 1",res.value(p)[5],0);
-		assertEqual("Pulse 2",res.value(p)[12],2);
-		assertEqual("Pulse 3",res.value(p)[16],0);
+		assertEqual("Pulse 1", res.value(p)[5], 0);
+		assertEqual("Pulse 2", res.value(p)[12], 2);
+		assertEqual("Pulse 3", res.value(p)[16], 0);
 		setValue(p, "Pulse(20,.5,2,10)");
 		res = runModel(true);
-		assertEqual("Pulse 4",res.value(p)[28],0);
-		assertEqual("Pulse 5",res.value(p)[20],0.5);
-		assertEqual("Pulse 6",res.value(p)[30],0.5);
+		assertEqual("Pulse 4", res.value(p)[28], 0);
+		assertEqual("Pulse 5", res.value(p)[20], 0.5);
+		assertEqual("Pulse 6", res.value(p)[30], 0.5);
 
 		//Test If Then Else
 		setValue(p, "IfThenElse(Years<20 and Years >= 10, 1, 0)");
 		res = runModel(true);
-		assertEqual("IfThenElse 1",res.value(p)[5],0);
-		assertEqual("IfThenElse 2",res.value(p)[11],1);
-		
-		p2  = createPrimitive("a", "Variable",[0,0],[100,100]);
-		l = createConnector("Link","Link",p2,p);
+		assertEqual("IfThenElse 1", res.value(p)[5], 0);
+		assertEqual("IfThenElse 2", res.value(p)[11], 1);
+
+		p2 = createPrimitive("a", "Variable", [0, 0], [100, 100]);
+		l = createConnector("Link", "Link", p2, p);
 		setValue(p2, "2");
-		var p3  = createPrimitive("b", "Variable",[0,0],[100,100]);
+		var p3 = createPrimitive("b", "Variable", [0, 0], [100, 100]);
 		setValue(p3, "1");
-		l = createConnector("Link","Link", p3, p);
+		l = createConnector("Link", "Link", p3, p);
 
 		setValue(p, "IfThenElse([a]=2,([b]+1)*[a],[a])");
 		res = runModel(true);
-		assertEqual("IfThenElse 3",res.value(p)[5],4);
-		assertEqual("IfThenElse 4",res.value(p)[11],4);
+		assertEqual("IfThenElse 3", res.value(p)[5], 4);
+		assertEqual("IfThenElse 4", res.value(p)[11], 4);
 
 		setValue(p, "IfThenElse([a]=2,[b],[a])");
 		res = runModel(true);
-		assertEqual("IfThenElse 5",res.value(p)[5],1);
-		assertEqual("IfThenElse 6",res.value(p)[11],1);
+		assertEqual("IfThenElse 5", res.value(p)[5], 1);
+		assertEqual("IfThenElse 6", res.value(p)[11], 1);
 
 		//Test Complex Vectors
 		setValue(p2, "{a: {1,2,3}, b: {4,5,6}}");
@@ -2408,21 +2414,21 @@ function testSimulation(){
 		//Test Staircase function
 		setValue(p, "Step(10,3)");
 		res = runModel(true);
-		assertEqual("Step 1",res.value(p)[5], 0);
+		assertEqual("Step 1", res.value(p)[5], 0);
 		assertEqual("Step 2", res.value(p)[12], 3);
 		assertEqual("Step 3", res.value(p)[16], 3);
 
 		//Test Staircase function Vectorized
 		setValue(p, "Step({a: 10, b:20, c:7}, {a:1, b:20, c:14}).c");
 		res = runModel(true);
-		assertEqual("Step Vec 1",res.value(p)[5], 0);
+		assertEqual("Step Vec 1", res.value(p)[5], 0);
 		assertEqual("Step Vec 2", res.value(p)[12], 14);
 		assertEqual("Step Vec 3", res.value(p)[16], 14);
 
 		//Test Staircase function Vectorized
 		setValue(p, "Step(7, {a:1, b:20, c:12}).c");
 		res = runModel(true);
-		assertEqual("Step Vec 4",res.value(p)[5], 0);
+		assertEqual("Step Vec 4", res.value(p)[5], 0);
 		assertEqual("Step Vcc 5", res.value(p)[12], 12);
 		assertEqual("Step Vec 6", res.value(p)[16], 12);
 
@@ -2438,14 +2444,14 @@ function testSimulation(){
 		setUnits(p, "cows");
 		setValue(p, "{1 cows} + Pulse(10,{2 cows},5)");
 		res = runModel(true);
-		assertEqual("Pulse Units 1",res.value(p)[5],1);
-		assertEqual("Pulse Units 2",res.value(p)[12],3);
-		assertEqual("Pulse Units 3",res.value(p)[16],1);
+		assertEqual("Pulse Units 1", res.value(p)[5], 1);
+		assertEqual("Pulse Units 2", res.value(p)[12], 3);
+		assertEqual("Pulse Units 3", res.value(p)[16], 1);
 		setValue(p, "{1 cows} + Pulse(20,{.5 cows},2,10)");
 		res = runModel(true);
-		assertEqual("Pulse Units 4",res.value(p)[28],1);
-		assertEqual("Pulse Units 5",res.value(p)[20],1.5);
-		assertEqual("Pulse Units 6",res.value(p)[30],1.5);
+		assertEqual("Pulse Units 4", res.value(p)[28], 1);
+		assertEqual("Pulse Units 5", res.value(p)[20], 1.5);
+		assertEqual("Pulse Units 6", res.value(p)[30], 1.5);
 
 
 		//Test Ramp function
@@ -2458,43 +2464,43 @@ function testSimulation(){
 		//Test Staircase function
 		setValue(p, "{1 cows} + Step(10, {3 cows})");
 		res = runModel(true);
-		assertEqual("Step Units 1",res.value(p)[5], 1);
+		assertEqual("Step Units 1", res.value(p)[5], 1);
 		assertEqual("Step Units 2", res.value(p)[12], 4);
 		assertEqual("Step Units 3", res.value(p)[16], 4);
 
 		//Test Mean, Median, Max, Min, StdDev functions
 		clearModel()
-		p  = createPrimitive("x", "Variable",[0,0],[100,100]);
-		p2  = createPrimitive("y", "Variable",[0,0],[100,100]);
-		l = createConnector("Link","Link",p,p2);
+		p = createPrimitive("x", "Variable", [0, 0], [100, 100]);
+		p2 = createPrimitive("y", "Variable", [0, 0], [100, 100]);
+		l = createConnector("Link", "Link", p, p2);
 		setValue(p, "(Years-60)^2");
 		setValue(p2, "PastMean([x])");
 		res = runModel(true);
-		assertEqual("Mean",res.lastValue(p2),950);
+		assertEqual("Mean", res.lastValue(p2), 950);
 		setValue(p2, "[x].PastMean()");
 		res = runModel(true);
-		assertEqual("Mean (Obj)",res.lastValue(p2),950);
+		assertEqual("Mean (Obj)", res.lastValue(p2), 950);
 
 		setValue(p2, "PastMedian([x])");
 		res = runModel(true);
-		assertEqual("Median",Math.round(res.lastValue(p2)),625);
+		assertEqual("Median", Math.round(res.lastValue(p2)), 625);
 		setValue(p2, "[x].PastMedian()");
 		res = runModel(true);
-		assertEqual("Median (Obj)",Math.round(res.lastValue(p2)),625);
+		assertEqual("Median (Obj)", Math.round(res.lastValue(p2)), 625);
 
 		setValue(p2, "Median(PastValues([x]))");
 		res = runModel(true);
-		assertEqual("Median 2",Math.round(res.lastValue(p2)),625);
+		assertEqual("Median 2", Math.round(res.lastValue(p2)), 625);
 		setValue(p2, "[x].PastValues().Median()");
 		res = runModel(true);
-		assertEqual("Median 2 (Obj)",Math.round(res.lastValue(p2)),625);
+		assertEqual("Median 2 (Obj)", Math.round(res.lastValue(p2)), 625);
 
 		setValue(p2, "PastStdDev([x])");
 		res = runModel(true);
-		assertEqual("StdDev", Math.round(res.lastValue(p2)*10), Math.round(962.8*10));
+		assertEqual("StdDev", Math.round(res.lastValue(p2) * 10), Math.round(962.8 * 10));
 		setValue(p2, "[x].PastStdDev()");
 		res = runModel(true);
-		assertEqual("StdDev (Obj)", Math.round(res.lastValue(p2)*10), Math.round(962.8*10));
+		assertEqual("StdDev (Obj)", Math.round(res.lastValue(p2) * 10), Math.round(962.8 * 10));
 
 		setValue(p2, "PastMax([x])");
 		res = runModel(true);
@@ -2505,19 +2511,19 @@ function testSimulation(){
 
 		setValue(p2, "PastMin([x])");
 		res = runModel(true);
-		assertEqual("Min", res.lastValue(p2),0);
+		assertEqual("Min", res.lastValue(p2), 0);
 		setValue(p2, "[x].PastMin()");
 		res = runModel(true);
-		assertEqual("Min (Obj)", res.lastValue(p2),0);
+		assertEqual("Min (Obj)", res.lastValue(p2), 0);
 
 		setValue(p, "(Years-60)^2");
 		setValue(p2, "Mean(1,2,3)");
 		res = runModel(true);
-		assertEqual("Mean",res.lastValue(p2),2);
+		assertEqual("Mean", res.lastValue(p2), 2);
 
 		setValue(p2, "Median(1,2,4)");
 		res = runModel(true);
-		assertEqual("Median",Math.round(res.lastValue(p2)),2);
+		assertEqual("Median", Math.round(res.lastValue(p2)), 2);
 
 		setValue(p2, "Max(1,5,7,6)");
 		res = runModel(true);
@@ -2525,25 +2531,25 @@ function testSimulation(){
 
 		setValue(p2, "Min(1,0,7,6)");
 		res = runModel(true);
-		assertEqual("Min", res.lastValue(p2),0);
+		assertEqual("Min", res.lastValue(p2), 0);
 
 
 		//Test Smooth function
 		clearModel()
-		p  = createPrimitive("My Param", "Variable",[0,0],[100,100]);
-		p2  = createPrimitive("Smoothed", "Variable",[0,0],[100,100]);
-		l = createConnector("Link","Link",p,p2);
+		p = createPrimitive("My Param", "Variable", [0, 0], [100, 100]);
+		p2 = createPrimitive("Smoothed", "Variable", [0, 0], [100, 100]);
+		l = createConnector("Link", "Link", p, p2);
 		setValue(p, "StairCase(40, 3)");
 		setValue(p2, "Smooth([My Param],20, 5)");
 		res = runModel(true);
 		assertEqual("Smooth 1", res.value(p2)[0], 5);
-		assertEqual("Smooth 2", Math.round(res.value(p2)[40]*1000), Math.round(0.64256*1000));
-		assertEqual("Smooth 3", Math.round(res.value(p2)[59]*1000), Math.round(2.110412*1000));
+		assertEqual("Smooth 2", Math.round(res.value(p2)[40] * 1000), Math.round(0.64256 * 1000));
+		assertEqual("Smooth 3", Math.round(res.value(p2)[59] * 1000), Math.round(2.110412 * 1000));
 		setValue(p2, "[My Param].Smooth(20, 5)");
 		res = runModel(true);
-		assertEqual("Smooth 1 (Obj)", res.value(p2)[0],5);
-		assertEqual("Smooth 2 (Obj)", Math.round(res.value(p2)[40]*1000), Math.round(0.64256*1000));
-		assertEqual("Smooth 3 (obj)", Math.round(res.value(p2)[59]*1000), Math.round(2.110412*1000));
+		assertEqual("Smooth 1 (Obj)", res.value(p2)[0], 5);
+		assertEqual("Smooth 2 (Obj)", Math.round(res.value(p2)[40] * 1000), Math.round(0.64256 * 1000));
+		assertEqual("Smooth 3 (obj)", Math.round(res.value(p2)[59] * 1000), Math.round(2.110412 * 1000));
 
 
 		setValue(p, "years");
@@ -2551,98 +2557,98 @@ function testSimulation(){
 		res = runModel(true);
 		assertEqual("Smooth 4", res.value(p2)[0], 5);
 		assertEqual("Smooth 5", res.value(p2)[1], 4.75);
-		assertEqual("Smooth 6", Math.round(res.value(p2)[10]*1000), Math.round(4.96842*1000));
+		assertEqual("Smooth 6", Math.round(res.value(p2)[10] * 1000), Math.round(4.96842 * 1000));
 
 		setValue(p2, "Smooth([My Param], 20)");
 		res = runModel(true);
 		assertEqual("Smooth 4", res.value(p2)[0], 0);
 		assertEqual("Smooth 5", res.value(p2)[1], 0);
-		assertEqual("Smooth 6", Math.round(res.value(p2)[10]*1000), Math.round(1.97474*1000));
+		assertEqual("Smooth 6", Math.round(res.value(p2)[10] * 1000), Math.round(1.97474 * 1000));
 
 		//Test ExpDelay function
 		clearModel()
-		p  = createPrimitive("x", "Variable",[0,0],[100,100]);
-		p2  = createPrimitive("ExpValue", "Variable",[0,0],[100,100]);
-		l = createConnector("Link","Link",p,p2);
+		p = createPrimitive("x", "Variable", [0, 0], [100, 100]);
+		p2 = createPrimitive("ExpValue", "Variable", [0, 0], [100, 100]);
+		l = createConnector("Link", "Link", p, p2);
 		setValue(p, "Staircase(20)");
 		setValue(p2, "Delay3([x],10,2)");
 		res = runModel(true);
-		if(algorithms[i]=="RK1"){
-			assertEqual("ExpDelay 1", Math.round(res.value(p2)[3]*100), Math.round(1.946*100));
-			assertEqual("ExpDelay 2", Math.round(res.value(p2)[2]*100), Math.round(2*100));
-			assertEqual("ExpDelay 3",Math.round( res.value(p2)[26]*100), Math.round(0.269*100));
-		}else if(algorithms[i]=="RK4"){
-			assertEqual("ExpDelay 1", Math.floor(res.value(p2)[3]*10), Math.floor(1.946*10));
+		if (algorithms[i] == "RK1") {
+			assertEqual("ExpDelay 1", Math.round(res.value(p2)[3] * 100), Math.round(1.946 * 100));
+			assertEqual("ExpDelay 2", Math.round(res.value(p2)[2] * 100), Math.round(2 * 100));
+			assertEqual("ExpDelay 3", Math.round(res.value(p2)[26] * 100), Math.round(0.269 * 100));
+		} else if (algorithms[i] == "RK4") {
+			assertEqual("ExpDelay 1", Math.floor(res.value(p2)[3] * 10), Math.floor(1.946 * 10));
 		}
 		setValue(p2, "[x].Delay3(10,2)");
 		res = runModel(true);
-		if(algorithms[i]=="RK1"){
-			assertEqual("ExpDelay 1 (Obj)", Math.round(res.value(p2)[3]*100), Math.round(1.946*100));
-			assertEqual("ExpDelay 2 (Obj)", Math.round(res.value(p2)[2]*100), Math.round(2*100));
-			assertEqual("ExpDelay 3 (Obj)",Math.round( res.value(p2)[26]*100), Math.round(0.269*100));
-		}else if(algorithms[i]=="RK4"){
-			assertEqual("ExpDelay 1 (Obj)", Math.floor(res.value(p2)[3]*10), Math.floor(1.946*10));
+		if (algorithms[i] == "RK1") {
+			assertEqual("ExpDelay 1 (Obj)", Math.round(res.value(p2)[3] * 100), Math.round(1.946 * 100));
+			assertEqual("ExpDelay 2 (Obj)", Math.round(res.value(p2)[2] * 100), Math.round(2 * 100));
+			assertEqual("ExpDelay 3 (Obj)", Math.round(res.value(p2)[26] * 100), Math.round(0.269 * 100));
+		} else if (algorithms[i] == "RK4") {
+			assertEqual("ExpDelay 1 (Obj)", Math.floor(res.value(p2)[3] * 10), Math.floor(1.946 * 10));
 		}
 
 		//Test Rand Functions
 		clearModel()
-		p  = createPrimitive("RandParam", "Variable",[0,0],[100,100]);
-		p2  = createPrimitive("HalfRand", "Variable",[0,0],[100,100]);
-		s  = createPrimitive("HalfRand", "Stock",[0,0],[100,100]);
-		l = createConnector("Link","Link",p, p2);
-		l = createConnector("Link","Link",p, s);
+		p = createPrimitive("RandParam", "Variable", [0, 0], [100, 100]);
+		p2 = createPrimitive("HalfRand", "Variable", [0, 0], [100, 100]);
+		s = createPrimitive("HalfRand", "Stock", [0, 0], [100, 100]);
+		l = createConnector("Link", "Link", p, p2);
+		l = createConnector("Link", "Link", p, s);
 		setValue(p, "Rand");
 		setValue(p2, "[RandParam]/2");
 		setValue(s, "[RandParam]/4");
 		res = runModel(true);
-		assertEqual("Rand Cached Value", Math.round(res.lastValue(p)*10000), Math.round(res.lastValue(p2)*2*10000));
-    if (algorithms[i]=="RK1") {
-		  assertEqual("Rand Stock", Math.round(res.value(p)[0]*10000), Math.round(res.value(s)[0]*4*10000));
-    }
+		assertEqual("Rand Cached Value", Math.round(res.lastValue(p) * 10000), Math.round(res.lastValue(p2) * 2 * 10000));
+		if (algorithms[i] == "RK1") {
+			assertEqual("Rand Stock", Math.round(res.value(p)[0] * 10000), Math.round(res.value(s)[0] * 4 * 10000));
+		}
 
 
 		res = runModel(true);
 		var r1 = res.lastValue(p);
 		res = runModel(true);
-		assertUnequal("Set Rand Seed 1",res.lastValue(p),r1);
+		assertUnequal("Set Rand Seed 1", res.lastValue(p), r1);
 
 		setMacros("SetRandSeed(1)");
 		res = runModel(true);
 		var r1 = res.lastValue(p);
 		res = runModel(true);
-		assertEqual("Set Rand Seed 2",res.lastValue(p),r1);
+		assertEqual("Set Rand Seed 2", res.lastValue(p), r1);
 
 		setMacros("SetRandSeed(3)");
 		res = runModel(true);
-		assertUnequal("Set Rand Seed 3", res.lastValue(p2),r1);
+		assertUnequal("Set Rand Seed 3", res.lastValue(p2), r1);
 		setMacros("");
 
 
 		//Test Misc Function using tagged time units
 		clearModel()
-		p  = createPrimitive("x", "Variable",[0,0],[100,100]);
-		p2  = createPrimitive("y", "Variable",[0,0],[100,100]);
-		l = createConnector("Link","Link",p,p2);
+		p = createPrimitive("x", "Variable", [0, 0], [100, 100]);
+		p2 = createPrimitive("y", "Variable", [0, 0], [100, 100]);
+		l = createConnector("Link", "Link", p, p2);
 		setValue(p, "Years");
 		setValue(p2, "Delay([x], {3 Years} )");
 		res = runModel(true);
-		assertEqual("Time Units Delay 1", Math.round(res.value(p2)[6]*10000), Math.round(3*10000));
+		assertEqual("Time Units Delay 1", Math.round(res.value(p2)[6] * 10000), Math.round(3 * 10000));
 
 		setValue(p2, "Delay([x], {x: {3 years}, y: {5 years}} ).x");
 		res = runModel(true);
-		assertEqual("Time Units Delay Vec 1", Math.round(res.value(p2)[6]*10000), Math.round(3*10000));
+		assertEqual("Time Units Delay Vec 1", Math.round(res.value(p2)[6] * 10000), Math.round(3 * 10000));
 
 		setValue(p2, "Delay([x], {x: 2, y: 4} ).y");
 		res = runModel(true);
-		assertEqual("Time Units Delay Vec 2", Math.round(res.value(p2)[6]*10000), Math.round(2*10000));
+		assertEqual("Time Units Delay Vec 2", Math.round(res.value(p2)[6] * 10000), Math.round(2 * 10000));
 
 
-		p3  = createPrimitive("z", "Variable",[0,0],[100,100]);
+		p3 = createPrimitive("z", "Variable", [0, 0], [100, 100]);
 		setValue(p3, "{x: 2, y: 4}");
-		l = createConnector("Link","Link", p3, p2);
+		l = createConnector("Link", "Link", p3, p2);
 		setValue(p2, "Delay([x], [z]).y");
 		res = runModel(true);
-		assertEqual("Time Units Delay Vec 3", Math.round(res.value(p2)[6]*10000), Math.round(2*10000));
+		assertEqual("Time Units Delay Vec 3", Math.round(res.value(p2)[6] * 10000), Math.round(2 * 10000));
 
 		setValue(p2, "Delay([x], {x: -1, y: 4} ).y"); // Can't have negative delay
 		res = runModel(true);
@@ -2651,31 +2657,31 @@ function testSimulation(){
 
 		setValue(p2, "[x].Delay({3 Years} )");
 		res = runModel(true);
-		assertEqual("Time Units Delay 1 (Obj)", Math.round(res.value(p2)[6]*10000), Math.round(3*10000));
+		assertEqual("Time Units Delay 1 (Obj)", Math.round(res.value(p2)[6] * 10000), Math.round(3 * 10000));
 
 		setValue(p2, "Delay([x], {48 Months})");
 		res = runModel(true);
-		assertEqual("Time Units Delay 2", Math.round(res.value(p2)[6]*10000), Math.round(2*10000));
+		assertEqual("Time Units Delay 2", Math.round(res.value(p2)[6] * 10000), Math.round(2 * 10000));
 
 		setValue(p2, "PastMean([x], {48 Months})");
 		res = runModel(true);
-		assertEqual("Time Units Mean 1", Math.round(res.value(p2)[6]*10000), Math.round((6+5+4+3+2)/5*10000));
+		assertEqual("Time Units Mean 1", Math.round(res.value(p2)[6] * 10000), Math.round((6 + 5 + 4 + 3 + 2) / 5 * 10000));
 
 		setValue(p2, "Mean(PastValues([x], {48 Months}))");
 		res = runModel(true);
-		assertEqual("Time Units Mean 2", Math.round(res.value(p2)[6]*10000), Math.round((6+5+4+3+2)/5*10000));
+		assertEqual("Time Units Mean 2", Math.round(res.value(p2)[6] * 10000), Math.round((6 + 5 + 4 + 3 + 2) / 5 * 10000));
 
 		setValue(p2, "PastMean([x], {3 Years})");
 		res = runModel(true);
-		assertEqual("Time Units Mean 3", Math.round(res.value(p2)[6]*10000), Math.round((6+5+4+3)/4*10000));
+		assertEqual("Time Units Mean 3", Math.round(res.value(p2)[6] * 10000), Math.round((6 + 5 + 4 + 3) / 4 * 10000));
 
 		setValue(p2, "PastCorrelation([x],[x])");
 		res = runModel(true);
-		assertEqual("Correlation", Math.round(res.value(p2)[6]*10000), 10000);
+		assertEqual("Correlation", Math.round(res.value(p2)[6] * 10000), 10000);
 
 		setValue(p2, "PastCorrelation([x],[x], {3 Years})");
 		res = runModel(true);
-		assertEqual("Correlation", Math.round(res.value(p2)[6]*10000), 10000);
+		assertEqual("Correlation", Math.round(res.value(p2)[6] * 10000), 10000);
 
 
 
@@ -2684,13 +2690,13 @@ function testSimulation(){
 
 		clearModel();
 
-		var p1 = createPrimitive("x1", "Variable", [0,0], [100,100]);
-		var p2 = createPrimitive("x2", "Variable", [0,0], [100,100]);
-		var p3 = createPrimitive("y", "Variable", [0,0], [100,100]);
+		var p1 = createPrimitive("x1", "Variable", [0, 0], [100, 100]);
+		var p2 = createPrimitive("x2", "Variable", [0, 0], [100, 100]);
+		var p3 = createPrimitive("y", "Variable", [0, 0], [100, 100]);
 		var l = createConnector("l", "Link", p1, p3);
 		var l2 = createConnector("l2", "Link", p2, p3);
 
-		setUnits(p1,"Centimeters");
+		setUnits(p1, "Centimeters");
 		setUnits(p2, "Meters^2");
 		setUnits(p3, "Meters^3")
 		setValue(p1, "200");
@@ -2698,28 +2704,28 @@ function testSimulation(){
 		setValue(p3, "[x1]*[x2]");
 		var res = runModel(true);
 
-		assertEqual("Variable Units Conversion 1",res.value(p3)[50], 6)
+		assertEqual("Variable Units Conversion 1", res.value(p3)[50], 6)
 		setUnits(p1, "Seconds")
 		res = runModel(true);
 		assertUnequal("Variable Units Conversion 2", res.error, "none");
 
 		clearModel();
 
-		var p1 = createPrimitive("y1", "Variable", [0,0], [100,100]);
-		var p2 = createPrimitive("y2", "Variable", [0,0], [100,100]);
-		var p3 = createPrimitive("x", "Variable", [0,0], [100,100]);
+		var p1 = createPrimitive("y1", "Variable", [0, 0], [100, 100]);
+		var p2 = createPrimitive("y2", "Variable", [0, 0], [100, 100]);
+		var p3 = createPrimitive("x", "Variable", [0, 0], [100, 100]);
 		var l = createConnector("l", "Link", p3, p1);
 		var l2 = createConnector("l2", "Link", p3, p2);
 
-		setUnits(p2,"Centimeters");
+		setUnits(p2, "Centimeters");
 		setValue(p3, "years");
 		setValue(p1, "delay([x],3)");
 		setValue(p2, "delay([x],5)");
 		var res = runModel(true);
 
-		assertEqual("Past Values Clone Check 1",res.value(p1)[10], 7)
-		assertEqual("Past Values Clone Check 2",res.value(p2)[10], 5)
-		assertEqual("Past Values Clone Check 3",res.value(p3)[10], 10)
+		assertEqual("Past Values Clone Check 1", res.value(p1)[10], 7)
+		assertEqual("Past Values Clone Check 2", res.value(p2)[10], 5)
+		assertEqual("Past Values Clone Check 3", res.value(p3)[10], 10)
 
 		setValue(p1, "delay1([x],2)");
 		setValue(p2, "delay1([x],2)");
@@ -2743,15 +2749,15 @@ function testSimulation(){
 		clearModel();
 
 
-		p1 = createPrimitive("x", "Variable", [0,0], [100,100]);
-		p2 = createPrimitive("y", "Variable", [0,0], [100,100]);
+		p1 = createPrimitive("x", "Variable", [0, 0], [100, 100]);
+		p2 = createPrimitive("y", "Variable", [0, 0], [100, 100]);
 
 		l = createConnector("l", "Link", p1, p2);
 
-		setValue(p1,"{36 Meters}");
+		setValue(p1, "{36 Meters}");
 		setValue(p2, "1");
 
-		setUnits(p2,"Qubits");
+		setUnits(p2, "Qubits");
 
 		res = runModel(true);
 		assertUnequal("Variable Units Scaling 1", res.error, "none");
@@ -2767,7 +2773,7 @@ function testSimulation(){
 }
 
 
-function testClearModel(){
+function testClearModel() {
 
 	test = "ClearModel";
 
@@ -2778,14 +2784,14 @@ function testClearModel(){
 
 }
 
-function testTimeShift(){
+function testTimeShift() {
 	var oldTest = test;
 	test = "Time Shift";
 
 	clearModel();
 
-	var A = createPrimitive("A", "Stock", [200,200], [140,30]);
-	var B = createPrimitive("B", "Stock", [400,200], [140,30]);
+	var A = createPrimitive("A", "Stock", [200, 200], [140, 30]);
+	var B = createPrimitive("B", "Stock", [400, 200], [140, 30]);
 	var flow_A = createConnector("Flow A", "Flow", null, A);
 	var flow_B = createConnector("Flow B", "Flow", null, B);
 
@@ -2795,8 +2801,8 @@ function testTimeShift(){
 	setValue(flow_B, "0.1*[B]");
 
 
-	var fA = createPrimitive("f A", "Folder", [200,150], [150,100]);
-	var fB = createPrimitive("f B", "Folder", [200,150], [150,100]);
+	var fA = createPrimitive("f A", "Folder", [200, 150], [150, 100]);
+	var fB = createPrimitive("f B", "Folder", [200, 150], [150, 100]);
 
 	setParent([A, flow_A], fA);
 	setParent([B, flow_B], fB);
@@ -2809,41 +2815,41 @@ function testTimeShift(){
 	assertEqual("Base 1", res.value(A)[1], 11);
 	assertEqual("Base 2", res.value(B)[1], 11);
 
-	setFolderSolver(fA, {enabled:true, algorithm: "RK4", timeStep: 1});
+	setFolderSolver(fA, { enabled: true, algorithm: "RK4", timeStep: 1 });
 	res = runModel(true);
-	assertEqual("Switch 1", Math.round(res.value(A)[1]*1000), Math.round(11.051708*1000));
+	assertEqual("Switch 1", Math.round(res.value(A)[1] * 1000), Math.round(11.051708 * 1000));
 	assertEqual("Switch 2", res.value(B)[1], 11);
 
-	setFolderSolver(fB, {enabled:true, algorithm: "RK1", timeStep: 2.5});
+	setFolderSolver(fB, { enabled: true, algorithm: "RK1", timeStep: 2.5 });
 	res = runModel(true);
-	assertEqual("Switch 3", Math.round(res.value(A)[1]*1000), Math.round(11.051708*1000));
+	assertEqual("Switch 3", Math.round(res.value(A)[1] * 1000), Math.round(11.051708 * 1000));
 	assertEqual("Switch 4", isUndefined(res.value(B)[1]), true);
 	assertEqual("Switch 5", res.value(B)[3], 12.5);
 	assertEqual("Switch 6", isUndefined(res.value(A)[3]), true);
 
-	setFolderSolver(fA, {enabled:true, algorithm: "RK4", timeStep: 2.5});
-	setFolderSolver(fB, {enabled:true, algorithm: "RK1", timeStep: 1});
+	setFolderSolver(fA, { enabled: true, algorithm: "RK4", timeStep: 2.5 });
+	setFolderSolver(fB, { enabled: true, algorithm: "RK1", timeStep: 1 });
 	res = runModel(true);
 	assertEqual("Switch 7", isUndefined(res.value(A)[1]), true);
 	assertEqual("Switch 8", res.value(B)[1], 11);
-	assertEqual("Switch 9", Math.round(res.value(A)[3]*1000), Math.round(12.8401699*1000));
+	assertEqual("Switch 9", Math.round(res.value(A)[3] * 1000), Math.round(12.8401699 * 1000));
 	assertEqual("Switch 10", isUndefined(res.value(B)[3]), true);
 
 
 	test = oldTest;
 }
 
-function testFolders(){
+function testFolders() {
 	test = "Folders";
 
-	var s = createPrimitive("s", "Stock", [300,200], [140,30]);
-	var f = createPrimitive("f", "Folder", [200,150], [150,100]);
+	var s = createPrimitive("s", "Stock", [300, 200], [140, 30]);
+	var f = createPrimitive("f", "Folder", [200, 150], [150, 100]);
 
 	assertNull("Parent Null", getParent(s));
 	setParent(s, f);
 	assertEqual("Set Parent", getID(getParent(s)), getID(f));
 
-	if(!(graph instanceof SimpleNode)){
+	if (!(graph instanceof SimpleNode)) {
 		assertEqual("Default Folder", getCollapsed(f), false);
 		collapseFolder(f);
 		assertEqual("Collapse Folder", getCollapsed(f), true);
@@ -2865,14 +2871,14 @@ function testFolders(){
 }
 
 
-function testCreate(){
+function testCreate() {
 	test = "Create";
 
-	var x = createPrimitive("Test Stock", "Stock", [300,200], [140,30]);
+	var x = createPrimitive("Test Stock", "Stock", [300, 200], [140, 30]);
 	assertEqual("Name", getName(x), "Test Stock");
 	assertEqual("Type", getType(x), "Stock");
 
-	if(!(graph instanceof SimpleNode)){
+	if (!(graph instanceof SimpleNode)) {
 		var p = getPosition(x);
 		assertEqual("Position x", p[0], 300);
 		assertEqual("Position y", p[1], 200);
@@ -2884,7 +2890,7 @@ function testCreate(){
 	}
 
 
-	x = createPrimitive("Test Variable", "Variable", [400,200], [140,30]);
+	x = createPrimitive("Test Variable", "Variable", [400, 200], [140, 30]);
 	assertEqual("Type", getType(x), "Variable");
 
 	x = createConnector("Test Link", "Link", findName("Test Stock"), findName("Test Variable"));
@@ -2892,7 +2898,55 @@ function testCreate(){
 
 }
 
-function testFind(){
+function testResultsFormatting() {
+	test = "Results formatting";
+
+	var x = createPrimitive("Test Variable", "Variable", [300, 200], [140, 30]);
+
+	// string value
+	setValue(x, "'abc'");
+	var res = runModel(true);
+	assertEqual("String", res.value(x)[0], "abc");
+
+	// boolean value
+	setValue(x, "true");
+	res = runModel(true);
+	assertEqual("Boolean 1", res.value(x)[0], "1");
+
+	setValue(x, "false");
+	res = runModel(true);
+	assertEqual("Boolean 2", res.value(x)[0], "0");
+
+	// vector boolean
+	setValue(x, "{true, false}");
+	res = runModel(true);
+	assertEqual("Vector Boolean", JSON.stringify(res.value(x)[0]), "[true,false]");
+
+	// vector num
+	setValue(x, "{1, 2}");
+	res = runModel(true);
+	assertEqual("Vector Num", JSON.stringify(res.value(x)[0]), "[1,2]");
+
+	// named vector boolean
+	setValue(x, "{a: true, b: false}");
+	res = runModel(true);
+	assertEqual("Named Vector Boolean", JSON.stringify(res.value(x)[0]), '{"a":true,"b":false}');
+
+	// named vector num
+	setValue(x, "{a: 1, b: 0}");
+	res = runModel(true);
+	assertEqual("Named Vector Number", JSON.stringify(res.value(x)[0]), '{"a":1,"b":0}');
+
+	// named vector string
+	setValue(x, "{a: 'a', b: 'b'}");
+	res = runModel(true);
+	assertEqual("Named Vector String", JSON.stringify(res.value(x)[0]), '{"a":"a","b":"b"}');
+
+
+	clearModel();
+}
+
+function testFind() {
 	test = "Find";
 
 	setupComplexDummy();
@@ -2902,7 +2956,7 @@ function testFind(){
 	setNote(findType("Stock"), "foo")
 	assertEqual("findNote", findNote("foo").length, 4);
 
-	assertEqual("findType", findType(["Stock","Variable"]).length, 6);
+	assertEqual("findType", findType(["Stock", "Variable"]).length, 6);
 	assertEqual("findType", findType(["dsfsdf"]).length, 0);
 	assertEqual("findType", findType("dsfsdf").length, 0);
 
@@ -2911,34 +2965,32 @@ function testFind(){
 	assertNull("findName", findName("fdfsdgfg"));
 	assertNotNull("findName", findName("y"));
 	assertEqual("findName", findName("y").length, 2);
-	assertEqual("findName", findName(["x","y","fvdf"]).length, 3);
+	assertEqual("findName", findName(["x", "y", "fvdf"]).length, 3);
 
 
 	var id = getID(findName("x"));
 	assertNotNull("findID", findID(id));
 	assertNotNull("findID", findID([id]));
 	assertNull("findID", findID("gfdgdfg"));
-
-
 }
 
-function setupDummy(){
+function setupDummy() {
 	clearModel();
-	var x = createPrimitive("x", "Stock", [200,200], [140,30]);
+	createPrimitive("x", "Stock", [200, 200], [140, 30]);
 }
 
-function setupComplexDummy(){
+function setupComplexDummy() {
 	clearModel();
 
-	createPrimitive("My Converter", "Converter", [200,200], [140,30]);
+	createPrimitive("My Converter", "Converter", [200, 200], [140, 30]);
 
-	createPrimitive("x", "Stock", [200,200], [140,30]);
-	createPrimitive("y", "Stock", [100,200], [140,30]);
-	createPrimitive("My Stock", "Stock", [200,100], [140,30]);
-	createPrimitive("y", "Stock", [200,100], [140,30]);
+	createPrimitive("x", "Stock", [200, 200], [140, 30]);
+	createPrimitive("y", "Stock", [100, 200], [140, 30]);
+	createPrimitive("My Stock", "Stock", [200, 100], [140, 30]);
+	createPrimitive("y", "Stock", [200, 100], [140, 30]);
 
-	createPrimitive("a", "Variable", [300,200], [140,30]);
-	createPrimitive("b", "Variable", [300,100], [140,30]);
+	createPrimitive("a", "Variable", [300, 200], [140, 30]);
+	createPrimitive("b", "Variable", [300, 100], [140, 30]);
 
 	createConnector("Link", "Link", findName("x"), findName("b"));
 	createConnector("Link 2", "Link", findName("x"), findName("My Converter"));

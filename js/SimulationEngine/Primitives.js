@@ -82,12 +82,13 @@ Primitive.method("getPastValues", function (length) {
 		items.push(this.value());
 	}
 
+	var res;
 	if (isUndefined(length)) {
 		res = items.map(function (x) { return x.fullClone() });
 	} else {
 		var bins = Math.ceil(div(length.forceUnits(simulate.timeUnits), this.dna.solver.userTimeStep).value);
 
-		var res = [];
+		res = [];
 		for (var i = Math.max(0, items.length - 1 - bins); i < items.length; i++) {
 			res.push(items[i].fullClone());
 		}
@@ -628,7 +629,7 @@ function updateTrigger(clear) {
 						this.trigger();
 						return;
 					} else {
-						var start = this.scheduledTrigger.data.start;
+						start = this.scheduledTrigger.data.start;
 						t = minus(t, minus(simulate.time(), start));
 						this.scheduledTrigger = null;
 					}
@@ -1126,21 +1127,16 @@ Stock.method("setInitialValue", function () {
 
 
 	if (isUndefined(this.delay)) {
-		//it's a non-serialized stock;
+		// it's a non-serialized stock;
 		this.level = init;
 	} else {
-		//it's serialized
+		// it's serialized
 		var startVal = mult(init, div(simulate.userTimeStep, this.delay))
 		this.initRate = div(init, this.delay.forceUnits(simulate.timeUnits));
-		//console.log(this.initRate);
+
 		this.level = startVal;
 
-		var me = this;
-
 		simulate.tasks.addEvent(function (timeChange, oldTime, newTime) {
-			/*console.log('--')
-			console.log(timeChange.value);
-			console.log(me.totalContents().value);*/
 			if (timeChange.value > 0) {
 				if (lessThanEq(minus(newTime, simulate.timeStart), minus(me.delay, simulate.userTimeStep))) {
 					timeChange = functionBank["min"]([timeChange, minus(me.delay, minus(oldTime, simulate.timeStart))]);

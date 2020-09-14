@@ -1223,12 +1223,12 @@ function flatten(arr) {
 var downloadButton = function (name) {
 	return {
 		xtype: 'button',
-		text: 'Download',
+		text: 'Download CSV',
 		glyph: 0xf0ed,
 		handler: function () {
 			var grid = this.up("gridpanel");
 			var store = grid.getStore();
-			var columns = grid.columns;//store.fields ? store.fields.items : store.model.prototype.fields.items;
+			var columns = grid.columns;
 
 			var res = "";
 
@@ -1238,7 +1238,7 @@ var downloadButton = function (name) {
 				return '"' + (x.text || x.name).replace(/"/g, '""') + '"';
 			}).join(",");
 
-			store.each(function (record, index) {
+			store.each(function (record) {
 				var cells = [];
 				columns.forEach(function (col) {
 					var name = col.name || col.dataIndex;

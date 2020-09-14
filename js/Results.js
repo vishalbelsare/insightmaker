@@ -23,12 +23,25 @@ function dataRenderer(item) {
 }
 
 function commaStr(nStr) {
-	//if(nStr instanceof String){
-	//	return nStr;
-	//}
+	if (typeof nStr === 'string') {
+		return nStr.replace(/[&<>'"]/g, 
+			tag => ({
+					'&': '&amp;',
+					'<': '&lt;',
+					'>': '&gt;',
+					"'": '&#39;',
+					'"': '&quot;'
+				}[tag]));
+	}
+	
+	if (typeof nStr === 'boolean') {
+		return nStr.toString();
+	}
+	
 	if (isUndefined(nStr) || nStr === null) {
 		return "";
 	}
+
 	if (nStr >= 1e9 || nStr <= 1e-9 && nStr != 0) {
 		return nStr.toPrecision(3);
 	} else {
@@ -1258,23 +1271,6 @@ function renderDisplay(display, displayInformation) {
 			},
 
 			html: "<div id='scratchpad" + analysisCount + "_" + display.id + "' style='z-index:1000;position:absolute; left:0px;bottom:0px;top:0px;right:0px;display:none;'></div>"
-			/*,
-			dockedItems: [{
-				xtype: 'toolbar',
-				dock: 'bottom',
-				items: ["->", {
-					xtype: 'button',
-					text: "Download",
-					handler: function() {
-						surpressCloseWarning = true;
-						this.up("panel")
-							.down("chart")
-							.save({
-							type: "image/png"
-						});
-					}
-				}]
-			}]*/
 		};
 		return p;
 	}
@@ -2099,14 +2095,11 @@ function createHistogramChart(displayInformation, i) {
 	var vecs = histogram.data;
 
 	try {
-		//console.log(functionBank["min"](vecs));
-		//console.log(functionBank["max"](vecs));
 		histogram.min = Math.floor(0 + functionBank["min"](vecs)
 			.value);
 		histogram.max = Math.ceil(0 + functionBank["max"](vecs)
 			.value);
 	} catch (err) {
-		//console.log("err");
 		histogram.min = -1;
 		histogram.max = 1;
 	}
@@ -2119,7 +2112,6 @@ function createHistogramChart(displayInformation, i) {
 		histogram.min = histogram.min - 1;
 		histogram.max = histogram.max + 1;
 	}
-	//console.log(histogram);
 
 	var chart = Ext.create("Ext.chart.CartesianChart", {
 		xtype: 'chart',
@@ -2150,8 +2142,12 @@ function createHistogramChart(displayInformation, i) {
 			tooltip: {
 				trackMouse: true,
 				width: 80,
-				renderer: function (storeItem, item) {
-					this.setTitle("<center>" + commaStr(item.value[1]) + "</center>");
+				renderer: function (_storeItem, item) {
+					if (item.value) {
+						this.setTitle("<center>" + clean(commaStr(item.value[1])) + "</center>");
+					} else if (item.record && item.record.data) {
+						this.setTitle("<center>" + clean(item.record.data.Label) + ' – ' + clean(commaStr(item.record.data.Count)) + "</center>");
+					}
 				}
 			}
 		}]
@@ -2174,19 +2170,12 @@ function createHistogramData(data, min, max) {
 			Count: 0
 		});
 	}
-	//console.log(data);
 	for (var i = 0; i < data.items.length; i++) {
-		//console.log("--")
-		//console.log(min);
-		//console.log(max);
-		var index = 0 + data.items[i].value;
+		var index = +(data.items[i].value !== undefined ? data.items[i].value : data.items[i]);
 		if (!isNaN(index)) {
-			//console.log(index)
 			index = Math.max(0, Math.min(divisions - 1, Math.round((index - min) / width - 0.5)));
-			//console.log(index);
 			counts[index].Count = counts[index].Count + 1;
 		}
 	}
-	//console.log(counts);
 	return counts;
 }
