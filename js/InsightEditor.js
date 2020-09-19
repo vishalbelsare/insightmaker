@@ -26,28 +26,6 @@ if (require.config) {
 }
 
 
-function renderTimeBut(value) {
-	var id = Ext.id();
-
-	Ext.Function.defer(function () {
-		new Ext.Button({
-			text: getText("Edit Time Settings"),
-
-			padding: 0,
-			margin: 0,
-			handler: function (btn, e) {
-				var config = JSON.parse(getSelected()[0].getAttribute("Solver"))
-				config.cell = getSelected()[0];
-
-				showTimeSettings(config);
-
-			}
-		}).render(id);
-	}, 15);
-	return '<div id="' + id + '" style="height:24px"></div>';
-}
-
-
 function isLocal() {
 	return (document.location.hostname == "localhost") || (document.location.hostname == "insightmaker.test");
 }
@@ -724,13 +702,6 @@ function main() {
 			}
 		}
 
-		if (connectionType() !== 'Link' && source && target) {
-			if (orig(source).value.nodeName == 'Stock' || orig(source).value.nodeName == 'State') {
-				if (orig(source).value.nodeName != orig(target).value.nodeName) {
-					return getText('You cannot connect a Stock to a State using a Flow or Transition.');
-				}
-			}
-		}
 
 		if (edge) {
 			if (edge.value.nodeName == 'Transition' && ((source && orig(source).value.nodeName == 'Stock') || (target && orig(target).value.nodeName == 'Stock'))) {
@@ -739,6 +710,14 @@ function main() {
 
 			if (edge.value.nodeName == 'Flow' && ((source && orig(source).value.nodeName == 'State') || (target && orig(target).value.nodeName == 'State'))) {
 				return getText('You cannot connect a Flow to a State.');
+			}
+		} else {
+			if (connectionType() !== 'Link' && source && target) {
+				if (orig(source).value.nodeName == 'Stock' || orig(source).value.nodeName == 'State') {
+					if (orig(source).value.nodeName != orig(target).value.nodeName) {
+						return getText('You cannot connect a Stock to a State using a Flow or Transition.');
+					}
+				}
 			}
 		}
 
@@ -1594,7 +1573,30 @@ function main() {
 				'text': getText('Time Settings'),
 				'value': cell.getAttribute("Equation"),
 				'group': ' ' + getText('Configuration'),
-				'renderer': renderTimeBut
+				'renderer': () => {
+					var id = Ext.id();
+				
+					Ext.Function.defer(function () {
+						if (!document.getElementById(id)) {
+							// It's no longer in the document, bail out
+							return;
+						}
+
+						new Ext.Button({
+							text: getText("Edit Time Settings"),
+				
+							padding: 0,
+							margin: 0,
+							handler: function () {
+								var config = JSON.parse(getSelected()[0].getAttribute("Solver"))
+								config.cell = getSelected()[0];
+				
+								showTimeSettings(config);
+							}
+						}).render(id);
+					}, 15);
+					return '<div id="' + id + '" style="height:24px"></div>';
+				}
 			});
 
 			properties.push({
@@ -2536,5 +2538,3 @@ function showContextMenu(node, e) {
 	menu.showAt([mxEvent.getClientX(e) + 1, mxEvent.getClientY(e) + 1]);
 	menu.focus();
 }
-
-
