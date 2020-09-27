@@ -188,8 +188,8 @@ function saveConfigRecord(record, selectedPrimitive) {
                 String(value));
             graph.getModel().execute(edit);
             if (itemId == "name") {
-                propogateGhosts(selectedPrimitive);
-                propogateName(selectedPrimitive, oldName);
+                propagateGhosts(selectedPrimitive);
+                propagateName(selectedPrimitive, oldName);
             }
         }
 

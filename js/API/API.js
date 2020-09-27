@@ -1981,7 +1981,7 @@ function setName(primitive, name) {
 	map(primitive, function (primitive) {
 		if (validPrimitiveName(String(name), primitive)) {
 			setAttributeUndoable(primitive, "name", String(name));
-			propogateGhosts(primitive);
+			propagateGhosts(primitive);
 		}
 	});
 
@@ -2798,7 +2798,7 @@ function setOpacity(primitive, opacity) {
 			primitive,
 			style));
 
-		propogateGhosts(primitive);
+		propagateGhosts(primitive);
 
 	});
 
@@ -2848,7 +2848,7 @@ function setLineColor(primitive, lineColor) {
 			primitive,
 			style));
 
-		propogateGhosts(primitive);
+		propagateGhosts(primitive);
 
 	});
 
@@ -2898,7 +2898,7 @@ function setFontColor(primitive, fontColor) {
 			primitive,
 			style));
 
-		propogateGhosts(primitive);
+		propagateGhosts(primitive);
 
 	});
 
@@ -2948,7 +2948,7 @@ function setFillColor(primitive, fillColor) {
 			primitive,
 			style));
 
-		propogateGhosts(primitive);
+		propagateGhosts(primitive);
 
 	});
 

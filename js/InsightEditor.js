@@ -415,8 +415,8 @@ function main() {
 			var edit = new mxCellAttributeChange(cell, "name", newValue);
 			graph.getModel().execute(edit);
 			selectionChanged(false);
-			propogateGhosts(cell);
-			propogateName(cell, oldName);
+			propagateGhosts(cell);
+			propagateName(cell, oldName);
 
 			graph.model.endUpdate();
 			return cell;
@@ -455,7 +455,6 @@ function main() {
 	configPanel = Ext.create('Ext.Panel', ConfigPanel());
 	ribbonPanel = Ext.create('Ext.Panel', RibbonPanel(graph, mainPanel, configPanel));
 
-	window.toNum = 0;
 	new Ext.Viewport({
 		layout: 'border',
 		padding: 0,
@@ -570,7 +569,7 @@ function main() {
 
 	graph.model.styleForCellChanged = function (cell, style) {
 		var x = mxGraphModel.prototype.styleForCellChanged(cell, style);
-		propogateGhosts(cell);
+		propagateGhosts(cell);
 		return x;
 	}
 
@@ -619,7 +618,6 @@ function main() {
 	graph.setSplitEnabled(false);
 	graph.connectionHandler.connectImage = new mxImage(builder_path + '/images/connector.gif', 16, 16);
 	graph.connectionHandler.isConnectableCell = function (cell) {
-		//console.log(cell);
 		if (!cell) {
 			return false;
 		}
@@ -658,6 +656,22 @@ function main() {
 
 	graph.model.addListener(mxEvent.CHANGED, clearPrimitiveCache);
 
+
+	// This check lets us move the dangling ends of flows in folders
+	// without them trying to bind to the folder.
+	let oldIsConnectable = mxCell.prototype.isConnectable
+	mxCell.prototype.isConnectable = function () {
+		let selected = graph.getSelectionCells();
+		if (this.value.nodeName === 'Folder') {
+			if (selected && selected.length === 1 && selected[0]){
+				if (selected[0].value.nodeName === 'Flow') {
+					return false
+				}
+			}
+		}
+
+		return oldIsConnectable.apply(this);
+	}
 
 
 	settingCell = graph.insertVertex(parent, null, primitiveBank.setting, 20, 20, 80, 40);
@@ -851,8 +865,6 @@ function main() {
 	graph.connectionHandler.factoryMethod = function (source, target) {
 		var style;
 		var parent;
-		var value;
-		var conn;
 		if (connectionType() == "Link") {
 			style = 'link';
 			parent = primitiveBank.link.cloneNode(true);
@@ -2213,9 +2225,8 @@ var makeGhost = function (item) {
 	graph.getModel().endUpdate();
 
 	return vertex;
-
-
 };
+
 
 var makeFolder = function () {
 	var group = graph.groupCells(null, 20);
@@ -2223,7 +2234,6 @@ var makeFolder = function () {
 	graph.setSelectionCell(group);
 	graph.orderCells(true);
 };
-
 
 
 function showContextMenu(node, e) {
@@ -2464,7 +2474,6 @@ function showContextMenu(node, e) {
 
 				]);
 
-
 			}
 
 			if (!mxClipboard.isEmpty()) {
@@ -2538,3 +2547,5 @@ function showContextMenu(node, e) {
 	menu.showAt([mxEvent.getClientX(e) + 1, mxEvent.getClientY(e) + 1]);
 	menu.focus();
 }
+
+

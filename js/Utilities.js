@@ -359,7 +359,7 @@ function setPicture(cell) {
 	graph.getModel().execute(edit);
 
 	//cell.setStyle(styleString);
-	propogateGhosts(cell);
+	propagateGhosts(cell);
 }
 
 function setLabelPosition(cell) {
@@ -416,7 +416,7 @@ function setLabelPosition(cell) {
 	graph.getModel().execute(edit);
 
 	//cell.setStyle(styleString);
-	propogateGhosts(cell);
+	propagateGhosts(cell);
 }
 
 function removeAgent(cell) {
@@ -889,7 +889,7 @@ function isTouch() {
 	return mxClient.IS_TOUCH;
 }
 
-function propogateGhosts(cell) {
+function propagateGhosts(cell) {
 	var ghosts = primitives("Ghost");
 	for (var i = 0; i < ghosts.length; i++) {
 		if (ghosts[i].getAttribute("Source") == cell.id) {
@@ -903,9 +903,9 @@ function propogateGhosts(cell) {
 	}
 }
 
-function propogateName(cell, oldName) {
+function propagateName(cell, oldName) {
 	if (isValued(cell)) {
-		//console.log(oldName)
+
 		var newValue = getName(cell);
 		var patt = new RegExp("\\[" + oldName + "\\]", "gi");
 
@@ -922,14 +922,11 @@ function propogateName(cell, oldName) {
 			} else {
 				neighbor = connected[i].target;
 			}
-			//console.log(neighbor.getAttribute("name"))
+
 			if (isValued(neighbor) || (neighbor && neighbor.value.nodeName == "Action")) {
-				//console.log(getValue(neighbor))
 				setValue(neighbor, getValue(neighbor).replace(patt, "[" + newValue + "]"))
 			}
 		}
-
-
 	}
 }
 
