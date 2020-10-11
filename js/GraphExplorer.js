@@ -30,26 +30,8 @@ function doLoops() {
 			return a.length - b.length;
 		});
 
-		/*
-		// remove cycles with duplicate elements
-		var els = cycles.map(function(x){
-			var z =  x.map(function(item){return +item.id});
-			z.sort();
-			return z.join(",");
-		});
-		
-		for(var i=0; i<els.length-1; i++){
-			for(var j=i+1; j<els.length; j++){
-				if(els[i]==els[j]){
-					els.splice(j,1);
-					cycles.splice(j,1);
-					j--;
-				}
-			}
-		}*/
-
 		var formatName = function (n) {
-			return "<span style='background-color: aliceblue; padding:5px; margin: 2px; border-radius: 5px; cursor: pointer;' onclick='highlight(findID(" + n.id + "))'><nobr>" + n.value.getAttribute("name") + "</nobr></span>";
+			return "<span style='background-color: aliceblue; padding:5px; margin: 2px; border-radius: 5px; cursor: pointer;' class='select-loop-button' data-primitive='" + n.id + "'><nobr>" + n.value.getAttribute("name") + "</nobr></span>";
 		};
 
 		showData("Model Loops", [
@@ -80,6 +62,10 @@ function doLoops() {
 		)
 	}
 
+	$('.select-loop-button').click(function() {
+		highlight(findID($(this).attr('data-primitive')));
+	});
+
 	function findConnection(a, b) {
 		for (var j = 0; j < connectors.length; j++) {
 			var ends = getEnds(connectors[j]);
@@ -109,7 +95,6 @@ function getAdjList() {
 			}
 			if (ends[1]) {
 				setAdjacent(getIndex(orig(ends[1])), cI);
-				//setAdjacent(cI, getIndex(orig(ends[1])));
 			}
 		} else {
 			if (ends[0] && ends[1]) {

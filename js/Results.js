@@ -193,25 +193,19 @@ function openDisplayConfigure(win) {
 									text: getText("Time Series"),
 									itemId: "Time Series",
 									pressed: true,
-									tooltip: "A time series chart shows how the valus of one or primitives change over time.."
+									tooltip: "A time series chart shows how the values of one or more primitives change over time."
 								},
-								{
-									//glyph: 0xf095,
-									//iconCls: 'green-icon',
+								{	
 									text: getText("Scatter Plot"),
 									itemId: "Scatterplot",
 									tooltip: "A scatter plot allows you to see how two primitives change together. It is also known as a Phase-Plane plot."
 								},
 								{
-									//glyph: 0xf095,
-									//iconCls: 'green-icon',
 									text: getText("Table"),
 									itemId: "Tabular",
 									tooltip: "A table gives you the precise values of your primitives over the course of the simulation."
 								},
 								{
-									//glyph: 0xf095,
-									//iconCls: 'green-icon',
 									text: getText("Agent Map"),
 									itemId: "Map",
 									tooltip: "An agent map plots the geographic locations of agents within an Agent Population primitive. Connections between agents and agent states are also plotted."
@@ -946,10 +940,12 @@ function renderDisplay(display, displayInformation) {
 				},
 				titleMargin: 20,
 				renderer: commaStr
-				/*getRange: unfilteredRange*/
 			});
 		}
 
+		// A blank item may be added to the primitive
+		primitives2 = primitives2.filter(p => !!p);
+		
 		if (primitives2.length > 0) {
 			axes.push({
 				minimum: numericBound(display.getAttribute("yAxisMin2")),
@@ -1187,7 +1183,6 @@ function renderDisplay(display, displayInformation) {
 						this.oldLinks = [];
 					}
 					if (this.links) {
-						//window.chart=chart;
 						var scaleX = function (v) {
 							var box = chart.getInnerRect();
 							var outX = chart.getAxes()[1].getRange();

@@ -1450,7 +1450,7 @@ function main() {
 					topDesc = "<div class='sidebar_description'>" + topDesc + "</div>";
 				}
 				if (drupal_node_ID != -1 && cell == null) {
-					topDesc = topDesc + ' <div class="sidebar_share"> ' /*+ getText('Share')*/ + '<div class="addthis_sharing_toolbox addthis_default_style" style="display:inline-block"><a class="addthis_button_preferred_1"></a> <a class="addthis_button_preferred_2"></a>  <a class="addthis_button_preferred_3"></a>  <a class="addthis_button_preferred_4"></a> <a class="addthis_button_compact"></a></div> </div>' + (is_editor ? '<div class="sidebar_edit"><a href="#" onclick="blockUnfold(updateProperties)()"><i class="fa fa-pencil-square"></i> ' + getText('Edit Info') + '</a></div>' : '');
+					topDesc = topDesc + ' <div class="sidebar_share"> ' /*+ getText('Share')*/ + '<div class="addthis_sharing_toolbox addthis_default_style" style="display:inline-block"><a class="addthis_button_preferred_1"></a> <a class="addthis_button_preferred_2"></a>  <a class="addthis_button_preferred_3"></a>  <a class="addthis_button_preferred_4"></a> <a class="addthis_button_compact"></a></div> </div>' + (is_editor ? '<div class="sidebar_edit"><a href="#" class="sidebar-edit-button"><i class="fa fa-pencil-square"></i> ' + getText('Edit Info') + '</a></div>' : '');
 				}
 
 				if (graph_tags.trim() != "") {
@@ -1917,7 +1917,7 @@ function main() {
 
 		} else if (cellType == "Ghost") {
 			bottomDesc = descBase + "This item is a 'Ghost' of another primitive. It mirrors the values and properties of its source primitive. You cannot edit the properties of the Ghost. You need to instead edit the properties of its source.";
-			bottomDesc = bottomDesc + "<center style='padding-top: 6px'><a href='#' onclick='var x = findID(getSelected()[0].getAttribute(\"Source\"));highlight(x);'>Show Source <i class='fa fa-angle-right '></i></a></center>" + descriptionLink("/ghosting", "Ghosts");
+			bottomDesc = bottomDesc + "<center style='padding-top: 6px'><a href='#' class='find-source-button'>Show Source <i class='fa fa-angle-right'></i></a></center>" + descriptionLink("/ghosting", "Ghosts");
 
 		} else if (cellType == "Converter") {
 			bottomDesc = descBase + "Converters store a table of input and output data. When the input source takes on one of the input values, the converter takes on the corresponding output value. If no specific input value exists for the current input source value, then the nearest input neighbors are averaged. " + descriptionLink("/converters", "Converters");
@@ -1995,6 +1995,13 @@ function main() {
 
 
 		createGrid(properties, topItems, bottomItems, cell);
+
+		$('.find-source-button').click(() => {
+			highlight(findID(getSelected()[0].getAttribute('Source')));
+		});
+		$('.sidebar-edit-button').click(() => {
+			blockUnfold(updateProperties)();
+		})
 
 
 		if (drupal_node_ID != -1) {

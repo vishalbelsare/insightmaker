@@ -85,7 +85,6 @@ function innerRunSimulation(config) {
 	simulate = new Simulator();
 
 	if (config.resultsWindow) {
-		//console.log("ABC")
 		simulate.resultsWindow = config.resultsWindow;
 	}
 
