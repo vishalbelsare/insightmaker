@@ -1249,11 +1249,6 @@ function main() {
 	});
 
 
-	keyHandler.bindControlKey(80, printGraph);
-
-
-
-
 	graph.getSelectionModel().addListener(mxEvent.CHANGE, function (sender, evt) {
 
 		selectionChanged(false);

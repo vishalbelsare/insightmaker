@@ -1380,10 +1380,6 @@ var RibbonPanel = function (graph, mainPanel, configPanel) {
 									findNext();
 								}
 							}
-						}, '-', {
-							text: getText("Print..."),
-							glyph: 0xf02f,
-							handler: printGraph
 						},
 						'-', {
 							itemId: "zoomMenuButton",
@@ -1518,10 +1514,8 @@ var RibbonPanel = function (graph, mainPanel, configPanel) {
 							}
 						}, '-',
 						{
-							/*hidden: (!is_editor),*/
 							itemId: 'textBut',
 							text: getText('Complete Equation List'),
-							/*glyph: 0xf03a,*/
 							tooltip: getText('A listing of all equations in the Insight'),
 							handler: textEquations,
 							scope: this

@@ -10,7 +10,7 @@ terms of the Insight Maker Public License (https://InsightMaker.com/impl).
 
 function textEquations() {
 
-	var html = "<table style='width:100%'>";
+	var html = "<table style='width:100%' id='equation-list-table'>";
 
 	var odd = true;
 
@@ -116,7 +116,7 @@ function textEquations() {
 
 	html += "</table>";
 
-	var tab = Ext.create("Ext.tab.Panel", {
+	Ext.create("Ext.tab.Panel", {
 		xtype: "tabpanel",
 		layout: "fit",
 		activeTab: 0,
@@ -178,6 +178,18 @@ function textEquations() {
 		height: Math.min(Ext.getBody().getViewSize().height, 500),
 		items: [{ title: getText("Insight Equations"), xtype: "box", html: html, style: "background-color: white", autoScroll: true }],
 		buttons: [
+			{
+				scale: "large",
+				text: getText('Select All'),
+				handler: function () {
+					const selection = window.getSelection();
+					selection.removeAllRanges();
+
+					const range = document.createRange();
+					range.selectNode(document.querySelector('#equation-list-table'));
+					selection.addRange(range);
+				}
+			},
 			"->",
 			{
 				scale: "large",

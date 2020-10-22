@@ -336,7 +336,6 @@ function setPicture(cell) {
 			styleString = mxUtils.setStyle(styleString, "shape", "ellipse");
 		}
 	} else {
-		//alert(cell.getAttribute("Image"));
 		if (urlImage(cell)) {
 			styleString = mxUtils.setStyle(styleString, "image", cell.getAttribute("Image"));
 		} else {
@@ -358,12 +357,11 @@ function setPicture(cell) {
 
 	graph.getModel().execute(edit);
 
-	//cell.setStyle(styleString);
 	propagateGhosts(cell);
 }
 
-function setLabelPosition(cell) {
 
+function setLabelPosition(cell) {
 
 	var labelPos = cell.getAttribute("LabelPosition");
 
@@ -415,9 +413,9 @@ function setLabelPosition(cell) {
 
 	graph.getModel().execute(edit);
 
-	//cell.setStyle(styleString);
 	propagateGhosts(cell);
 }
+
 
 function removeAgent(cell) {
 	var items = primitives("Agents");
@@ -427,6 +425,7 @@ function removeAgent(cell) {
 		}
 	}
 }
+
 
 function deletePrimitive(cell) {
 	var myCells = primitives();
@@ -474,6 +473,7 @@ function deletePrimitive(cell) {
 	}
 }
 
+
 function linkBroken(edge) {
 	var myCells = primitives();
 	for (var i = 0; i < myCells.length; i++) {
@@ -481,13 +481,13 @@ function linkBroken(edge) {
 			testConverterSource(myCells[i]);
 		}
 		/*else if(myCells[i].value.nodeName == "Agents") {
-            var source = myCells[i].getAttribute("Agent");
+						var source = myCells[i].getAttribute("Agent");
 			if(source){
 				if(! connected(myCells[i], findID(source))){
 					myCells[i].setAttribute("Agent", "");
 				}
 			}
-        }*/
+				}*/
 	}
 	if ((edge.getTerminal(false) !== null) && edge.getTerminal(false).value.nodeName == "Converter") {
 		if (typeof (edge.getTerminal(true)) != "undefined") {
@@ -498,6 +498,7 @@ function linkBroken(edge) {
 	}
 
 }
+
 
 function testConverterSource(target) {
 	var neigh = neighborhood(target);
@@ -514,15 +515,15 @@ function testConverterSource(target) {
 	}
 }
 
+
 function downloadModel() {
 	var data = getGraphXml(graph);
 	surpressCloseWarning = true;
 	document.getElementById('downloader').title.value = encodeURIComponent(graph_title);
 	document.getElementById('downloader').code.value = encodeURIComponent(data);
-	document.getElementById('downloader').submit()
-	//alert(encodeURIComponent(data));
-	//location.href = "/builder/downloader.php?code=" + encodeURIComponent(data) + "&title=" + encodeURIComponent(graph_title);
+	document.getElementById('downloader').submit();
 }
+
 
 function getSetting() {
 	var myCells = primitives();
@@ -536,9 +537,11 @@ function getSetting() {
 	return null;
 }
 
+
 function handelCursors() {
 	graph.container.style.cursor = 'auto';
 }
+
 
 var propertiesWin;
 
@@ -764,9 +767,11 @@ function updateProperties() {
 	Ext.getCmp("sinsightTitle").focus(true, 300);
 }
 
+
 function isTrue(item) {
 	return (item != "false" && item != "No" && item != 0) && (item == 1 || item == -1 || item == "True" || item == "true" || item == true || item == "Yes");
 }
+
 
 function customUnits() {
 	if (typeof (getSetting().getAttribute("Units")) != "undefined") {
@@ -794,6 +799,7 @@ function orig(cell) {
 	}
 }
 
+
 function currentStyleIs(val) {
 	var tmp = graph.getCellStyle(graph.getSelectionCell())[mxConstants.STYLE_FONTSTYLE];
 	for (var i = 3; i >= 1; i--) {
@@ -804,6 +810,7 @@ function currentStyleIs(val) {
 	}
 	return (tmp >= val);
 }
+
 
 function setStyles() {
 	if ((!is_embed) && is_editor) {
@@ -828,6 +835,7 @@ function setStyles() {
 	}
 }
 
+
 function stringArray(items, comma, and) {
 	if (items.length == 0) {
 		return "";
@@ -841,11 +849,13 @@ function stringArray(items, comma, and) {
 	}
 }
 
+
 function quickLabel(label, title, objects) {
 	var setting = getSetting();
 
 	return processLabel(label, title, objects, setting.getAttribute("TimeUnits"), setting.getAttribute("TimeStep"), setting.getAttribute("SolutionAlgorithm"));
 }
+
 
 function processLabel(label, title, objects, units, timeStep, algorithm) {
 	var ph = "<PERCENTSIGNPLACEHOLDER>";
@@ -862,6 +872,7 @@ function processLabel(label, title, objects, units, timeStep, algorithm) {
 	return clean(label);
 }
 
+
 function replaceAll(txt, replace, with_this) {
 
 	if (isUndefined(txt)) {
@@ -870,15 +881,18 @@ function replaceAll(txt, replace, with_this) {
 	return txt.replace(new RegExp(replace, 'g'), with_this);
 }
 
+
 function loadBackgroundColor() {
 	mxPanel.el.dom.style["background-color"] = getSetting().getAttribute("BackgroundColor");
 
 	mxPanel.el.dom.style.backgroundColor = getSetting().getAttribute("BackgroundColor");
 }
 
+
 function isUndefined(item) {
 	return typeof item == "undefined";
 }
+
 
 function isDefined(item) {
 	return !isUndefined(item);
@@ -889,6 +903,7 @@ function isTouch() {
 	return mxClient.IS_TOUCH;
 }
 
+
 function propagateGhosts(cell) {
 	var ghosts = primitives("Ghost");
 	for (var i = 0; i < ghosts.length; i++) {
@@ -896,12 +911,12 @@ function propagateGhosts(cell) {
 			var style = cell.getStyle();
 			style = mxUtils.setStyle(style, "opacity", 30);
 			ghosts[i].setStyle(style);
-			//console.log(cell.getAttribute("name"));
 			var edit = setAttributeUndoable(ghosts[i], "name", cell.getAttribute("name"));
 
 		}
 	}
 }
+
 
 function propagateName(cell, oldName) {
 	if (isValued(cell)) {
@@ -930,6 +945,7 @@ function propagateName(cell, oldName) {
 	}
 }
 
+
 function map(val, fn) {
 	if (val instanceof Array) {
 		return val.map(fn);
@@ -937,6 +953,7 @@ function map(val, fn) {
 		return fn(val);
 	}
 }
+
 
 function unitsUsedInModel() {
 	var items = primitives();
@@ -950,6 +967,7 @@ function unitsUsedInModel() {
 	return Ext.Array.unique(us);
 }
 
+
 function changeNodeName(node, newName) {
 	var doc = mxUtils.createXmlDocument();
 	var newNode = doc.createElement(newName);
@@ -960,6 +978,7 @@ function changeNodeName(node, newName) {
 	return newNode;
 }
 
+
 function cmd(key) {
 	if (mxClient.IS_MAC) {
 		return "<span style='color:grey'>(&#8984;" + key + ")</span>";
@@ -967,6 +986,7 @@ function cmd(key) {
 		return "<span style='color:grey'>(Ctrl-" + key + ")</span>";
 	}
 }
+
 
 function inAgent(cell) {
 	if ((!cell) || cell == null) {
@@ -983,6 +1003,7 @@ function inAgent(cell) {
 	return inAgent(p);
 }
 
+
 function parentAgent(cell) {
 	if ((!cell) || cell == null) {
 		return undefined;
@@ -997,6 +1018,7 @@ function parentAgent(cell) {
 	}
 	return parentAgent(p);
 }
+
 
 function isGray(color) {
 	if (isUndefined(color)) {
@@ -1185,16 +1207,6 @@ function colourNameToHex(colour) {
 }
 
 
-function printGraph() { // P
-	var pageCount = mxUtils.prompt(getText('Enter page count for printing') + ":", '1');
-
-	if (pageCount != null) {
-		var scale = mxUtils.getScaleForPageCount(pageCount, graph);
-		var preview = new mxPrintPreview(graph, scale);
-		preview.open();
-	}
-}
-
 function flatten(arr) {
 	var r = [];
 
@@ -1304,6 +1316,7 @@ function deepClone(target, obj, depth, fn) {
 	return target;
 
 }
+
 
 function exportSvg() {
 	var scale = graph.view.scale;
