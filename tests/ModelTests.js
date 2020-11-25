@@ -2,7 +2,7 @@
 "use strict";
 /*
 
-Copyright 2010-2016 Scott Fortmann-Roe. All rights reserved.
+Copyright 2010-2020 Scott Fortmann-Roe. All rights reserved.
 
 This file may distributed and/or modified under the
 terms of the Insight Maker Public License (http://insightMaker.com/impl).
@@ -1510,6 +1510,17 @@ function testUnitsAndConstraints() {
 	assertEqual("Constraints Error", runModel(true).error, "none");
 
 
+	// test square root and units
+	clearModel();
+
+	x = createPrimitive("tester", "Variable", [0, 0], [100, 10]);
+	setValue(x, "sqrt({4 square meters}) * {3 square meters}");
+	setUnits(x, "meters^3");
+
+
+	var res = runModel(true);
+	assertEqual("Sqrt units", res.error, "none");
+	assertEqual("Sqrt units 2", res.value(x)[10], 6);
 }
 
 

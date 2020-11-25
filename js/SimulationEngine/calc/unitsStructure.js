@@ -1,7 +1,7 @@
 "use strict";
 /*
 
-Copyright 2010-2018 Scott Fortmann-Roe. All rights reserved.
+Copyright 2010-2020 Scott Fortmann-Roe. All rights reserved.
 
 This file may distributed and/or modified under the
 terms of the Insight Maker Public License (https://InsightMaker.com/impl).
@@ -10,7 +10,7 @@ terms of the Insight Maker Public License (https://InsightMaker.com/impl).
 
 var unitsBank = {};
 
-function sortAndCollapseUnits(names, exponents){
+function sortAndCollapseUnits(names, exponents) {
 	if (names.length <= 1) {
 		if (names.length == 1) {
 			names[0] = names[0].toLowerCase();
@@ -23,7 +23,7 @@ function sortAndCollapseUnits(names, exponents){
 				exponent: exponents[i]
 			});
 		}
-		sorter.sort(function(a, b) {
+		sorter.sort(function (a, b) {
 			return a.name.localeCompare(b.name);
 		});
 		names = [];
@@ -43,7 +43,7 @@ function sortAndCollapseUnits(names, exponents){
 					j--;
 				}
 			}
-			
+
 			if (exponents[i] == 0) {
 				names.splice(i, 1);
 				exponents.splice(i, 1)
@@ -51,8 +51,8 @@ function sortAndCollapseUnits(names, exponents){
 			}
 		}
 	}
-	
-	return {names: names, exponents: exponents};
+
+	return { names: names, exponents: exponents };
 }
 
 function getUnitStore(names, exponents, checkNames) {
@@ -60,7 +60,7 @@ function getUnitStore(names, exponents, checkNames) {
 		var x = sortAndCollapseUnits(names, exponents);
 		names = x.names;
 		exponents = x.exponents;
-		
+
 	}
 
 	if (names.length == 0) {
@@ -68,12 +68,12 @@ function getUnitStore(names, exponents, checkNames) {
 	}
 
 	var id = getUnitsId(names, exponents);
-	
+
 	if (!unitsBank[id]) {
-		
+
 		unitsBank[id] = new UnitStore(names, exponents);
 	}
-	
+
 	return unitsBank[id];
 }
 
@@ -91,30 +91,30 @@ function UnitStore(names, exponents) {
 	this.id = getUnitsId(this.names, this.exponents);
 }
 
-UnitStore.prototype.addBase = function() {
+UnitStore.prototype.addBase = function () {
 
-	
+
 	if (this.toBase) {
 		return;
 	}
-	
+
 	this.toBase = 1;
-	
-	
+
+
 	var names = this.names.slice();
-	var exponents =  this.exponents.slice();
-	
+	var exponents = this.exponents.slice();
+
 	var modified = true;
 	while (modified) {
 		modified = false;
-		
+
 		for (var i = names.length - 1; i >= 0; i--) {
 			var j = findSourceIndex(names[i]);
-			if (j !== -1 && ! ( conUnitTargets[j].names.length == 1 && conUnitTargets[j].names[0] == names[i] )) {
+			if (j !== -1 && !(conUnitTargets[j].names.length == 1 && conUnitTargets[j].names[0] == names[i])) {
 				this.toBase = fn["*"](this.toBase, fn.expt(conScalings[j], exponents[i]));
 				names = names.concat(conUnitTargets[j].names);
 				names.splice(i, 1);
-				exponents = exponents.concat(conUnitTargets[j].exponents.map(function(x){ return x*exponents[i] }))
+				exponents = exponents.concat(conUnitTargets[j].exponents.map(function (x) { return x * exponents[i] }))
 				exponents.splice(i, 1);
 				modified = true;
 				break;
@@ -124,82 +124,82 @@ UnitStore.prototype.addBase = function() {
 	//console.log(names)
 	//console.log(exponents)
 	var x = sortAndCollapseUnits(names, exponents);
-	
-	this.baseUnits =  getUnitStore(x.names, x.exponents);
-	
+
+	this.baseUnits = getUnitStore(x.names, x.exponents);
+
 }
 
-UnitStore.prototype.power = function(exponent){
+UnitStore.prototype.power = function (exponent) {
 	var names = this.names.slice();
 	var exponents = this.exponents.slice();
-	for(var i = 0; i < exponents.length; i++){
-		exponents[i] = exponents[i]*exponent;
+	for (var i = 0; i < exponents.length; i++) {
+		exponents[i] = exponents[i] * exponent;
 	}
 	return getUnitStore(names, exponents);
 }
 
 
-UnitStore.prototype.toStringShort = function() {
-  var s = "";
-  for (var i = 0; i < this.names.length; i++) {
-    if (s != "") {
-      s = s + ",";
-    }
-    s = s + this.names[i];
-    if (this.exponents[i] != 1) {
-      s = s + "^" + this.exponents[i];
-    }
-  }
-  return s;
+UnitStore.prototype.toStringShort = function () {
+	var s = "";
+	for (var i = 0; i < this.names.length; i++) {
+		if (s != "") {
+			s = s + ",";
+		}
+		s = s + this.names[i];
+		if (this.exponents[i] != 1) {
+			s = s + "^" + this.exponents[i];
+		}
+	}
+	return s;
 }
 
-UnitStore.prototype.multiply = function(rhs, exponent) {
-	var id = rhs.id+";"+exponent;
-	
-	
-	if(! this.multiples[id]){
-		if(! this.toBase){
+UnitStore.prototype.multiply = function (rhs, exponent) {
+	var id = rhs.id + ";" + exponent;
+
+
+	if (!this.multiples[id]) {
+		if (!this.toBase) {
 			this.addBase();
 		}
-		if(! rhs.toBase){
+		if (!rhs.toBase) {
 			rhs.addBase();
 		}
-		
-		if(this.baseUnits){
+
+		if (this.baseUnits) {
 			var names = this.baseUnits.names.slice();
 			var exponents = this.baseUnits.exponents.slice();
-		
 
-			if(rhs.baseUnits){
+
+			if (rhs.baseUnits) {
 				for (var i = 0; i < rhs.baseUnits.names.length; i++) {
 					var j = names.indexOf(rhs.baseUnits.names[i]);
 					if (j != -1) {
 						exponents[j] = exponents[j] + rhs.baseUnits.exponents[i] * exponent;
 					} else {
 						var found = false;
-						for(var k = 0; k < names.length; k++){
-							if(rhs.baseUnits.names[i] < names[k]){
+						for (var k = 0; k < names.length; k++) {
+							if (rhs.baseUnits.names[i] < names[k]) {
 								names.splice(k, 0, rhs.baseUnits.names[i]);
 								exponents.splice(k, 0, rhs.baseUnits.exponents[i] * exponent)
 								found = true;
 								break;
 							}
 						}
-						if(! found){
+						if (!found) {
 							names.push(rhs.baseUnits.names[i]);
 							exponents.push(rhs.baseUnits.exponents[i] * exponent);
 						}
 					}
 				}
-		
-				for(var i = exponents.length-1; i >= 0; i--){
-					if( exponents[i] == 0){
+
+				for (var i = exponents.length - 1; i >= 0; i--) {
+					if (exponents[i] == 0) {
 						exponents.splice(i, 1);
 						names.splice(i, 1);
 					}
 				}
 			}
-		}else{
+		} else {
 			var names = rhs.baseUnits.names.slice();
 			var exponents = rhs.baseUnits.exponents.slice();
 		}
@@ -227,14 +227,14 @@ function unitsFromString(expandString) {
 }
 
 var titleCaseReg = /\w\S*/g;
-var titleCaseFunc = function(txt) {
+var titleCaseFunc = function (txt) {
 	return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
 };
 
 function toTitleCase(str) {
 	return str.replace(titleCaseReg, titleCaseFunc);
 }
-UnitStore.prototype.toString = function() {
+UnitStore.prototype.toString = function () {
 	var n = "",
 		den = "";
 	var numItems = 0,
@@ -260,8 +260,8 @@ UnitStore.prototype.toString = function() {
 			}
 		}
 	}
-		
-		
+
+
 	if (n == "") {
 		n = "Unitless";
 	}
@@ -277,28 +277,28 @@ UnitStore.prototype.toString = function() {
 
 
 function convertUnits(source, target, loose) {
-	if(source === target) {
+	if (source === target) {
 		return 1;
 	}
-	if((source && (! target)) || (target && (! source))){
-		if(loose){
+	if ((source && (!target)) || (target && (!source))) {
+		if (loose) {
 			return 1
-		}else{
+		} else {
 			return 0;
 		}
 	}
-	
-	if(! source.toBase){
+
+	if (!source.toBase) {
 		source.addBase()
 	}
-	if(! target.toBase){
+	if (!target.toBase) {
 		target.addBase()
 	}
 
 	if (source.baseUnits !== target.baseUnits) {
 		return 0;
 	}
-	
+
 	return fn["/"](source.toBase, target.toBase);
 }
 
