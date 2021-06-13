@@ -36,7 +36,6 @@ function sendGraphtoServer(graph) {
 					title: graph_title,
 					description: graph_description,
 					tags: graph_tags,
-					has_article: has_article,
 					published: published,
 					groups: JSON.stringify(node_groups)
 				}
@@ -1011,7 +1010,6 @@ function parentAgent(cell) {
 
 	var p = getParent(cell);
 	if (p) {
-		//console.log(p);
 		if (p.getAttribute("Type") == "Agent") {
 			return p;
 		}
@@ -1031,7 +1029,7 @@ function isGray(color) {
 		c = colourNameToHex(color);
 	}
 	if (c == "#6482B9") {
-		return true; //treat flows as grey alwayse
+		return true; // treat flows as grey always
 	}
 	var start = c[1];
 	if (c.length == 4) {

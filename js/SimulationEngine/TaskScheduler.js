@@ -189,320 +189,309 @@ t.toString()
 */
 
 
-function TaskQueue(config) {
-	config = config || {};
-	this.tasks = new RedBlackTree();
-	this.onMoveEvents = [];
-	this.setTime(config.start);
-	this.debug = false;
-	this.end = config.end;
-	this.states = {};
-}
-
-TaskQueue.prototype.print = function () {
-	console.log("Current Time: " + this.time.value);
-	this.tasks.goMin();
-	while (this.tasks.current() !== null) {
-		console.log(this.tasks.current().name);
-		console.log("    Time: " + this.tasks.current().time.value);
-		console.log("    Priority: " + this.tasks.current().priority);
-		if (isDefined(this.tasks.current().expires)) {
-			console.log("    Expires: " + this.tasks.current().expires);
-		}
-		if (isDefined(this.tasks.current().skip)) {
-			console.log("    Skip: " + this.tasks.current().skip);
-		}
-		this.tasks.next()
+class TaskQueue {
+	constructor(config) {
+		config = config || {};
+		this.tasks = new RedBlackTree();
+		this.onMoveEvents = [];
+		this.setTime(config.start);
+		this.debug = false;
+		this.end = config.end;
+		this.states = {};
 	}
-}
 
-TaskQueue.prototype.addEvent = function (event) {
-	this.onMoveEvents.push(event)
-}
-
-TaskQueue.prototype.fireEvents = function (timeChange, oldTime, newTime) {
-	if (this.debug) {
-		console.log("Firing Events")
-	}
-	for (var i = 0; i < this.onMoveEvents.length; i++) {
-		this.onMoveEvents[i](timeChange, oldTime, newTime);
-	}
-}
-
-TaskQueue.prototype.setTime = function (t) {
-	if (isUndefined(this.time) || neq(t, this.time)) {
-		var oldTime = this.time;
-
-		this.time = t;
-
-		if (isDefined(oldTime)) {
-			this.fireEvents(minus(t, oldTime), oldTime, t);
-		}
-
-	}
-}
-
-TaskQueue.prototype.moveTime = function (timeChange) {
-	if (this.debug) {
-		console.log("Shifting time by: " + timeChange.value);
-	}
-	this.moveTo(timePlus(this.time, timeChange));
-}
-
-TaskQueue.prototype.moveTo = function (newTime) {
-	if (eq(this.time, newTime)) {
-		return;
-	} else {
-		if (this.debug) {
-			console.log("Shifting time to: " + newTime.value);
-		}
-
-		if (this.tasks.current() !== null) { // we have something defined
-			var maxTime = this.tasks.max().time;
-			var minTime = this.tasks.min().time;
-
-			while (lessThan(this.time, newTime) && (!greaterThan(this.time, maxTime))) {
-				this.step()
-			}
-			while (greaterThan(this.time, newTime) && greaterThan(this.time, minTime)) {
-				this.stepBack();
-			}
-		}
-
-		this.setTime(newTime);
-
-		if (this.debug) {
-			console.log("Time shift to  " + newTime.value + " completed.");
-		}
-	}
-}
-
-TaskQueue.prototype.add = function (task) {
-	task.queue = this;
-
-	this.tasks.add(task);
-}
-
-TaskQueue.prototype.step = function () {
-	if (isUndefined(this.time)) {
+	print() {
+		console.log("Current Time: " + this.time.value);
 		this.tasks.goMin();
-		this.setTime(this.tasks.current().time);
+		while (this.tasks.current() !== null) {
+			console.log(this.tasks.current().name);
+			console.log("    Time: " + this.tasks.current().time.value);
+			console.log("    Priority: " + this.tasks.current().priority);
+			if (isDefined(this.tasks.current().expires)) {
+				console.log("    Expires: " + this.tasks.current().expires);
+			}
+			if (isDefined(this.tasks.current().skip)) {
+				console.log("    Skip: " + this.tasks.current().skip);
+			}
+			this.tasks.next()
+		}
 	}
 
-	var t = this.tasks.current().time;
-	//debugger;
+	addEvent(event) {
+		this.onMoveEvents.push(event)
+	}
+	
+	fireEvents(timeChange, oldTime, newTime) {
+		if (this.debug) {
+			console.log("Firing Events")
+		}
+		for (var i = 0; i < this.onMoveEvents.length; i++) {
+			this.onMoveEvents[i](timeChange, oldTime, newTime);
+		}
+	}
 
-	//	console.log("--")
-	if (this.tasks.current() !== null /*&& eq(t, this.tasks.current().time)*/) {
-		var dead = this.tasks.current().deadAction;
-		this.tasks.current().execute();
-		if ((!dead) && this.tasks.current().timeShift) {
-			this.tasks.current().timeShift()
+	setTime(t) {
+		if (isUndefined(this.time) || neq(t, this.time)) {
+			var oldTime = this.time;
+
+			this.time = t;
+
+			if (isDefined(oldTime)) {
+				this.fireEvents(minus(t, oldTime), oldTime, t);
+			}
+
+		}
+	}
+
+	moveTime(timeChange) {
+		if (this.debug) {
+			console.log("Shifting time by: " + timeChange.value);
+		}
+		this.moveTo(timePlus(this.time, timeChange));
+	}
+
+	moveTo(newTime) {
+		if (eq(this.time, newTime)) {
+			return;
+		} else {
+			if (this.debug) {
+				console.log("Shifting time to: " + newTime.value);
+			}
+
+			if (this.tasks.current() !== null) { // we have something defined
+				var maxTime = this.tasks.max().time;
+				var minTime = this.tasks.min().time;
+
+				while (lessThan(this.time, newTime) && (!greaterThan(this.time, maxTime))) {
+					this.step()
+				}
+				while (greaterThan(this.time, newTime) && greaterThan(this.time, minTime)) {
+					this.stepBack();
+				}
+			}
+
+			this.setTime(newTime);
+
+			if (this.debug) {
+				console.log("Time shift to  " + newTime.value + " completed.");
+			}
+		}
+	}
+
+	add(task) {
+		task.queue = this;
+
+		this.tasks.add(task);
+	}
+
+	step() {
+		if (isUndefined(this.time)) {
+			this.tasks.goMin();
+			this.setTime(this.tasks.current().time);
+		}
+
+		var t = this.tasks.current().time;
+		//debugger;
+
+		//	console.log("--")
+		if (this.tasks.current() !== null /*&& eq(t, this.tasks.current().time)*/) {
+			var dead = this.tasks.current().deadAction;
+			this.tasks.current().execute();
+			if ((!dead) && this.tasks.current().timeShift) {
+				this.tasks.current().timeShift()
+				return;
+			}
+			//console.log(this.tasks.current());
+			this.tasks.next();
+		}
+
+		//	console.log(this.tasks.current());
+
+		if (this.tasks.current() !== null) {
+			this.setTime(this.tasks.current().time);
+		} else {
+			//		console.log("null");
+			this.tasks.next();
+			//		console.log(this.tasks.current())
+			this.setTime(mult(this.tasks.max().time, new Material(10)));
+		}
+	}
+
+	stepBack() {
+		if (isUndefined(this.time)) {
+			this.tasks.goMin();
+			this.setTime(this.tasks.current().time);
 			return;
 		}
-		//console.log(this.tasks.current());
-		this.tasks.next();
-	}
 
-	//	console.log(this.tasks.current());
+		if (this.tasks.current() === null) {
+			this.tasks.goMax();
+		} else {
+			this.tasks.previous();
+		}
 
-	if (this.tasks.current() !== null) {
+		var t = this.tasks.current().time;
+		while (this.tasks.current() !== null && eq(t, this.tasks.current().time)) {
+			this.tasks.current().rollback();
+			this.tasks.previous();
+		}
+
+		if (this.tasks.current() === null) {
+			this.tasks.goMin();
+		} else {
+			this.tasks.next();
+		}
+
 		this.setTime(this.tasks.current().time);
-	} else {
-		//		console.log("null");
-		this.tasks.next();
-		//		console.log(this.tasks.current())
-		this.setTime(mult(this.tasks.max().time, new Material(10)));
-	}
-}
-
-TaskQueue.prototype.stepBack = function () {
-	if (isUndefined(this.time)) {
-		this.tasks.goMin();
-		this.setTime(this.tasks.current().time);
-		return;
 	}
 
-	if (this.tasks.current() === null) {
-		this.tasks.goMax();
-	} else {
-		this.tasks.previous();
+	atStart() {
+		return isUndefined(this.time) || this.tasks.current() === this.tasks.min();
 	}
 
-	var t = this.tasks.current().time;
-	while (this.tasks.current() !== null && eq(t, this.tasks.current().time)) {
-		this.tasks.current().rollback();
-		this.tasks.previous();
+	completed() {
+		return isDefined(this.time) && (greaterThan(this.time, this.end) || (this.tasks.current() === null));
 	}
 
-	if (this.tasks.current() === null) {
-		this.tasks.goMin();
-	} else {
-		this.tasks.next();
+	remove(task) {
+		if (task == this.tasks.current()) {
+			this.tasks.next();
+		}
+		this.tasks.remove(task);
 	}
-
-	this.setTime(this.tasks.current().time);
-}
-
-TaskQueue.prototype.atStart = function () {
-	return isUndefined(this.time) || this.tasks.current() === this.tasks.min();
-}
-
-TaskQueue.prototype.completed = function () {
-	return isDefined(this.time) && (greaterThan(this.time, this.end) || (this.tasks.current() === null));
-}
-
-TaskQueue.prototype.remove = function (task) {
-	//var c;
-	if (task == this.tasks.current()) {
-		//console.log("overlap!!!")
-		//console.log(this.time.value);
-		this.tasks.next();
-		//if(this.tasks.current() !== null){
-		//	this.setTime(this.tasks.current().time);
-		//}else{
-		//	this.tasks.next();
-		//	this.setTime(mult(this.tasks.max().time, new Material(10)));
-		//}
-		//var c = this.tasks._cursor;
-	}
-	this.tasks.remove(task);
-	//if(c){
-	//	this.tasks._cursor = c;
-	//console.log(this.time.value);
-	//console.log(this.tasks.current().name);
-	//}
 }
 
 var TaskId = 0
 // new Take({name: "solver", time: t, action: fn(), rollback: fn(), priority: -10, expires: 1})
-function Task(config) {
-	this.id = TaskId++;
-	this.name = config.name;
-	this.time = config.time;
-	this.action = config.action;
-	this.reverse = config.rollback;
-	this.priority = config.priority || 0; // Lower priorities will be run before higher priorities at the same time
-	this.expires = config.expires; // if defined, the number of times this is called before it expires
-	this.skip = config.skip;
-	this.timeShift = config.timeShift;
-	this.data = config.data; //optional data object to be carried along, the task scheduler makes no use of this
-	this.blocker = config.blocker;
+class Task {
+	constructor(config) {
+		this.id = TaskId++;
+		this.name = config.name;
+		this.time = config.time;
+		this.action = config.action;
+		this.reverse = config.rollback;
+		this.priority = config.priority || 0; // Lower priorities will be run before higher priorities at the same time
+		this.expires = config.expires; // if defined, the number of times this is called before it expires
+		this.skip = config.skip;
+		this.timeShift = config.timeShift;
+		this.data = config.data; //optional data object to be carried along, the task scheduler makes no use of this
+		this.blocker = config.blocker;
 
-	this.deadAction = false; // once dead no longer executes
-	this.deadReverse = false; // once dead no longer executes
+		this.deadAction = false; // once dead no longer executes
+		this.deadReverse = false; // once dead no longer executes
 
-	if (this.action) {
-		this.action.task = this;
+		if (this.action) {
+			this.action.task = this;
+		}
+		if (this.reverse) {
+			this.action.reverse = this
+		}
+
 	}
-	if (this.reverse) {
-		this.action.reverse = this
-	}
 
-}
+	execute() {
+		if (this.action && (!this.deadAction) && ((!this.blocker) || !this.queue.states[this.blocker])) {
+			if (isDefined(this.skip) && this.skip > 0) {
+				this.skip--;
+				if (this.queue.debug) {
+					console.log("Skipping: " + this.name);
+				}
+			} else {
+				if (this.queue.debug) {
+					console.log("%c Executing: " + this.name + " (Time: " + this.time.value + ")", "color:blue");
+				}
 
-Task.prototype.execute = function () {
-	if (this.action && (!this.deadAction) && ((!this.blocker) || !this.queue.states[this.blocker])) {
-		if (isDefined(this.skip) && this.skip > 0) {
-			this.skip--;
-			if (this.queue.debug) {
-				console.log("Skipping: " + this.name);
+				if (isDefined(this.expires)) {
+					this.expires--;
+					if (this.queue.debug) {
+						console.log("    Current count before expire: " + this.expires);
+					}
+					if (this.expires <= 0) {
+						if (this.queue.debug) {
+							console.log("    Task expired.");
+						}
+						this.deadAction = true;
+					}
+				}
 			}
-		} else {
+
+
+			this.action();
+		}
+	}
+
+	rollback() {
+		if (this.reverse && (!this.deadReverse) && ((!this.blocker) || !this.queue.states[this.blocker])) {
 			if (this.queue.debug) {
-				console.log("%c Executing: " + this.name + " (Time: " + this.time.value + ")", "color:blue");
+				console.log("Rolling back: " + this.name + " (Time: " + this.time.value + ")");
 			}
 
 			if (isDefined(this.expires)) {
-				this.expires--;
-				if (this.queue.debug) {
-					console.log("    Current count before expire: " + this.expires);
-				}
 				if (this.expires <= 0) {
 					if (this.queue.debug) {
-						console.log("    Task expired.");
+						console.log("    Rollback expired.");
 					}
-					this.deadAction = true;
+					this.deadReverse = true;
 				}
 			}
+
+			this.reverse();
 		}
-
-
-		this.action();
 	}
-}
 
-Task.prototype.rollback = function () {
-	if (this.reverse && (!this.deadReverse) && ((!this.blocker) || !this.queue.states[this.blocker])) {
-		if (this.queue.debug) {
-			console.log("Rolling back: " + this.name + " (Time: " + this.time.value + ")");
-		}
+	reschedule(newTime) {
+		this.queue.remove(this);
+		this.time = newTime;
+		this.queue.add(this);
+	}
 
-		if (isDefined(this.expires)) {
-			if (this.expires <= 0) {
-				if (this.queue.debug) {
-					console.log("    Rollback expired.");
+	remove() {
+		this.queue.remove(this);
+	}
+
+	kill() {
+		this.deadAction = true;
+		this.deadReverse = true;
+	}
+
+	block(id) {
+		id = id || this.blocker;
+		this.queue.states[id] = true;
+	}
+
+	unblock(id) {
+		id = id || this.blocker;
+		this.queue.states[id] = false;
+	}
+
+	compare(other) {
+		if (eq(other.time, this.time)) {
+			if (other.priority == this.priority) {
+				if (other.id == this.id) {
+					return 0;
+				} else if (other.id < this.id) {
+					return 1;
+				} else {
+					return -1;
 				}
-				this.deadReverse = true;
-			}
-		}
-
-		this.reverse();
-	}
-}
-
-Task.prototype.reschedule = function (newTime) {
-	this.queue.remove(this);
-	this.time = newTime;
-	this.queue.add(this);
-}
-
-Task.prototype.remove = function () {
-	this.queue.remove(this);
-}
-
-Task.prototype.kill = function () {
-	this.deadAction = true;
-	this.deadReverse = true;
-}
-
-Task.prototype.block = function (id) {
-	id = id || this.blocker;
-	this.queue.states[id] = true;
-}
-
-Task.prototype.unblock = function (id) {
-	id = id || this.blocker;
-	this.queue.states[id] = false;
-}
-
-Task.prototype.compare = function (other) {
-	if (eq(other.time, this.time)) {
-		if (other.priority == this.priority) {
-			if (other.id == this.id) {
-				return 0;
-			} else if (other.id < this.id) {
-				return 1;
+			} else if (other.priority < this.priority) {
+				return 1
 			} else {
 				return -1;
 			}
-		} else if (other.priority < this.priority) {
-			return 1
 		} else {
-			return -1;
+			if (lessThan(other.time, this.time)) {
+				return 1
+			} else {
+				return -1;
+			}
 		}
-	} else {
-		if (lessThan(other.time, this.time)) {
-			return 1
-		} else {
-			return -1;
-		}
+		throw "Comparison error";
 	}
-	throw "Comparison error";
-}
 
-Task.prototype.toString = function () {
-	return this.name + " - " + this.id;
+	toString() {
+		return this.name + " - " + this.id;
+	}
 }
 
 

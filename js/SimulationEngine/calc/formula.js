@@ -1,7 +1,7 @@
 "use strict";
 /*
 
-Copyright 2010-2018 Scott Fortmann-Roe. All rights reserved.
+Copyright 2010-2020 Scott Fortmann-Roe. All rights reserved.
 
 This file may distributed and/or modified under the
 terms of the Insight Maker Public License (https://InsightMaker.com/impl).
@@ -50,28 +50,11 @@ function bootCalc(){
 }
 
 
-if(! Agent){
-	var Agent = function(){}
-}
-if(! Agents){
-	var Agents = function(){}
-}
 
 var PrimitiveStore = function(primitive, type){
 	this.primitive = primitive;
 	this.type = type; // "value", "totalValue", "object"
 }
-
-/*
-
-var Primitive = function(value){
-	this.val = value;
-}
-Primitive.prototype.value = function(){
-	return this.val;
-}
-primitiveBank["x"] = new Primitive(10);
-primitiveBank["xy"] = new Primitive(5);*/
 
 Boolean.prototype.toNum = function(){
 	return this.valueOf();
@@ -451,28 +434,6 @@ Vector.prototype.equals = function(vec){
 }
 
 
-if(! Primitive){
-	var Primitive = function(n){
-		this.v = n;
-		this.vector = new Vector([],[], VectorBase);
-	}
-	Primitive.prototype.value = function(){
-		return this.v.fullClone();
-	};
-	Primitive.prototype.setValue = function(newValue){
-		this.v = newValue;
-		return newValue;
-	};
-	Primitive.prototype.toNum = function(){
-		return this.v.fullClone();
-	};
-	Primitive.prototype.toString = function(){
-		return "Primitive Reference";
-	};
-	
-	
-}
-
 function strictEquals(a,b){
 	if((a instanceof Agent) || (b instanceof Agent)){
 		if((a instanceof Agent) && (b instanceof Agent)){
@@ -519,9 +480,6 @@ function evaluateTree(root, varBank){
 		}
 	}
 }
-
-var PB = {"test": new Primitive(new Material(3)),"a": new Primitive(new Material(1)),"b": new Primitive(new Material(2)),"c": new Primitive(new Material(3))};
-
 
 function evaluate(input, dontToNum) {
 	//console.log(input);

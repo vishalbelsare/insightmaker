@@ -1,4 +1,3 @@
-
 "use strict";
 /*
 
@@ -262,12 +261,12 @@ function testSubscripting() {
 	setValue(r, "«'males': repeat(3, <<'canada', 'usa', 'mexico'>>), 'females': repeat(-4, <<'canada', 'usa', 'mexico'>>)»");
 	var res = runModel(true);
 	assertEqual("Flow OnlyPositive 1", res.value(a)[10], 2 + 30);
-	assertEqual("Flow OnlyPositive  2", res.value(b)[10], 30 + 0);
+	assertEqual("Flow OnlyPositive 2", res.value(b)[10], 30 + 0);
 
 	setNonNegative(f, false);
 	var res = runModel(true);
-	assertEqual("Flow OnlyPositive  3", res.value(a)[10], 2 + 30);
-	assertEqual("Flow OnlyPositive  4", res.value(b)[10], 30 - 40);
+	assertEqual("Flow OnlyPositive 3", res.value(a)[10], 2 + 30);
+	assertEqual("Flow OnlyPositive 4", res.value(b)[10], 30 - 40);
 
 	setNonNegative(p, true);
 	var res = runModel(true);
@@ -1097,6 +1096,18 @@ function testAgents() {
 	assertEqual("Custom Network 28", res.value(v)[0], 9);
 	assertEqual("Custom Network 29", res.value(v2)[8], 1);
 
+	
+	var exogAdder = createPrimitive("Adder", "Action", [200, 150], [150, 100]);
+	setTriggerType(exogAdder, "Condition");
+	setTriggerValue(exogAdder, "true")
+	setValue(exogAdder, "[Population].add()");
+	createConnector('Connect', 'link', pop, exogAdder);
+	res = runModel(true);
+	assertEqual("Custom Network 29 (add 1)", res.value(v)[10], 19);
+	assertEqual("Custom Network 29 (add 2)", res.value(v2)[10], 1);
+	removePrimitive(exogAdder);
+
+
 	setValue(v, "count(connectionWeight(findIndex([Population], 1), connected(findIndex([Population], 1))))")
 	setValue(v2, "connectionWeight(findIndex([Population], 3), connected(findIndex([Population], 3))){1}")
 	res = runModel(true);
@@ -1149,6 +1160,8 @@ function testAgents() {
 	setValue(mover, "ifthenelse(index(self)==3, connect(self, true),0)");
 	res = runModel(true);
 	assertUnequal("Custom Network 38", res.error, "none");
+
+
 
 
 	setValue(mover, "ifthenelse(index(self)==3, self.connect(true),0)");
@@ -2043,6 +2056,23 @@ function testSimulation() {
 		assertEqual("Conveyor 18", res.value(s)[5], 10);
 		assertEqual("Conveyor 19", res.value(s)[12], 10);
 
+
+		clearModel();
+
+		s = createPrimitive("My Stock", "Stock", [100, 100], [140, 50]);
+		p = createPrimitive("My Variable", "Variable", [100, 100], [140, 50]);
+		l = createConnector("My Link", "Link", s, p)
+		l2 = createConnector("My Link", "Link", p, s)
+		setValue(s, "[My Variable]");
+
+		setStockType(s, "Conveyor");
+		setDelay(s, 5);
+		setValue(p, "[[My Stock]]");
+
+
+		res = runModel(true);
+
+		assertEqual("Circular conveyor initialization", res.error.includes('Circular equation'), true);
 
 
 

@@ -1216,39 +1216,6 @@ function showUnfoldingWin() {
 
 }
 
-function configureArticle() {
-	if (has_article) {
-		Ext.getCmp("articleText").update("<a href='https://InsightMaker.com/article/" + drupal_node_ID + "/" + getURLTitle() + "' target='_blank'>https://InsightMaker.com/article/" + drupal_node_ID + "/" + getURLTitle() + "</a>");
-		Ext.getCmp("articlePublish").hide();
-		Ext.getCmp("articleRefresh").show();
-		Ext.getCmp("articleDelete").show();
-	} else {
-
-		Ext.getCmp("articleText").update("Story article has not been published");
-		Ext.getCmp("articlePublish").show();
-		Ext.getCmp("articleRefresh").hide();
-		Ext.getCmp("articleDelete").hide();
-	}
-}
-
-
-function deleteArticle() {
-	var request = $.ajax({
-		type: "GET",
-		url: "/builder/StoryConverter.php",
-		data: {
-			nid: drupal_node_ID,
-			"delete": "1"
-		}
-	});
-
-
-	has_article = false;
-	saveModel();
-
-	configureArticle();
-}
-
 
 function blockUnfold(fn) {
 	return function () {
